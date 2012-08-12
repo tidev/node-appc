@@ -1,7 +1,7 @@
 ## Overview
 
-This is a common library used by Appcelerator Node.js based software products such as the 
-[Titanium CLI](http://github.com/appcelerator/titanium) and [Alloy](http://github.com/appcelerator/alloy).
+This is a common library used by Appcelerator Node.js-based software products such as the 
+[Titanium CLI](http://github.com/appcelerator/titanium).
 
 <a name="Installation"></a>
 ## Installation
