@@ -20,11 +20,15 @@
 	},
 	"dependencies": {
 		"colors": "0.6.x",
-		"progress": "0.0.5"
+		"progress": "0.0.5",
+		"request": "2.9.x"
 	},
 	"license":"Apache Public License v2",
 	"main": "./lib/appc",
 	"engines": {
 		"node": ">= 0.8.0"
+	},
+	"scripts": {
+		"test": "node tests/run.js"
 	}
 }
