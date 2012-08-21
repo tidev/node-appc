@@ -1,6 +1,7 @@
 var spawn = require('child_process').spawn,
 	exitCode = 0,
 	tests = [
+		'test-fs.js',
 		'test-net.js'
 	];
 
@@ -17,6 +18,7 @@ var spawn = require('child_process').spawn,
 	proc.stderr.pipe(process.stderr);
 	proc.on('exit', function (code) {
 		exitCode += code || 0;
+		console.log('');
 		next();
 	});
 }());

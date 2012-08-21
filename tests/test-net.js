@@ -1,5 +1,5 @@
 var assert = require('assert'),
-	appc = require('../lib/appc'),
+	appc = require('../lib/appc'), // needed for dump()
 	net = require('../lib/net');
 
 (function testInterfaces() {
