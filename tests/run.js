@@ -2,7 +2,8 @@ var spawn = require('child_process').spawn,
 	exitCode = 0,
 	tests = [
 		'test-fs.js',
-		'test-net.js'
+		'test-net.js',
+		'test-environ.js'
 	];
 
 (function next() {

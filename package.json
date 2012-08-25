@@ -19,6 +19,7 @@
 		"url": "http://github.com/appcelerator/node-appc.git"
 	},
 	"dependencies": {
+		"async": "0.1.x",
 		"colors": "0.6.x",
 		"i18n": "0.3.x",
 		"progress": "0.0.5",
