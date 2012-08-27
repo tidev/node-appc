@@ -3,7 +3,8 @@ var spawn = require('child_process').spawn,
 	tests = [
 		'test-fs.js',
 		'test-net.js',
-		'test-environ.js'
+		'test-environ.js',
+		'test-tiappxml.js'
 	];
 
 (function next() {
