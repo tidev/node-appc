@@ -25,6 +25,12 @@ var assert = require('assert'),
 	tiapp.version = '2.0';
 	tiapp['deployment-targets'] = { android: false, iphone: true, mobileweb: true };
 	tiapp['sdk-version'] = '2.2.0';
+	tiapp.properties = {
+		prop1: 'value1',
+		prop2: 'value2',
+		prop3: 'value3',
+		prop4: 'value4'
+	};
 	
 	console.log('\nCreating empty tiapp.xml and adding new nodes'.cyan);
 	console.log('toString():')
@@ -36,7 +42,6 @@ var assert = require('assert'),
 	console.log('\nXML:');
 	console.log(tiapp.toString('xml').green);
 }());
-
 (function () {
 	var tiapp = new appc.tiappxml(path.dirname(module.filename) + '/resources/tiapp1.xml');
 	
