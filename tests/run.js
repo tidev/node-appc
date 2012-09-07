@@ -5,6 +5,7 @@ var spawn = require('child_process').spawn,
 		'test-net.js',
 		'test-environ.js',
 		'test-tiappxml.js'
+		'test-plist.js'
 	];
 
 (function next() {

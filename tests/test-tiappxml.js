@@ -42,6 +42,7 @@ var assert = require('assert'),
 	console.log('\nXML:');
 	console.log(tiapp.toString('xml').green);
 }());
+
 (function () {
 	var tiapp = new appc.tiappxml(path.dirname(module.filename) + '/resources/tiapp1.xml');
 	

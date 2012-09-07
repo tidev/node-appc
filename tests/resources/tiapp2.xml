@@ -26,6 +26,61 @@
 	<guid>088dc83c-64af-4a81-b57c-7407649453f0</guid>
 	<property name="ti.ui.defaultunit">system</property>
 	<property name="another property">this "one" with quotes</property>
+	<ios>
+		<plist>
+			<dict>
+				<key>UISupportedInterfaceOrientations</key>
+				<array>
+					<string>UIInterfaceOrientationPortrait</string>
+					<string>UIInterfaceOrientationPortraitUpsideDown</string>
+					<string>UIInterfaceOrientationLandscapeLeft</string>
+					<string>UIInterfaceOrientationLandscapeRight</string>
+				</array>
+				<key>UIBackgroundModes</key>
+				<array>
+					<string>audio</string>
+					<string>location</string>
+					<string>voip</string>
+					<string>newsstand-content</string>
+					<string>external-accessory</string>
+					<string>bluetooth-central</string>
+				</array>
+				<key>UIRequiredDeviceCapabilities</key>
+				<array>
+					<string>telephony</string>
+					<string>wifi</string>
+					<string>sms</string>
+					<string>still-camera</string>
+					<string>auto-focus-camera</string>
+					<string>front-facing-camera</string>
+					<string>camera-flash</string>
+					<string>video-camera</string>
+					<string>accelerometer</string>
+					<string>gyroscope</string>
+					<string>location-services</string>
+					<string>gps</string>
+					<string>magnetometer</string>
+					<string>gamekit</string>
+					<string>microphone</string>
+					<string>opengles-1</string>
+					<string>opengles-2</string>
+					<string>armv6</string>
+					<string>armv7</string>
+					<string>peer-peer</string>
+					<string>bluetooth-le</string>
+				</array>
+				<key>UIRequiresPersistentWiFi</key>
+				<true/>
+				<key>UIPrerenderedIcon</key>
+				<true/>
+				<key>UIStatusBarHidden</key>
+				<true/>
+				<key>UIStatusBarStyle</key>
+				<string>UIStatusBarStyleBlackTranslucent</string>
+			</dict>
+		</plist>
+		<min-ios-ver>5.0</min-ios-ver>
+	</ios>
 	<iphone>
 		<orientations device="iphone">
 			<orientation>Ti.UI.PORTRAIT</orientation>
@@ -36,6 +91,41 @@
 			<orientation>Ti.UI.LANDSCAPE_LEFT</orientation>
 			<orientation>Ti.UI.LANDSCAPE_RIGHT</orientation>
 		</orientations>
+		<background>
+			<mode>audio</mode>
+			<mode>location</mode>
+			<mode>voip</mode>
+		</background>
+		<requires>
+			<feature>telephony</feature>
+			<feature>wifi</feature>
+			<feature>sms</feature>
+			<feature>still-camera</feature>
+			<feature>auto-focus-camera</feature>
+			<feature>front-facing-camera</feature>
+			<feature>camera-flash</feature>
+			<feature>video-camera</feature>
+			<feature>accelerometer</feature>
+			<feature>gyroscope</feature>
+			<feature>location-services</feature>
+			<feature>gps</feature>
+			<feature>magnetometer</feature>
+			<feature>gamekit</feature>
+			<feature>microphone</feature>
+			<feature>opengles-1</feature>
+			<feature>opengles-2</feature>
+			<feature>armv6</feature>
+			<feature>armv7</feature>
+			<feature>peer-peer</feature>
+		</requires>
+		<types>
+			<type>
+				<name>something</name>
+				<icon>someicon.png</icon>
+				<uti>public.item,public.content</uti>
+				<owner>true</owner>
+			</type>
+		</types>
 	</iphone>
 	<android xmlns:android="http://schemas.android.com/apk/res/android">
 		<manifest>
@@ -53,6 +143,7 @@
 			</application>
 		</manifest>
 		<activity android:name="ti.modules.titanium.ui.android.TiPreferencesActivity"/>
+		<tool-api-level>8</tool-api-level>
 		<services>
 			<service type="interval" url="testservice.js"/>
 		</services>
@@ -137,4 +228,6 @@
 		<module platform="android" version="7.8">ti.androidtest</module>
 		<module platform="iphone" version="9.0">ti.iphonetest</module>
 	</modules>
+	<plugins>
+	</plugins>
 </ti:app>
