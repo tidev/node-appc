@@ -4,7 +4,8 @@ var spawn = require('child_process').spawn,
 		'test-fs.js',
 		'test-net.js',
 		'test-environ.js',
-		'test-plist.js'
+		'test-plist.js',
+		'test-progress.js'
 	];
 
 (function next() {
@@ -15,9 +16,7 @@ var spawn = require('child_process').spawn,
 	var file = tests.shift();
 	console.log(file);
 	
-	var proc = spawn('node', [ 'tests/' + file ]);
-	proc.stdout.pipe(process.stdout);
-	proc.stderr.pipe(process.stderr);
+	var proc = spawn('node', [ 'tests/' + file ], { stdio: 'inherit' });
 	proc.on('exit', function (code) {
 		exitCode += code || 0;
 		console.log('');
