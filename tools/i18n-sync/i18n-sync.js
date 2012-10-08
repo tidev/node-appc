@@ -165,7 +165,7 @@ async.parallel(requestInfoTasks, function(err, result) {
 								}
 								localeFile = path.join(localeFile, locale + '.js');
 								console.log('Writing locale file ' + localeFile);
-								fs.writeFile(localeFile, JSON.stringify(translations[locale], false, '\t'), function(err) {
+								fs.writeFile(localeFile, JSON.stringify(translation.translations[locale], false, '\t'), function(err) {
 									if (err) {
 										console.log('Error writing locale file ' + localeFile + ': ' + err);
 									}
