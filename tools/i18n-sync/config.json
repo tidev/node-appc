@@ -1,0 +1,12 @@
+[
+	{
+		"name": "Project 1",
+		"privateKey": "1234",
+		"location": "project1"
+	},
+	{
+		"name": "Project 2",
+		"privateKey": "5678",
+		"location": "project2"
+	}
+]
