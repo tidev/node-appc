@@ -3,7 +3,7 @@
 var path = require('path'),
 	fs = require('fs'),
 	util = require('util'),
-	astWalker = require('../../lib/ast-walker'),
+	astWalker = require('../../lib/astwalker'),
 	wrench = require('wrench'),
 	
 	sourceDir = process.argv[2],
