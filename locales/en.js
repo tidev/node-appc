@@ -10,7 +10,7 @@
 	"Installing module: %s": "Installing module: %s",
 	"Could not find Titanium plugin id: %s version: %s": "Could not find Titanium plugin id: %s version: %s",
 	"Looking for Titanium plugin id: %s version: %s": "Looking for Titanium plugin id: %s version: %s",
-	"Detected legacy plugin: %s %s @ %s": "Detected legacy plugin: %s %s @ %s",
 	"Detected plugin: %s %s @ %s": "Detected plugin: %s %s @ %s",
+	"Detected plugin: %s @ %s": "Detected plugin: %s @ %s",
 	"Detecting plugins in %s": "Detecting plugins in %s"
 }
