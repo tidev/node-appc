@@ -1,3 +1,7 @@
+0.1.13 (11/11/2012)
+-------------------
+ * Fixed bug with unzip arguments being unnecessarily quoted
+
 0.1.12 (11/7/2012)
 -------------------
  * Changed environ lib to explicit detect() call instead of automatic
