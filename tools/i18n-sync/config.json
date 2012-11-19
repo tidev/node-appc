@@ -1,12 +1,14 @@
-[
-	{
-		"name": "Project 1",
-		"privateKey": "1234",
-		"location": "project1"
-	},
-	{
-		"name": "Project 2",
-		"privateKey": "5678",
-		"location": "project2"
+{
+	"cli": {
+		"privateKey": "123",
+		"projects": {
+			"node-appc": "path/to/node-appc",
+			"titanium": "path/to/titanium",
+			"titanium-sdk": "path/to/titanium_mobile/support/node_modules/titanium-sdk",
+			"titanium-sdk-lib": "path/to/titanium_mobile/support/node_modules/titanium-sdk",
+			"titanium-sdk-android": "path/to/titanium_mobile/android/cli",
+			"titanium-sdk-iphone": "path/to/titanium_mobile/iphone/cli",
+			"titanium-sdk-mobileweb": "path/to/titanium_mobile/mobileweb/cli"
+		}
 	}
-]
+}
