@@ -5,7 +5,7 @@
 	"keywords": [
 		"appcelerator"
 	],
-	"version": "0.1.4",
+	"version": "0.1.13",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "info@appcelerator.com"
@@ -31,7 +31,7 @@
 	"license":"Apache Public License v2",
 	"main": "./lib/appc",
 	"engines": {
-		"node": ">=0.6.6"
+		"node": ">=0.8"
 	},
 	"scripts": {
 		"test": "node tests/run.js"
