@@ -1,3 +1,7 @@
+0.1.14 (11/21/2012)
+-------------------
+ * Fixed bug with Android detection library not resolving Android SDK paths starting with a tilde (~) [TIMOB-11781]
+
 0.1.13 (11/11/2012)
 -------------------
  * Fixed bug with unzip arguments being unnecessarily quoted
