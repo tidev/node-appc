@@ -1,3 +1,7 @@
+0.1.15 (11/21/2012)
+-------------------
+ * Small tweaks
+
 0.1.14 (11/21/2012)
 -------------------
  * Fixed bug with Android detection library not resolving Android SDK paths starting with a tilde (~) [TIMOB-11781]
