@@ -1,3 +1,7 @@
+0.1.16 (11/27/2012)
+-------------------
+ * Fixed bug with zip file extracting on Windows [TIMOB-11880]
+
 0.1.15 (11/21/2012)
 -------------------
  * Small tweaks
