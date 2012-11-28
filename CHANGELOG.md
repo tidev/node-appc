@@ -1,3 +1,7 @@
+0.1.17 (11/28/2012)
+-------------------
+ * Fixed Uglify version to 1.3.X [TIMOB-11867]
+
 0.1.16 (11/27/2012)
 -------------------
  * Fixed bug with zip file extracting on Windows [TIMOB-11880]
