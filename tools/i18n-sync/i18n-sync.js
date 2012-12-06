@@ -80,9 +80,9 @@ function validateConfig() {
 function printUsage() {
 	console.log('Usage: i18n-sync [command]\n\n' +
 		'commands:\n' +
-		'   push     Assembles the global master locale file from the projects and pushes it to Web Translate It' +
-		'   pull     Pulls all locale information from Web Translate It and creates the per-project locale files' +
-		'   analyze  Analyzes a project ');
+		'   push     Assembles the global master locale file from the projects and pushes it to Web Translate It\n' +
+		'   pull     Pulls all locale information from Web Translate It and creates the per-project locale files\n' +
+		'   analyze  Analyzes a project\n');
 }
 
 function push() {
