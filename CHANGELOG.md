@@ -1,3 +1,7 @@
+0.1.18 (12/6/2012)
+-------------------
+ * Updated i18n strings and fixed a bug with the locale being loaded correctly [TIMOB-11825]
+
 0.1.17 (11/28/2012)
 -------------------
  * Fixed Uglify version to 1.3.X [TIMOB-11867]
