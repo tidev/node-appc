@@ -1,3 +1,7 @@
+0.1.19 (12/6/2012)
+-------------------
+ * Fixed ISO string formatting in plist date fields [TIMOB-11982]
+
 0.1.18 (12/6/2012)
 -------------------
  * Updated i18n strings and fixed a bug with the locale being loaded correctly [TIMOB-11825]
