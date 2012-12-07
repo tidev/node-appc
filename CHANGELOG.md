@@ -1,3 +1,7 @@
+0.1.20 (12/6/2012)
+-------------------
+ * Extended the AST walker to accept a pre-parsed AST tree instead of the filename of a file to parse
+
 0.1.19 (12/6/2012)
 -------------------
  * Fixed ISO string formatting in plist date fields [TIMOB-11982]
