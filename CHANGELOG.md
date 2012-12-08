@@ -1,3 +1,9 @@
+0.1.21 (12/7/2012)
+-------------------
+ * Fixed bug with the zip library not properly unzipping on Windows due to extraneous quotes [TIMOB-11649]
+ * Added better error handling when unzipping on Windows
+ * Added trace logging for the image resizing
+
 0.1.20 (12/6/2012)
 -------------------
  * Extended the AST walker to accept a pre-parsed AST tree instead of the filename of a file to parse
