@@ -2,6 +2,7 @@
 	"Invalid username or password combination. If you have forgotten your password, please visit %s.": "Invalid username or password combination. If you have forgotten your password, please visit %s.",
 	"Copying %s => %s": "Copying %s => %s",
 	"Symlinking %s => %s": "Symlinking %s => %s",
+	"Resizing images: %s": "Resizing images: %s",
 	"Did you mean this?": "Did you mean this?",
 	"Installing module: %s": "Installing module: %s",
 	"Detecting modules in %s": "Detecting modules in %s",
