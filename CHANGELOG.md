@@ -1,3 +1,8 @@
+0.1.22 (12/11/2012)
+-------------------
+ * Fixed timodule unzipping [TIMOB-12031]
+ * Updated a i18n string
+
 0.1.21 (12/7/2012)
 -------------------
  * Fixed bug with the zip library not properly unzipping on Windows due to extraneous quotes [TIMOB-11649]
