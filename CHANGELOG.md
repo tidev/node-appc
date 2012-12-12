@@ -1,3 +1,7 @@
+0.1.23 (12/13/2012)
+-------------------
+ * Fixed bug with modules not properly being unzipped if the modules directory doesn't exist [TIMOB-12031]
+
 0.1.22 (12/11/2012)
 -------------------
  * Fixed timodule unzipping [TIMOB-12031]
