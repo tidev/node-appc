@@ -1,4 +1,8 @@
-0.1.23 (12/13/2012)
+0.1.24 (12/12/2012)
+-------------------
+ * Removed 'default' from Android skin detection that was throwing off Titanium Studio [TIMOB-12082]
+
+0.1.23 (12/12/2012)
 -------------------
  * Fixed bug with modules not properly being unzipped if the modules directory doesn't exist [TIMOB-12031]
 
