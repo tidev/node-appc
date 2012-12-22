@@ -1,3 +1,7 @@
+0.1.25 (12/21/2012)
+-------------------
+ * Fixed buffer size issues when ios library detects installed developer certs [TIMOB-12146]
+
 0.1.24 (12/12/2012)
 -------------------
  * Removed 'default' from Android skin detection that was throwing off Titanium Studio [TIMOB-12082]
