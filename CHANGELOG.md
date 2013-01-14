@@ -1,6 +1,8 @@
 0.1.X
 -------------------
+ * Fixed bugs in the analytics library when the user is offline [TIMOB-12265]
  * Fixed plist parsing when <string> tag is empty [TIMOB-12167]
+ * Fixed iOS cert parsing to properly decode special characters as well as organize certs by keychain [TIMOB-12033]
 
 0.1.25 (12/21/2012)
 -------------------
