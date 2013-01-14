@@ -1,3 +1,7 @@
+0.1.X
+-------------------
+ * Fixed plist parsing when <string> tag is empty [TIMOB-12167]
+
 0.1.25 (12/21/2012)
 -------------------
  * Fixed buffer size issues when ios library detects installed developer certs [TIMOB-12146]
