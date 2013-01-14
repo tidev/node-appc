@@ -1,3 +1,8 @@
+0.1.X
+-------------------
+ * Fixed bugs in the analytics library when the user is offline [TIMOB-12265]
+ * Fixed iOS cert parsing to properly decode special characters as well as organize certs by keychain [TIMOB-12033]
+
 0.1.25 (12/21/2012)
 -------------------
  * Fixed buffer size issues when ios library detects installed developer certs [TIMOB-12146]
