@@ -1,10 +1,14 @@
+0.1.27 (1/22/2013)
+-------------------
+ * Fixed bug if ~/.titanium folder doesn't already exist [TIMOB-12373]
+
 0.1.26 (1/21/2013)
 -------------------
  * Fixed bugs in the analytics library when the user is offline [TIMOB-12265]
  * Fixed plist parsing when <string> tag is empty [TIMOB-12167]
  * Fixed iOS cert parsing to properly decode special characters as well as organize certs by keychain [TIMOB-12033]
  * Fixed bug in fs lib's copyDirSyncRecursive() function with copying relative symlinks
- * Added support to Titanium module detection to find conflicting module names [TIMOB-11542]
+ * Added support to Titanium module detection to find conflicting module names [TIMOB-11919]
  * Fixed Titanium module detection searching the same path twice
 
 0.1.25 (12/21/2012)
