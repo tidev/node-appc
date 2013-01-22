@@ -1,4 +1,4 @@
-0.1.X
+0.1.26 (1/21/2013)
 -------------------
  * Fixed bugs in the analytics library when the user is offline [TIMOB-12265]
  * Fixed plist parsing when <string> tag is empty [TIMOB-12167]
