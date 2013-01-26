@@ -1,3 +1,7 @@
+0.1.x
+-------------------
+ * Fixed Titanium module detection library to properly handle the deploy-type property. [TIMOB-12422]
+
 0.1.27 (1/22/2013)
 -------------------
  * Fixed bug if ~/.titanium folder doesn't already exist [TIMOB-12373]
