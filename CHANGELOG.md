@@ -1,3 +1,7 @@
+0.1.x
+-------------------
+ * Removed the deprecated Uglify 1 AST walker since we've upgraded to Uglify 2. [TIMOB-12439]
+
 0.1.27 (1/22/2013)
 -------------------
  * Fixed bug if ~/.titanium folder doesn't already exist [TIMOB-12373]
