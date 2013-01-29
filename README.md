@@ -19,4 +19,4 @@ included in this distribution for more details on the license.  Also, please tak
 The [imgscalr](https://github.com/thebuzzmedia/imgscalr) Java-based image-scaling library is licensed under the Apache v2.0 license.
 Copyright 2011 The Buzz Media, LLC.
 
-#### (C) Copyright 2012, [Appcelerator](http://www.appcelerator.com) Inc. All Rights Reserved.
+#### (C) Copyright 2012-2013, [Appcelerator](http://www.appcelerator.com) Inc. All Rights Reserved.
