@@ -3,6 +3,7 @@
  * Fixed Titanium module detection library to properly handle the deploy-type property. [TIMOB-12422]
  * Removed the deprecated Uglify 1 AST walker since we've upgraded to Uglify 2. [TIMOB-12439]
  * Updated auth library to use request module instead of node.js built-in request functions. [TIMOB-12423]
+ * Fixed analytics library to set the uid cookie and not pass in the app_id. [TIMOB-12653]
 
 0.1.27 (1/22/2013)
 -------------------
