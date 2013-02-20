@@ -1,4 +1,4 @@
-0.1.28
+0.1.28 (2/19/2013)
 -------------------
  * Fixed Titanium module detection library to properly handle the deploy-type property. [TIMOB-12422]
  * Removed the deprecated Uglify 1 AST walker since we've upgraded to Uglify 2. [TIMOB-12439]
