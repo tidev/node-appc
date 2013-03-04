@@ -5,6 +5,7 @@
  * Updated auth library to use request module instead of node.js built-in request functions. [TIMOB-12423]
  * Fixed analytics library to set the uid cookie and not pass in the app_id. [TIMOB-12653]
  * Fixed bug with the Android detection library failing to call 'android list' on Windows [TIMOB-12764]
+ * Fixed analytics to only send payload when logged in. [TIMOB-12771]
 
 0.1.27 (1/22/2013)
 -------------------
