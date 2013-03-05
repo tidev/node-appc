@@ -1,3 +1,7 @@
+0.1.29
+-------------------
+ * Fixed bug with timodule detection that wasn't properly handling multiple platforms [TIMOB-12844]
+
 0.1.28 (2/19/2013)
 -------------------
  * Fixed Titanium module detection library to properly handle the deploy-type property. [TIMOB-12422]
