@@ -1,4 +1,4 @@
-0.1.29
+0.1.29 (4/16/2013)
 -------------------
  * Fixed bug with timodule detection that wasn't properly handling multiple platforms [TIMOB-12844]
  * Fixed bug when a file is copied and the dest exists, the dest isn't deleted first [TIMOB-13051]
