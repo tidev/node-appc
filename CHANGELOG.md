@@ -1,3 +1,8 @@
+0.1.30
+-------------------
+ * Fixed bug with the Android SDK path not being stored back in the Android detection results object after being converted to an absolute path [TIMOB-13549]
+ * Fixed a bug with not catching write exceptions in analytics [TIMOB-13908]
+
 0.1.29 (4/16/2013)
 -------------------
  * Fixed bug with timodule detection that wasn't properly handling multiple platforms [TIMOB-12844]
