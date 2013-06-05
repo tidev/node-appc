@@ -4,6 +4,7 @@
  * Added check to see if session file is writable when logging in or out of Appc network [TIMOB-13908]
  * Improved AppcException to include a toString() function and improved dump() function
  * Added isFileWritable() function to fs library
+ * Fixed bug with Android SDK add-ons with missing manifest.ini files to crash the CLI [TIMOB-13634]
 
 0.1.30
 -------------------
