@@ -1,3 +1,10 @@
+0.1.31
+-------------------
+ * Added try/catch around analytics processing with showErrors flag to display errors
+ * Added check to see if session file is writable when logging in or out of Appc network [TIMOB-13908]
+ * Improved AppcException to include a toString() function and improved dump() function
+ * Added isFileWritable() function to fs library
+
 0.1.30
 -------------------
  * Fixed bug with the Android SDK path not being stored back in the Android detection results object after being converted to an absolute path [TIMOB-13549]
