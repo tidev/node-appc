@@ -6,18 +6,18 @@ var fs = require('fs'),
 	request = require('request'),
 	async = require('async'),
 	wrench = require('wrench'),
-	
+
 	progress = require('../../lib/progress'),
-	
+
 	configFile = path.join(process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'], '.titanium', 'i18n-sync.json'),
 	config,
 	projects,
 	privateKey,
-	
+
 	wtiPrefix = 'https://webtranslateit.com/api/projects/',
-	
+
 	command = process.argv[2],
-	
+
 	startTime = Date.now();
 
 // Load the config file
@@ -87,7 +87,7 @@ function printUsage() {
 
 function push() {
 	var masterList = {};
-	
+
 	console.log('Generating master language file for remote');
 	Object.keys(projects).forEach(function (projectName) {
 		var localeFilePath = path.join(projects[projectName], 'locales', 'en.js'),
@@ -103,10 +103,10 @@ function push() {
 			masterList[p] = p;
 		}
 	});
-	
+
 	console.log('Writing master language file\n	');
 	fs.writeFileSync('en.js', JSON.stringify(masterList, false, '\t'));
-	
+
 	console.log('Pushing to Web Translate It is not yet suppported. Please upload the master locale file manually. ' +
 		'The assembled file can be found at ' + path.resolve('en.js'));
 	/*
@@ -130,7 +130,7 @@ function push() {
 				for(i = 0, len = body.project.project_files.length; i < len; i++) {
 					if (body.project.project_files[i].name === 'en.js') {
 						masterFileId = body.project.project_files[i].id;
-						
+
 						console.log('Uploading master file to remote');
 						request({
 							method: 'PUT',
@@ -156,7 +156,7 @@ function push() {
 								console.log(body);
 							}
 						});
-						
+
 						break;
 					}
 				}
@@ -175,7 +175,7 @@ function pull() {
 
 	console.log('Fetching remote project information');
 	async.parallel([
-			
+
 		// Get the list of locales from Web Translate It
 		function (next) {
 			request(wtiPrefix + privateKey + '.json', function (error, response, body) {
@@ -211,7 +211,7 @@ function pull() {
 				}
 			});
 		},
-			
+
 		// Get the list of strings from Web Translate It
 		function (next) {
 			request(wtiPrefix + privateKey + '/strings', function (error, response, body) {
@@ -257,7 +257,7 @@ function pull() {
 					total: numRequests
 				}),
 				translations = {};
-			
+
 			console.log(' Fetched ' + locales.length + ' locales and ' + strings.length + ' strings\nFetching remote internationalization information');
 			pb.tick(1);
 			locales.forEach(function (locale) {
@@ -299,14 +299,14 @@ function pull() {
 				});
 			});
 			async.parallel(localeTasks, function(err) {
-				
+
 				if (err) {
 					console.error(err);
 					process.exit(1);
 				} else {
 					var projectTasks = [],
 						numLocalesAssembled = 0;
-					
+
 					console.log('\n  ' + (transferAmount / 1000).toFixed(0) + ' kb transferred in ' +
 						((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\nAssembling local locale files');
 					Object.keys(projects).forEach(function (projectName) {
@@ -322,7 +322,7 @@ function pull() {
 								projectNext('Could not parse master locale file for ' + projectName + ': ' + e.message);
 								return;
 							}
-							
+
 							locales.forEach(function (locale) {
 								if (locale !== 'en') {
 									targetLocale = {};
@@ -337,7 +337,7 @@ function pull() {
 							projectNext();
 						});
 					});
-				
+
 					async.parallel(projectTasks, function(err) {
 						if (err) {
 							console.log('\n',err);
@@ -355,17 +355,17 @@ function analyze() {
 	var astWalker = require('../../lib/astwalker'),
 		jsExtensionRegex = /\.js$/,
 		dirWhiteList = /^(lib|plugins|commands|hooks)/;
-	
+
 	Object.keys(projects).forEach(function (projectName) {
 		var masterList = {},
 			files,
 			file,
-	
+
 			i = 0, len,
-			
+
 			sourceDir = projects[projectName],
 			localesDir = path.join(sourceDir, 'locales');
-		
+
 		console.log('Processing local project ' + projectName);
 		files = wrench.readdirSyncRecursive(sourceDir);
 		for(len = files.length; i < len; i++) {
@@ -374,12 +374,12 @@ function analyze() {
 				processFile(file);
 			}
 		}
-		
+
 		function processFile(file) {
 			var numStringsFound = 0;
-	
+
 			console.log('  Processing ' + file);
-	
+
 			function processCall(node, next) {
 				if (node[1][0] === 'name' && (node[1][1] === '__' || node[1][1] === '__n')) {
 					if (node[2][0][0].name !== 'string') {
@@ -400,7 +400,7 @@ function analyze() {
 				}
 				next();
 			}
-	
+
 			if (!astWalker(file, { call: processCall })) {
 				console.log('**** Could not process ' + file + ' ****');
 			} else {
@@ -417,6 +417,6 @@ function analyze() {
 		}
 		fs.writeFileSync(path.join(localesDir, 'en.js'), JSON.stringify(masterList, false, '\t'));
 	});
-	
+
 	console.log('Projects analyzed successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
 }
