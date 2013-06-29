@@ -27,7 +27,7 @@
 		"semver": "~2.0.8",
 		"sprintf": "~0.1.1",
 		"wrench": "~1.5.0",
-		"uglify-js": "~1.3.5",
+		"uglify-js": "~2.3.6",
 		"xmldom": "~0.1.16"
 	},
 	"devDependencies": {

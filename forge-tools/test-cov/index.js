@@ -28,7 +28,7 @@ module.exports = function () {
 				+ '   sudo make install\n');
 			process.exit(1);
 		} else {
-			var start = Date.now();
+			var startTime = Date.now();
 			console.log('Generating lib-cov...');
 
 			wrench.rmdirSyncRecursive(path.join(rootDir, 'lib-cov'), true);
@@ -44,9 +44,9 @@ module.exports = function () {
 					console.error('\nERROR: jscoverage failed (' + code + ')\n');
 					err && console.error(err.trim() + '\n');
 				} else {
-					console.log('lib-cov generation completed successfully in ' + (Date.now() - start) + ' ms\n');
+					console.log('lib-cov generation completed successfully in ' + (Date.now() - startTime) + ' ms\n');
 
-					start = Date.now();
+					startTime = Date.now();
 					console.log('Generating coverage.html...');
 
 					var coverageFile = path.join(rootDir, 'coverage.html');
@@ -67,7 +67,7 @@ module.exports = function () {
 					test.on('exit', function (code) {
 						if (!code) {
 							fs.writeFileSync(coverageFile, output);
-							console.log('coverage.html generated successfully in ' + (Date.now() - start) + ' ms\n');
+							console.log('coverage.html generated successfully in ' + (Date.now() - startTime) + ' ms\n');
 						} else {
 							console.error(output);
 						}

@@ -13,7 +13,7 @@ module.exports = function () {
 	var spawn = require('child_process').spawn,
 		async = require('async'),
 		wrench = require('wrench'),
-		start = Date.now();
+		startTime = Date.now();
 
 	spawn('which', [ 'jsdoc' ]).on('exit', function (code) {
 		if (code) {
@@ -45,7 +45,7 @@ module.exports = function () {
 					}
 				};
 			}), function () {
-				console.log('Docs generated successfully in ' + (Math.round((Date.now() - start) / 100) / 10) + ' seconds\n');
+				console.log('Docs generated successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
 			});
 
 			/*
@@ -80,11 +80,11 @@ module.exports = function () {
 				if (code) {
 					console.error('Error building docs:\n' + out + '\n');
 				} else {
-					console.log('Docs generated successfully in ' + (Math.round((Date.now() - start) / 100) / 10) + ' seconds\n');
+					console.log('Docs generated successfully in ' + (Math.round((Date.now() - startTime) / 100) / 10) + ' seconds\n');
 				}
 			});
 			*/
-			//console.log('Docs generated successfully in ' + (Math.round((Date.now() - start) / 100) / 10) + ' seconds\n');
+			//console.log('Docs generated successfully in ' + (Math.round((Date.now() - startTime) / 100) / 10) + ' seconds\n');
 		}
 	});
 };
