@@ -13,11 +13,14 @@ module.exports = function () {
 	var spawn = require('child_process').spawn,
 		async = require('async'),
 		wrench = require('wrench'),
+		colors = require('colors'),
 		startTime = Date.now();
+
+	console.log('Documentation Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
 
 	spawn('which', [ 'jsdoc' ]).on('exit', function (code) {
 		if (code) {
-			console.error('ERROR: Unable to find "jsdoc".\n\n'
+			console.error('ERROR: Unable to find "jsdoc".\n\n'.red
 				+ 'Please install it by running "npm install -g jsdoc".\n');
 			process.exit(1);
 		} else {

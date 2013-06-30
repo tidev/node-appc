@@ -1,89 +1,254 @@
-#!/usr/bin/env node
+/**
+ * Parses projects for i18n strings into locale/en.js files, prepares
+ * locale/en.js files for manual upload to webtranslateit.com, and
+ * fetches and applies i18n strings from webtranslateit.com.
+ *
+ * @copyright
+ * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ *
+ * @license
+ * Licensed under the terms of the Apache Public License
+ * Please see the LICENSE included with this distribution for details.
+ */
 
 var fs = require('fs'),
 	path = require('path'),
+	wrench = require('wrench'),
+	UglifyJS = require('uglify-js'),
+	colors = require('colors'),
+	diff = require('diff'),
+	actions = {};
 
+module.exports = function (action) {
+	var configFile = path.join(process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'], '.titanium', 'i18n-tool.json'),
+		config;
+
+	console.log('i18n Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+
+	if (!action || !actions[action] || process.argv.indexOf('help') != -1 || process.argv.indexOf('--help') != -1 || process.argv.indexOf('-h') != -1) {
+		console.log('Usage: forge i18n <action> [options]\n');
+		action && console.error(('ERROR: Invalid action "' + action + '"\n').red);
+		console.log('Available actions:');
+		Object.keys(actions).sort().forEach(function (a) {
+			console.log('   ' + a + ' - ' + a.desc);
+		});
+		console.log();
+		process.exit(err ? 1 : 0);
+	}
+
+	if (!fs.existsSync(configFile)) {
+		console.error('ERROR: Config file does not exist\n'.red);
+		console.error('Copy ' + path.join(__dirname, 'i18n-sync.example.json') + ' to ' + configFile + ', then edit the file and configure the private key and project paths.\n');
+		process.exit(1);
+	}
+
+	// load the config file
+	try {
+		config = JSON.parse(fs.readFileSync(configFile));
+	} catch (ex) {
+		console.error(('ERROR: Failed to parse config file\n\n' + ex + '\n').red);
+		process.exit(1);
+	}
+
+	// validate the config
+	if (!config || typeof config != 'object') {
+		console.error('ERROR: Config file is malformed\n'.red);
+		process.exit(1);
+	}
+
+	if (!config.cli || typeof config.cli != 'object') {
+		console.error('ERROR: Config file does not have a valid "cli" property\n'.red);
+		process.exit(1);
+	}
+
+	if (!config.cli.privateKey || typeof config.cli.privateKey != 'string') {
+		console.error('ERROR: Config file does not have a valid webtranslateit.com private key\n'.red);
+		process.exit(1);
+	}
+
+	if (!config.cli.projects || typeof config.cli.projects != 'object') {
+		console.error('ERROR: Config file does not have a valid "cli.projects" property\n'.red);
+		process.exit(1);
+	}
+
+	Object.keys(config.cli.projects).forEach(function (project) {
+		if (!fs.existsSync(config.cli.projects[project])) {
+			console.error(('ERROR: Could not locate project "' + project + '"\n\n' + config.cli.projects[project] + ' does not exist\n').red);
+			process.exit(1);
+		}
+	});
+
+	actions[action](config);
+};
+
+/**
+ * Scans all projects in the config file for i18n strings, then writes them to
+ * each project's locales/en.js file.
+ * @param {Object} config - The i18n config
+ */
+actions.analyze = function (config) {
+	var projects = config.cli.projects,
+		startTime = Date.now(),
+		writeMode = process.argv.indexOf('--write') != -1;
+
+	Object.keys(projects).sort().forEach(function (project) {
+		var entries = {},
+			strings = [],
+			//files = {},
+			jsfile = /\.js$/,
+			scannable = /^(lib|plugins|commands|hooks)$/,
+			i18nFunctionRegex = /^__[fn]?$/,
+			changes = false;
+
+		console.log(project + (' (' + projects[project] + ')').grey);
+
+		(function walk(dir, depth) {
+			fs.readdirSync(dir).forEach(function (name) {
+				var file = path.join(dir, name);
+				if (fs.statSync(file).isDirectory()) {
+					if (depth || scannable.test(name)) {
+						walk(file, (depth | 0) + 1);
+					}
+				} else if (jsfile.test(name)) {
+					process.stdout.write('  ' + file.replace(projects[project], '').cyan + ': ');
+
+					try {
+						var numStringsFound = 0,
+							i18nFunction,
+							depth = -1,
+							argCounter = 0,
+							walker = new UglifyJS.TreeWalker(function (node, descend) {
+								if (node instanceof UglifyJS.AST_SymbolRef) {
+									i18nFunction = node.name.match(i18nFunctionRegex);
+									if (i18nFunction) {
+										//console.log(walker.stack.length, '[' + require('../../index').ast.getType(node).join(', ') + ']', node.name, '!!!!!!!!!!!!!!!!!!!!');
+										if (i18nFunction == '__') {
+											strings.push('');
+										} else if (i18nFunction == '__n') {
+											strings.push({
+												one: '',
+												other: ''
+											});
+										}
+										argCounter = i18nFunction[0] == '__n' ? 2 : 1;
+										depth = walker.stack.length;
+									}
+								} else if (node instanceof UglifyJS.AST_String && i18nFunction && walker.stack.length == depth) {
+									//console.log(walker.stack.length, '[' + require('../../index').ast.getType(node).join(', ') + ']', i18nFunction[0], node.value);
+									if (i18nFunction == '__') {
+										strings[strings.length-1] += node.value;
+										numStringsFound++;
+									//} else if (i18nFunction == '__f') {
+									//	var f = path.join(projects[project], 'locales', node.value, 'en.txt');
+									//	if (fs.existsSync(f)) {
+									//		files[node.value] = fs.readFileSync(f).toString();
+									//		numStringsFound++;
+									//	} else {
+									//		files[node.value] = null;
+									//	}
+									} else if (i18nFunction == '__n') {
+										strings[strings.length-1][argCounter == 2 ? 'one' : 'other'] += node.value;
+										argCounter--;
+										numStringsFound++;
+									} else if (argCounter <= 0) {
+										i18nFunction = null;
+										depth = -1;
+									}
+								} else {
+									i18nFunction = null;
+									depth = -1;
+								}
+							});
+
+						UglifyJS.parse(fs.readFileSync(file).toString(), { filename: file }).walk(walker);
+
+						process.stdout.write('found ' + (''+numStringsFound).magenta + ' string' + (numStringsFound != 1 ? 's' : '') + '\n');
+					} catch (ex) {
+						process.stdout.write('failed to parse file\n'.red);
+					}
+				}
+			});
+		}(projects[project]));
+
+		strings.forEach(function (s) {
+			s && (entries[typeof s == 'object' ? s.one : s] = s);
+		});
+
+		//Object.keys(files).forEach(function (name) {
+		//	files[name] && (entries['<file:' + name + '>' + files[name]] = '<file:' + name + '>' + files[name]);
+		//});
+
+		var localesDir = path.join(projects[project], 'locales'),
+			i18nFile = path.join(localesDir, 'en.js'),
+			newContents = JSON.stringify(entries, null, '\t');
+
+		if (!fs.existsSync(localesDir)) {
+			wrench.mkdirSyncRecursive(localesDir);
+		}
+
+		if (fs.existsSync(i18nFile)) {
+			var oldContents = fs.readFileSync(i18nFile).toString(),
+				output = diff.createPatch(i18nFile, oldContents, newContents).trim().split('\n').slice(2).map(function (line) {
+					return '  ' + (line.length && line[0] == '+' ? line.green : line.length && line[0] == '-' ? line.red : line);
+				});
+			console.log('\n' + (output.length > 2 ? output.join('\n') : '  No changes detected') + '\n');
+			if (output.length > 2) {
+				changes = true;
+			}
+		} else {
+			changes = true;
+		}
+
+		if (writeMode && changes) {
+			fs.writeFileSync(i18nFile, newContents);
+			console.log('Saved changes to ' + i18nFile.cyan + '\n');
+		}
+
+		console.log();
+	});
+
+	if (!writeMode) {
+		console.log('To update the en.js files, run ' + ('forge i18n analyze --write').cyan + '.\n');
+	}
+
+	console.log('Projects analyzed successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
+};
+actions.analyze.desc = 'scans project files for i18n strings and updates their locale/en.js file';
+
+/**
+ * Assembles all project's locales/en.js files into a single master locale file
+ * for manual upload to webtranslateit.org.
+ */
+actions.prepare = function (config) {
+	var projects = config.cli.projects,
+		startTime = Date.now();
+
+	//
+};
+actions.prepare.desc = "builds a master locale file from each project's locale/en.js files";
+
+/**
+ * Fetches the latest i18n strings from webtranslateit.com, then updates each
+ * project's i18n files.
+ */
+actions.pull = function (config) {
+	//
+};
+actions.pull.desc = 'fetches i18n strings from the Titanium CLI webtranslateit.com and updates locale files';
+
+
+
+
+/*
 	request = require('request'),
 	async = require('async'),
-	wrench = require('wrench'),
 
 	progress = require('../../lib/progress'),
-
-	configFile = path.join(process.env[process.platform == 'win32' ? 'USERPROFILE' : 'HOME'], '.titanium', 'i18n-sync.json'),
-	config,
-	projects,
-	privateKey,
-
 	wtiPrefix = 'https://webtranslateit.com/api/projects/',
-
-	command = process.argv[2],
-
 	startTime = Date.now();
+*/
 
-// Load the config file
-console.log();
-try {
-	config = JSON.parse(fs.readFileSync(configFile));
-} catch(e) {
-	console.error('Error reading the config file');
-	console.error(e.message + '\n');
-	process.exit(1);
-}
-switch(command) {
-	case 'push':
-		validateConfig();
-		push();
-		break;
-	case 'pull':
-		validateConfig();
-		pull();
-		break;
-	case 'analyze':
-		validateConfig();
-		analyze();
-		break;
-	case 'help':
-	case '--help':
-		printUsage();
-		break;
-	default:
-		if (command) {
-			console.error('Invalid command: ' + command + '\n');
-		} else {
-			console.error('Missing command\n');
-		}
-		printUsage();
-		process.exit();
-		break;
-}
 
-function validateConfig() {
-	if ('cli' in config && 'projects' in config.cli) {
-		for(var p in config.cli.projects) {
-			if (!fs.existsSync(config.cli.projects[p])) {
-				console.error('Could not locate project ' + p + ': ' + config.cli.projects[p] + ' does not exist\n');
-				process.exit(1);
-			}
-		}
-	} else {
-		console.error('Project information is missing from the config file');
-		process.exit(1);
-	}
-	projects = config.cli.projects;
-	privateKey = config.cli.privateKey;
-	if (!privateKey) {
-		console.error('Private key is missing from the config file');
-		process.exit(1);
-	}
-}
-
-function printUsage() {
-	console.log('Usage: i18n-sync [command]\n\n' +
-		'commands:\n' +
-		'   push     Assembles the global master locale file from the projects and pushes it to Web Translate It\n' +
-		'   pull     Pulls all locale information from Web Translate It and creates the per-project locale files\n' +
-		'   analyze  Analyzes a project\n');
-}
 
 function push() {
 	var masterList = {};
@@ -351,72 +516,3 @@ function pull() {
 	});
 }
 
-function analyze() {
-	var astWalker = require('../../lib/astwalker'),
-		jsExtensionRegex = /\.js$/,
-		dirWhiteList = /^(lib|plugins|commands|hooks)/;
-
-	Object.keys(projects).forEach(function (projectName) {
-		var masterList = {},
-			files,
-			file,
-
-			i = 0, len,
-
-			sourceDir = projects[projectName],
-			localesDir = path.join(sourceDir, 'locales');
-
-		console.log('Processing local project ' + projectName);
-		files = wrench.readdirSyncRecursive(sourceDir);
-		for(len = files.length; i < len; i++) {
-			file = path.join(sourceDir, files[i]);
-			if (jsExtensionRegex.test(file) && dirWhiteList.test(path.dirname(files[i]))) {
-				processFile(file);
-			}
-		}
-
-		function processFile(file) {
-			var numStringsFound = 0;
-
-			console.log('  Processing ' + file);
-
-			function processCall(node, next) {
-				if (node[1][0] === 'name' && (node[1][1] === '__' || node[1][1] === '__n')) {
-					if (node[2][0][0].name !== 'string') {
-						console.warn('**** Non-string found in i18n call ****');
-					}
-					numStringsFound++;
-					if (node[1][1] === '__') {
-						masterList[node[2][0][1]] = node[2][0][1];
-					} else {
-						if (node[2][1][0].name !== 'string') {
-							console.warn('**** Non-string found in i18n call ****');
-						}
-						masterList[node[2][0][1]] = {
-							one: node[2][0][1],
-							other: node[2][1][1]
-						};
-					}
-				}
-				next();
-			}
-
-			if (!astWalker(file, { call: processCall })) {
-				console.log('**** Could not process ' + file + ' ****');
-			} else {
-				if (numStringsFound) {
-					console.log('    ' + numStringsFound + ' i18n strings found');
-				}
-			}
-		}
-
-		// Write the en locale file
-		console.log('  Creating en locale file ' + path.join(localesDir, 'en.js') + '\n');
-		if (!fs.existsSync(localesDir)) {
-			wrench.mkdirSyncRecursive(localesDir);
-		}
-		fs.writeFileSync(path.join(localesDir, 'en.js'), JSON.stringify(masterList, false, '\t'));
-	});
-
-	console.log('Projects analyzed successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
-}

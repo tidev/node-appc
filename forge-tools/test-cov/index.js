@@ -14,12 +14,15 @@ module.exports = function () {
 	var spawn = require('child_process').spawn,
 		fs = require('fs'),
 		path = require('path'),
+		colors = require('colors'),
 		wrench = require('wrench'),
 		args = Array.prototype.slice.call(arguments);
 
+	console.log('Code Coverage Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+
 	which('jscoverage', function (code) {
 		if (code) {
-			console.error('ERROR: Unable to find "jscoverage".\n\n'
+			console.error('ERROR: Unable to find "jscoverage".\n\n'.red
 				+ 'You can download it by visiting "https://github.com/visionmedia/node-jscoverage" or by running:\n\n'
 				+ '   git clone https://github.com/visionmedia/node-jscoverage.git\n'
 				+ '   cd node-jscoverage\n'
@@ -41,7 +44,7 @@ module.exports = function () {
 
 			child.on('close', function (code) {
 				if (code) {
-					console.error('\nERROR: jscoverage failed (' + code + ')\n');
+					console.error('\nERROR: jscoverage failed (' + code + ')\n'.red);
 					err && console.error(err.trim() + '\n');
 				} else {
 					console.log('lib-cov generation completed successfully in ' + (Date.now() - startTime) + ' ms\n');

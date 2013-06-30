@@ -1,6 +1,6 @@
-# i18n Sync Tool
+# i18n Tool
 
-This i18n sync tool makes it easy to analyze projects for i18n information and to sync that data with
+This i18n tool makes it easy to analyze projects for i18n information and to sync that data with
 webtranslateit.com.
 
 ## Usage
