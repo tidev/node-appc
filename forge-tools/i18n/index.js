@@ -87,6 +87,12 @@ module.exports = function (action) {
 	actions[action](config);
 };
 
+/**
+ * Analyzes all projects for i18n function calls and creates the project-
+ * specific en.js files.
+ * @param {Object} config - The i18n config
+ * @param {Boolean} writeMode - If true, writes the changes to disk
+ */
 function doAnalyze(config, writeMode) {
 	var projects = config.cli.projects,
 		masterList = {},
