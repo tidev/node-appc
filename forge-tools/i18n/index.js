@@ -13,10 +13,14 @@
 
 var fs = require('fs'),
 	path = require('path'),
+	appc = require('../../index'),
 	wrench = require('wrench'),
 	UglifyJS = require('uglify-js'),
 	colors = require('colors'),
 	diff = require('diff'),
+	request = require('request'),
+	async = require('async'),
+	wtiUrl = 'https://webtranslateit.com/api/projects/',
 	actions = {};
 
 module.exports = function (action) {
@@ -26,14 +30,14 @@ module.exports = function (action) {
 	console.log('i18n Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
 
 	if (!action || !actions[action] || process.argv.indexOf('help') != -1 || process.argv.indexOf('--help') != -1 || process.argv.indexOf('-h') != -1) {
-		console.log('Usage: forge i18n <action> [options]\n');
+		console.log('Usage: ' + 'forge i18n <action> [options]'.cyan + '\n');
 		action && console.error(('ERROR: Invalid action "' + action + '"\n').red);
 		console.log('Available actions:');
 		Object.keys(actions).sort().forEach(function (a) {
-			console.log('   ' + a + ' - ' + a.desc);
+			console.log('   ' + appc.string.rpad(a, 7).cyan + ' - ' + actions[a].desc);
 		});
 		console.log();
-		process.exit(err ? 1 : 0);
+		process.exit(action ? 1 : 0);
 	}
 
 	if (!fs.existsSync(configFile)) {
@@ -81,20 +85,17 @@ module.exports = function (action) {
 	actions[action](config);
 };
 
-/**
- * Scans all projects in the config file for i18n strings, then writes them to
- * each project's locales/en.js file.
- * @param {Object} config - The i18n config
- */
-actions.analyze = function (config) {
+function doAnalyze(config, writeMode) {
 	var projects = config.cli.projects,
-		startTime = Date.now(),
-		writeMode = process.argv.indexOf('--write') != -1;
+		masterList = {},
+		anyChanges = false;
+
+	console.log('Analyzing projects...');
 
 	Object.keys(projects).sort().forEach(function (project) {
 		var entries = {},
 			strings = [],
-			//files = {},
+			files = {},
 			jsfile = /\.js$/,
 			scannable = /^(lib|plugins|commands|hooks)$/,
 			i18nFunctionRegex = /^__[fn]?$/,
@@ -138,14 +139,18 @@ actions.analyze = function (config) {
 									if (i18nFunction == '__') {
 										strings[strings.length-1] += node.value;
 										numStringsFound++;
-									//} else if (i18nFunction == '__f') {
-									//	var f = path.join(projects[project], 'locales', node.value, 'en.txt');
-									//	if (fs.existsSync(f)) {
-									//		files[node.value] = fs.readFileSync(f).toString();
-									//		numStringsFound++;
-									//	} else {
-									//		files[node.value] = null;
-									//	}
+										i18nFunction = null;
+										depth = -1;
+									} else if (i18nFunction == '__f') {
+										var f = path.join(projects[project], 'locales', node.value, 'en.txt');
+										if (fs.existsSync(f)) {
+											files[node.value] = fs.readFileSync(f).toString();
+											numStringsFound++;
+										} else {
+											files[node.value] = null;
+										}
+										i18nFunction = null;
+										depth = -1;
 									} else if (i18nFunction == '__n') {
 										strings[strings.length-1][argCounter == 2 ? 'one' : 'other'] += node.value;
 										argCounter--;
@@ -171,12 +176,15 @@ actions.analyze = function (config) {
 		}(projects[project]));
 
 		strings.forEach(function (s) {
-			s && (entries[typeof s == 'object' ? s.one : s] = s);
+			if (s) {
+				entries[typeof s == 'object' ? s.one : s] = s;
+				masterList[typeof s == 'object' ? s.one : s] = s;
+			}
 		});
 
-		//Object.keys(files).forEach(function (name) {
-		//	files[name] && (entries['<file:' + name + '>' + files[name]] = '<file:' + name + '>' + files[name]);
-		//});
+		Object.keys(files).forEach(function (name) {
+			files[name] && (masterList['<file:' + name + '>' + files[name]] = '<file:' + name + '>' + files[name]);
+		});
 
 		var localesDir = path.join(projects[project], 'locales'),
 			i18nFile = path.join(localesDir, 'en.js'),
@@ -193,10 +201,10 @@ actions.analyze = function (config) {
 				});
 			console.log('\n' + (output.length > 2 ? output.join('\n') : '  No changes detected') + '\n');
 			if (output.length > 2) {
-				changes = true;
+				anyChanges = changes = true;
 			}
 		} else {
-			changes = true;
+			anyChanges = changes = true;
 		}
 
 		if (writeMode && changes) {
@@ -207,10 +215,21 @@ actions.analyze = function (config) {
 		console.log();
 	});
 
-	if (!writeMode) {
-		console.log('To update the en.js files, run ' + ('forge i18n analyze --write').cyan + '.\n');
+	if (!writeMode && anyChanges) {
+		console.log('Updates detected. It is highly recommend you run ' + ('forge i18n analyze --write').cyan + '.\n');
 	}
 
+	return masterList;
+}
+
+/**
+ * Scans all projects in the config file for i18n strings, then writes them to
+ * each project's locales/en.js file.
+ * @param {Object} config - The i18n config
+ */
+actions.analyze = function (config) {
+	var startTime = Date.now();
+	doAnalyze(config, process.argv.indexOf('--write') != -1);
 	console.log('Projects analyzed successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
 };
 actions.analyze.desc = 'scans project files for i18n strings and updates their locale/en.js file';
@@ -220,10 +239,16 @@ actions.analyze.desc = 'scans project files for i18n strings and updates their l
  * for manual upload to webtranslateit.org.
  */
 actions.prepare = function (config) {
-	var projects = config.cli.projects,
-		startTime = Date.now();
+	var startTime = Date.now(),
+		masterList = doAnalyze(config, process.argv.indexOf('--write') != -1),
+		dest = process.argv.slice(4).shift() || path.join(process.cwd(), 'en-us.js'),
+		dir = path.dirname(/\.js$/.test(dest) ? dest : dest = path.join(dest, 'en-us.js'));
 
-	//
+	fs.existsSync(dir) || wrench.mkdirSyncRecursive(dir);
+	console.log('Writing ' + dest.cyan + '\n');
+	fs.writeFileSync(dest, JSON.stringify(masterList, false, '\t'));
+
+	console.log('Master i18n file assembled successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
 };
 actions.prepare.desc = "builds a master locale file from each project's locale/en.js files";
 
@@ -232,287 +257,256 @@ actions.prepare.desc = "builds a master locale file from each project's locale/e
  * project's i18n files.
  */
 actions.pull = function (config) {
-	//
-};
-actions.pull.desc = 'fetches i18n strings from the Titanium CLI webtranslateit.com and updates locale files';
-
-
-
-
-/*
-	request = require('request'),
-	async = require('async'),
-
-	progress = require('../../lib/progress'),
-	wtiPrefix = 'https://webtranslateit.com/api/projects/',
-	startTime = Date.now();
-*/
-
-
-
-function push() {
-	var masterList = {};
-
-	console.log('Generating master language file for remote');
-	Object.keys(projects).forEach(function (projectName) {
-		var localeFilePath = path.join(projects[projectName], 'locales', 'en.js'),
-			localeFile,
-			p;
-		try {
-			localeFile = JSON.parse(fs.readFileSync(localeFilePath));
-		} catch(e) {
-			console.error('Could not parse locale file ' + localeFilePath + ': ' + e.message);
-			process.exit(1);
-		}
-		for(p in localeFile) {
-			masterList[p] = p;
-		}
-	});
-
-	console.log('Writing master language file\n	');
-	fs.writeFileSync('en.js', JSON.stringify(masterList, false, '\t'));
-
-	console.log('Pushing to Web Translate It is not yet suppported. Please upload the master locale file manually. ' +
-		'The assembled file can be found at ' + path.resolve('en.js'));
-	/*
-	var requestInfoTasks = [],
-		transferAmount = 0;
-
-	console.log('Fetching remote project information');
-	request(wtiPrefix + privateKey + '.json', function (error, response, body) {
-		var i, len,
-			masterFileId;
-		body && (transferAmount += body.length);
-		if (error) {
-			console.log('Could not fetch the remote information: ' + error + '\n');
-		} else if (response.statusCode !== 200) {
-			console.log('Could not fetch the remote information: server returned ' + response.statusCode + '\n');
-		} else {
-			body = JSON.parse(body);
-			if (body.error) {
-				next('Could not fetch the remote information: ' + body.error);
-			} else if (body.project && body.project.project_files && body.project.project_files) {
-				for(i = 0, len = body.project.project_files.length; i < len; i++) {
-					if (body.project.project_files[i].name === 'en.js') {
-						masterFileId = body.project.project_files[i].id;
-
-						console.log('Uploading master file to remote');
-						request({
-							method: 'PUT',
-							uri: wtiPrefix + privateKey + '/files/' + masterFileId + '/locales/en',
-							'content-type': 'application/json',
-							body: JSON.stringify({
-								file: masterList,
-								name: 'en.js'
-							})
-						}, function (error, response, body) {
-							body && (transferAmount += body.length);
-							if (error) {
-								console.log('Could not fetch the remote information: ' + error + '\n');
-							} else if (response.statusCode !== 200) {
-								console.log(body);
-								try {
-									console.log('Could not fetch the remote information: server returned ' +
-										response.statusCode + ': ' + JSON.parse(body).error + '\n');
-								} catch(e) {
-									console.log('Could not fetch the remote information: server returned ' + response.statusCode + '\n');
-								}
-							} else {
-								console.log(body);
-							}
-						});
-
-						break;
-					}
-				}
-			} else {
-				console.log('Could not fetch the remote information: invalid server response\n');
-			}
-		}
-	});*/
-}
-
-// Pulls the web translate it information from the cloud and parses it out into each of the projects
-function pull() {
-	var locales = [],
+	var startTime = Date.now(),
+		locales = [],
 		strings = [],
 		transferAmount = 0;
 
-	console.log('Fetching remote project information');
-	async.parallel([
+	console.log('Fetching remote project information...');
 
-		// Get the list of locales from Web Translate It
+	async.parallel([
+		// Get the list of locales from webtranslateit.com
 		function (next) {
-			request(wtiPrefix + privateKey + '.json', function (error, response, body) {
+			request(wtiUrl + config.cli.privateKey + '.json', function (error, response, body) {
 				if (body) {
 					transferAmount += body.length;
 				}
 				if (error) {
-					next('Could not fetch the Web Translate It information: ' + error);
+					next('Could not fetch the webtranslateit.com information: ' + error);
 				} else if (response.statusCode !== 200) {
 					try {
-						next('Could not fetch the Web Translate It information: server returned ' +
+						next('Could not fetch the webtranslateit.com information: server returned ' +
 							response.statusCode + ': ' + JSON.parse(body).error + '\n');
 					} catch(e) {
-						next('Could not fetch the Web Translate It information: server returned ' + response.statusCode + '\n');
+						next('Could not fetch the webtranslateit.com information: server returned ' + response.statusCode + '\n');
 					}
 				} else {
 					try {
 						body = JSON.parse(body);
 						if (body.error) {
-							next('Could not fetch the Web Translate It information: ' + body.error);
+							next('Could not fetch the webtranslateit.com information: ' + body.error);
 						}
 						if (body.project && body.project.target_locales) {
-							body.project.target_locales.forEach(function(locale) {
+							body.project.target_locales.forEach(function (locale) {
 								locales.push(locale.code);
 							});
 							next();
 						} else {
-							next('Could not fetch the Web Translate It information: invalid server response');
+							next('Could not fetch the webtranslateit.com information: invalid server response');
 						}
 					} catch(e) {
-						next('Could not parse the Web Translate It locale response: ' + e);
+						next('Could not parse the webtranslateit.com locale response: ' + e);
 					}
 				}
 			});
 		},
 
-		// Get the list of strings from Web Translate It
+		// Get the list of strings from webtranslateit.com
 		function (next) {
-			request(wtiPrefix + privateKey + '/strings', function (error, response, body) {
+			request(wtiUrl + config.cli.privateKey + '/strings', function (error, response, body) {
 				if (body) {
 					transferAmount += body.length;
 				}
 				if (error) {
-					next('Could not fetch the Web Translate It strings: ' + error);
+					next('Could not fetch the webtranslateit.com strings: ' + error);
 				} else if (response.statusCode !== 200) {
 					try {
-						next('Could not fetch the Web Translate It information: server returned ' +
+						next('Could not fetch the webtranslateit.com information: server returned ' +
 							response.statusCode + ': ' + JSON.parse(body).error + '\n');
 					} catch(e) {
-						next('Could not fetch the Web Translate It information: server returned ' + response.statusCode + '\n');
+						next('Could not fetch the webtranslateit.com information: server returned ' + response.statusCode + '\n');
 					}
 				} else {
 					try {
 						body = JSON.parse(body);
 						if (body.error) {
-							next('Could not fetch the Web Translate It information: ' + body.error);
+							next('Could not fetch the webtranslateit.com information: ' + body.error);
 						}
 						body.forEach(function (str) {
 							strings.push(str.id);
 						});
 						next();
 					} catch(e) {
-						next('Could not parse the Web Translate It string response: ' + e);
+						next('Could not parse the webtranslateit.com string response: ' + e);
 					}
 				}
 			});
 		}
-	], function(err) {
+	], function (err) {
 		if (err) {
 			console.error(err);
 			process.exit(1);
-		} else {
-			var numRequests = locales.length * strings.length,
-				localeTasks = [],
-				pb = new progress('  :paddedPercent [:bar] :etas', {
-					complete: '=',
-					incomplete: '.',
-					width: 65,
-					total: numRequests
-				}),
-				translations = {};
+		}
 
-			console.log(' Fetched ' + locales.length + ' locales and ' + strings.length + ' strings\nFetching remote internationalization information');
-			pb.tick(1);
-			locales.forEach(function (locale) {
-				translations[locale] = {};
-				localeTasks.push(function (localeNext) {
-					var stringTasks = [];
-					strings.forEach(function (str) {
-						stringTasks.push(function (strNext) {
-							request(wtiPrefix + privateKey + '/strings/' + str + '/locales/' + locale + '/translations.json', function (error, response, body) {
-								if (body) {
-									transferAmount += body.length;
+		var numRequests = locales.length * strings.length,
+			localeTasks = [],
+			pb = new appc.progress('  :paddedPercent [:bar] :etas', {
+				complete: '=',
+				incomplete: '.',
+				width: 40,
+				total: numRequests
+			}),
+			translations = {};
+
+		console.log(' Fetched ' + locales.length + ' locales and ' + strings.length + ' strings\n');
+		console.log('Fetching remote i18n translations...');
+		pb.tick(1);
+
+		locales.forEach(function (locale) {
+			translations[locale] = {};
+			localeTasks.push(function (localeNext) {
+				var stringTasks = [];
+				strings.forEach(function (str) {
+					stringTasks.push(function (strNext) {
+						request(wtiUrl + config.cli.privateKey + '/strings/' + str + '/locales/' + locale + '/translations.json', function (error, response, body) {
+							if (body) {
+								transferAmount += body.length;
+							}
+							if (error) {
+								strNext('Could not fetch the translations for "' + str + '": ' + error);
+							} else if (response.statusCode !== 200) {
+								try {
+									strNext('Could not fetch the translations for "' + str + '": server returned ' +
+										response.statusCode + ': ' + JSON.parse(body).error + '\n');
+								} catch(e) {
+									strNext('Could not fetch the translations for "' + str + '": server returned ' + response.statusCode + '\n');
 								}
-								if (error) {
-									strNext('Could not fetch the translations for "' + str + '": ' + error);
-								} else if (response.statusCode !== 200) {
-									try {
-										strNext('Could not fetch the translations for "' + str + '": server returned ' +
-											response.statusCode + ': ' + JSON.parse(body).error + '\n');
-									} catch(e) {
-										strNext('Could not fetch the translations for "' + str + '": server returned ' + response.statusCode + '\n');
-									}
-								} else {
-									body = JSON.parse(body);
-									if (body.error) {
-										strNext('Could not fetch the translations for "' + str + '": ' + body.error);
-									}
-									if (body.text) {
-										translations[locale][body.string.key] = body.text;
-									}
-									strNext();
+							} else {
+								body = JSON.parse(body);
+								if (body.error) {
+									strNext('Could not fetch the translations for "' + str + '": ' + body.error);
 								}
-								pb.tick(1);
-							});
+								if (body.text) {
+									translations[locale][body.string.key] = body.text;
+								}
+								strNext();
+							}
+							pb.tick(1);
 						});
-					});
-					async.parallel(stringTasks, function(err, result) {
-						localeNext(err, result);
 					});
 				});
+				async.parallel(stringTasks, function (err, result) {
+					localeNext(err, result);
+				});
 			});
-			async.parallel(localeTasks, function(err) {
+		});
 
-				if (err) {
-					console.error(err);
-					process.exit(1);
-				} else {
-					var projectTasks = [],
-						numLocalesAssembled = 0;
+		async.parallel(localeTasks, function (err) {
+			if (err) {
+				console.error();
+				console.error(err);
+				console.error();
+				process.exit(1);
+			}
 
-					console.log('\n  ' + (transferAmount / 1000).toFixed(0) + ' kb transferred in ' +
-						((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\nAssembling local locale files');
-					Object.keys(projects).forEach(function (projectName) {
-						projectTasks.push(function(projectNext) {
-							console.log('  Assembling locale files for ' + projectName);
-							var masterLocaleFilePath = path.join(projects[projectName], 'locales', 'en.js'),
-								masterLocale,
-								str,
-								targetLocale;
-							try {
-								masterLocale = JSON.parse(fs.readFileSync(masterLocaleFilePath));
-							} catch(e) {
-								projectNext('Could not parse master locale file for ' + projectName + ': ' + e.message);
-								return;
+			console.log('\n  ' + (transferAmount / 1000).toFixed(0) + ' kb transferred in ' +
+				((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\nAssembling local locale files');
+
+			var numLocalesAssembled = 0;
+
+			async.parallel(Object.keys(projects).map(function (projectName) {
+				return function (projectNext) {
+					console.log('  Assembling locale files for ' + projectName);
+					var masterLocaleFilePath = path.join(projects[projectName], 'locales', 'en.js'),
+						masterLocale,
+						str,
+						targetLocale;
+
+					try {
+						masterLocale = JSON.parse(fs.readFileSync(masterLocaleFilePath));
+					} catch(e) {
+						projectNext('Could not parse master locale file for ' + projectName + ': ' + e.message);
+						return;
+					}
+
+					locales.forEach(function (locale) {
+						if (locale !== 'en') {
+							targetLocale = {};
+							for (str in masterLocale) {
+								targetLocale[str] = translations[locale] && translations[locale][str];
 							}
-
-							locales.forEach(function (locale) {
-								if (locale !== 'en') {
-									targetLocale = {};
-									for(str in masterLocale) {
-										targetLocale[str] = translations[locale] && translations[locale][str];
-									}
-									fs.writeFileSync(path.join(projects[projectName], 'locales', locale + '.js'),
-										JSON.stringify(targetLocale, false, '\t'));
-									numLocalesAssembled++;
-								}
-							});
-							projectNext();
-						});
-					});
-
-					async.parallel(projectTasks, function(err) {
-						if (err) {
-							console.log('\n',err);
-						} else {
-							console.log('  Assembled ' + numLocalesAssembled + ' locale files\n\nSuccessfully pulled all remote i18n data\n');
+							//fs.writeFileSync(path.join(projects[projectName], 'locales', locale + '.js'), JSON.stringify(targetLocale, false, '\t'));
+							console.log(path.join(projects[projectName], 'locales', locale + '.js'));
+							console.log(JSON.stringify(targetLocale, false, '\t'));
+							numLocalesAssembled++;
 						}
 					});
+					projectNext();
+				};
+			}), function (err) {
+				if (err) {
+					console.error();
+					console.error(err);
+					console.error();
+					process.exit(1);
 				}
-			});
-		}
-	});
-}
 
+				console.log('  Assembled ' + numLocalesAssembled + ' locale files\n');
+				console.log('Updated i18n files successfully in ' + ((Date.now() - startTime) / 1000).toFixed(1) + ' seconds\n');
+			});
+		});
+	});
+};
+actions.pull.desc = 'fetches i18n strings from the Titanium CLI webtranslateit.com and updates locale files';
+
+
+/*
+CB: Below is the old, unfinished "push" code that is supposed to uploads the
+    master i18n list to webtranslateit.com. This is possible a bad idea and
+    maybe forcing the master list to manually be uploaded is a wise thing to
+    do. Who knows?
+
+var requestInfoTasks = [],
+	transferAmount = 0;
+console.log('Fetching remote project information');
+request(wtiUrl + config.cli.privateKey + '.json', function (error, response, body) {
+	var i, len,
+		masterFileId;
+	body && (transferAmount += body.length);
+	if (error) {
+		console.log('Could not fetch the remote information: ' + error + '\n');
+	} else if (response.statusCode !== 200) {
+		console.log('Could not fetch the remote information: server returned ' + response.statusCode + '\n');
+	} else {
+		body = JSON.parse(body);
+		if (body.error) {
+			next('Could not fetch the remote information: ' + body.error);
+		} else if (body.project && body.project.project_files && body.project.project_files) {
+			for (i = 0, len = body.project.project_files.length; i < len; i++) {
+				if (body.project.project_files[i].name === 'en.js') {
+					masterFileId = body.project.project_files[i].id;
+
+					console.log('Uploading master file to remote');
+					request({
+						method: 'PUT',
+						uri: wtiUrl + config.cli.privateKey + '/files/' + masterFileId + '/locales/en',
+						'content-type': 'application/json',
+						body: JSON.stringify({
+							file: masterList,
+							name: 'en.js'
+						})
+					}, function (error, response, body) {
+						body && (transferAmount += body.length);
+						if (error) {
+							console.log('Could not fetch the remote information: ' + error + '\n');
+						} else if (response.statusCode !== 200) {
+							console.log(body);
+							try {
+								console.log('Could not fetch the remote information: server returned ' +
+									response.statusCode + ': ' + JSON.parse(body).error + '\n');
+							} catch(e) {
+								console.log('Could not fetch the remote information: server returned ' + response.statusCode + '\n');
+							}
+						} else {
+							console.log(body);
+						}
+					});
+
+					break;
+				}
+			}
+		} else {
+			console.log('Could not fetch the remote information: invalid server response\n');
+		}
+	}
+});*/
