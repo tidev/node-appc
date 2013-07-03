@@ -11,11 +11,11 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-var toolsDir = './forge-tools';
-
-var spawn = require('child_process').spawn,
+var toolsDir = './forge-tools',
+	spawn = require('child_process').spawn,
 	fs = require('fs'),
-	path = require('path');
+	path = require('path'),
+	colors = require('colors');
 
 global.which = function which(program, fn) {
 	if (process.platform == 'win32') {
@@ -40,24 +40,24 @@ fs.readdirSync(toolsDir = path.resolve(toolsDir)).forEach(function (name) {
 });
 
 function help(err) {
-	console.log('Usage: forge <tool> [options]\n');
-	err && console.error(err + '\n');
+	console.log('Forge'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+	console.log('Usage: ' + 'forge <tool> [options]'.cyan + '\n');
+	err && console.error(err.red + '\n');
 	console.error('Available tools:');
 	Object.keys(tools).sort().forEach(function (t) {
-		console.log('   ' + t);
+		console.log('   ' + t.cyan);
 	});
 	console.log();
 	process.exit(err ? 1 : 0);
 }
 
-var args = process.argv.slice(2);
-if (!args.length || args.indexOf('-h') != -1 || args.indexOf('--help') != -1) {
-	help();
-}
+var args = process.argv.slice(2),
+	tool = args.shift();
 
-var tool = args.shift();
-if (!tools[tool]) {
+if (tool && !tools[tool]) {
 	help('ERROR: Invalid tool "' + tool + '"');
+} else if (!tool) {
+	help();
 }
 
 require(tools[tool]).apply(null, args);

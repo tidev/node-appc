@@ -1,23 +1,20 @@
-var assert = require("assert"),
+var appc = require('../index'),
 	http = require('http'),
 	temp = require('temp'),
-	wrench = require('wrench'),
-	analytics = require('../index').analytics,
-	getType = function (it) {
-		return Object.prototype.toString.call(it).replace(/^\[object (.+)\]$/, '$1');
-	};
+	wrench = require('wrench');
 
 describe('analytics', function () {
 	it('namespace exists', function () {
-		assert(!!require('../index').analytics, 'analytics namespace does not exist');
+		appc.should.have.property('analytics');
+		appc.analytics.should.be.a('object');
 	});
 
 	describe('#addEvent()', function () {
 		it('should add an analytics event to queue', function () {
-			var length = analytics.events.length;
-			analytics.addEvent('dummy unit test event', { dummy: 'data' }, 'unit.test');
-			(analytics.events.length).should.equal(length + 1);
-			analytics.events = [];
+			var length = appc.analytics.events.length;
+			appc.analytics.addEvent('dummy unit test event', { dummy: 'data' }, 'unit.test');
+			(appc.analytics.events.length).should.equal(length + 1);
+			appc.analytics.events = [];
 		});
 	});
 
@@ -26,14 +23,14 @@ describe('analytics', function () {
 			this.timeout(3000);
 			this.slow(3000);
 
-			analytics.events = [];
+			appc.analytics.events = [];
 
 			var server = http.createServer(function (req, res) {
 					res.writeHead(200, {'Content-Type': 'text/plain'});
 					res.end('Hello World\n');
 					cleanup(new Error('analytics sent despite missing arguments'));
 				}).listen(1337, '127.0.0.1'),
-				child = analytics.send({
+				child = appc.analytics.send({
 					analyticsUrl: 'http://127.0.0.1:1337'
 				}),
 				childRunning = true,
@@ -64,7 +61,7 @@ describe('analytics', function () {
 			this.timeout(3000);
 			this.slow(3000);
 
-			analytics.events = [];
+			appc.analytics.events = [];
 
 			var tempDir = temp.path(),
 				server = http.createServer(function (req, res) {
@@ -93,7 +90,7 @@ describe('analytics', function () {
 						cleanup();
 					});
 				}).listen(1337, '127.0.0.1'),
-				child = analytics.send({
+				child = appc.analytics.send({
 					analyticsUrl: 'http://127.0.0.1:1337',
 					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
 					appName: 'Analytics Unit Test',

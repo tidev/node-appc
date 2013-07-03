@@ -15,9 +15,61 @@ var fs = require('fs'),
 	should = require('should'),
 	Mocha = require(__dirname + '/../node_modules/mocha/lib/mocha.js'),
 	Base = require(__dirname + '/../node_modules/mocha/lib/reporters/base'),
-	runTest = process.argv.slice(2).shift(),
 	mocha = new Mocha,
+	optimist = require('optimist'),
 	reporter = 'spec';
+
+optimist
+	.option('h', {
+		alias: 'help',
+		boolean: true,
+		desc: 'shows this help screen'
+	})
+	.options('c', {
+		alias: 'conf <file>',
+		string: true,
+		desc: 'path to a json file containing test settings'
+	})
+	.options('no-colors', {
+		boolean: true,
+		default: true,
+		desc: 'disables colors'
+	});
+
+if (optimist.argv.hasOwnProperty('colors') && !optimist.argv.colors) {
+	Base.useColors = false;
+	colors.mode = 'none';
+}
+
+if (process.env.APPC_COV) {
+	console.log('Code Coverage Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+} else {
+	console.log('Unit Test Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.');
+}
+
+// display the help if we need to
+if (optimist.argv.help) {
+	console.log('\nUsage: ' + 'forge test [<test-suite>] [options]'.cyan + '\n');
+	console.log(optimist.help());
+	process.exit(0);
+}
+
+// load the config, if specified
+global.conf = {};
+var confFile = optimist.argv.conf;
+if (confFile) {
+	if (!fs.existsSync(confFile = path.resolve(confFile))) {
+		console.error(('\nERROR: Config file "' + confFile + '" does not exist').red + '\n');
+		process.exit(1);
+	}
+
+	try {
+		global.conf = JSON.parse(fs.readFileSync(confFile));
+	} catch (ex) {
+		console.error(('\nERROR: Unable to parse config file "' + confFile).red + '"\n');
+		process.exit(1);
+	}
+}
 
 // if we're running coverage testing, then we need to use our custom reporter
 if (process.env.APPC_COV) {
@@ -49,11 +101,14 @@ if (process.env.APPC_COV) {
 
 // most of the logic below is the same as what the standalone mocha process does
 Error.stackTraceLimit = Infinity;
-Base.useColors = process.argv.indexOf('--no-colors') == -1;
 
-mocha.reporter(reporter).ui('bdd').checkLeaks();
+mocha.reporter(reporter);
+mocha.ui('bdd');
+mocha.globals(['conf']);
+mocha.checkLeaks();
 mocha.suite.slow('1s');
 
+var runTest = optimist.argv._.shift();
 if (runTest) {
 	// running a single test
 	mocha.files = [ path.join(__dirname, 'test-' + runTest + '.js') ];
