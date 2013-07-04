@@ -274,13 +274,23 @@ describe('plist', function () {
 				true,
 				false,
 				{ "key": "value" },
-				[ true ]
-			]
+				[ true ],
+				{
+					"className": "PlistType",
+					"type": "data",
+					"value": "dGl0YW5pdW0K"
+				}
+			],
+			"testdata": {
+				"className": "PlistType",
+				"type": "data",
+				"value": "dGl0YW5pdW0K"
+			}
 		});
 
 		plist.toString().should.equal('[object Object]');
 
-		plist.toString('json').should.equal('{"CFBundleDevelopmentRegion":"English","CFBundleDisplayName":"${PRODUCT_NAME}","CFBundleExecutable":"${EXECUTABLE_NAME}","CFBundleIconFile":"appicon.png","CFBundleURLTypes":[{"CFBundleURLName":"ti.testapp","CFBundleURLSchemes":["testapp"]}],"CFBundleIdentifier":"ti.testapp","CFBundleInfoDictionaryVersion":"6.0","CFBundleName":"${PRODUCT_NAME}","CFBundlePackageType":"APPL","CFBundleSignature":"????","CFBundleVersion":"1.0","CFBundleShortVersionString":"1.0","LSRequiresIPhoneOS":true,"CFBundleIconFiles":["appicon.png"],"UISupportedInterfaceOrientations~ipad":["UIInterfaceOrientationPortrait","UIInterfaceOrientationPortraitUpsideDown","UIInterfaceOrientationLandscapeLeft","UIInterfaceOrientationLandscapeRight"],"UISupportedInterfaceOrientations":["UIInterfaceOrientationPortrait"],"UIStatusBarStyle":"UIStatusBarStyleDefault","testnull":null,"testinteger":13,"testfloat":3.14,"testdate":"2013-07-03T23:21:50.000Z","testbooltrue":true,"testboolfalse":false,"testnesteddict":{"nesteddict":{"key":"value"}},"testarray":[13,3.14,"2013-07-03T23:21:50.000Z",true,false,{"key":"value"},[true]]}');
+		plist.toString('json').should.equal('{"CFBundleDevelopmentRegion":"English","CFBundleDisplayName":"${PRODUCT_NAME}","CFBundleExecutable":"${EXECUTABLE_NAME}","CFBundleIconFile":"appicon.png","CFBundleURLTypes":[{"CFBundleURLName":"ti.testapp","CFBundleURLSchemes":["testapp"]}],"CFBundleIdentifier":"ti.testapp","CFBundleInfoDictionaryVersion":"6.0","CFBundleName":"${PRODUCT_NAME}","CFBundlePackageType":"APPL","CFBundleSignature":"????","CFBundleVersion":"1.0","CFBundleShortVersionString":"1.0","LSRequiresIPhoneOS":true,"CFBundleIconFiles":["appicon.png"],"UISupportedInterfaceOrientations~ipad":["UIInterfaceOrientationPortrait","UIInterfaceOrientationPortraitUpsideDown","UIInterfaceOrientationLandscapeLeft","UIInterfaceOrientationLandscapeRight"],"UISupportedInterfaceOrientations":["UIInterfaceOrientationPortrait"],"UIStatusBarStyle":"UIStatusBarStyleDefault","testnull":null,"testinteger":13,"testfloat":3.14,"testdate":"2013-07-03T23:21:50.000Z","testbooltrue":true,"testboolfalse":false,"testnesteddict":{"nesteddict":{"key":"value"}},"testarray":[13,3.14,"2013-07-03T23:21:50.000Z",true,false,{"key":"value"},[true],"dGl0YW5pdW0K"],"testdata":"dGl0YW5pdW0K"}');
 
 		plist.toString('pretty-json').should.equal([
 			'{',
@@ -339,8 +349,10 @@ describe('plist', function () {
 			'		},',
 			'		[',
 			'			true',
-			'		]',
-			'	]',
+			'		],',
+			'		"dGl0YW5pdW0K"',
+			'	],',
+			'	"testdata": "dGl0YW5pdW0K"',
 			'}'
 		].join('\n'));
 
@@ -434,7 +446,10 @@ describe('plist', function () {
 			'		<array>',
 			'			<true/>',
 			'		</array>',
+			'		<data>dGl0YW5pdW0K</data>',
 			'	</array>',
+			'	<key>testdata</key>',
+			'	<data>dGl0YW5pdW0K</data>',
 			'</dict>',
 			'</plist>'
 		].join('\n'));

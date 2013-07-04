@@ -12,7 +12,12 @@ describe('encoding', function () {
 		});
 
 		it('decodes octal string', function () {
-			appc.encoding.decodeOctalUTF8('testing \303\274 and \351\252\236').should.equal('testing ü and 骞');
+			appc.encoding.decodeOctalUTF8('testing \\303\\274 and \\351\\252\\236').should.equal('testing ü and 骞');
+		});
+
+		it('try to decode incomplete octal string', function () {
+			var s = appc.encoding.decodeOctalUTF8('testing \\');
+			appc.encoding.decodeOctalUTF8('testing \\').should.equal('testing \0');
 		});
 	});
 });
