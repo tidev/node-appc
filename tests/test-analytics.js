@@ -1,7 +1,6 @@
 var appc = require('../index'),
 	http = require('http'),
-	temp = require('temp'),
-	wrench = require('wrench');
+	temp = require('temp');
 
 describe('analytics', function () {
 	it('namespace exists', function () {
@@ -63,7 +62,7 @@ describe('analytics', function () {
 
 			appc.analytics.events = [];
 
-			var tempDir = temp.path(),
+			var tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
 					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
 
@@ -109,7 +108,6 @@ describe('analytics', function () {
 					childRunning = false;
 					child.kill();
 				}
-				wrench.rmdirSyncRecursive(tempDir);
 				server && server.close(function () {
 					server = null;
 					done(err);
@@ -117,8 +115,8 @@ describe('analytics', function () {
 			}
 		});
 
-		// test sending multiple events
-		// simulate logout
-		// simulate login
+		// TODO: test sending multiple events
+		// TODO: simulate send while logged out
+		// TODO: simulate send while logged in
 	});
 });

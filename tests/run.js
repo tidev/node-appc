@@ -41,13 +41,11 @@ if (optimist.argv.hasOwnProperty('colors') && !optimist.argv.colors) {
 	colors.mode = 'none';
 }
 
-if (process.env.APPC_COV) {
-	console.log('Code Coverage Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
-} else {
+if (!process.env.APPC_COV) {
 	console.log('Unit Test Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.');
 }
 
-// display the help if we need to
+// display the help, if needed
 if (optimist.argv.help) {
 	console.log('\nUsage: ' + 'forge test [<test-suite>] [options]'.cyan + '\n');
 	console.log(optimist.help());
@@ -104,7 +102,7 @@ Error.stackTraceLimit = Infinity;
 
 mocha.reporter(reporter);
 mocha.ui('bdd');
-mocha.globals(['conf']);
+mocha.globals(['conf', 'should']);
 mocha.checkLeaks();
 mocha.suite.slow('1s');
 

@@ -18,6 +18,8 @@ module.exports = function () {
 		wrench = require('wrench'),
 		args = Array.prototype.slice.call(arguments);
 
+	console.log('Code Coverage Tool'.cyan.bold + ' - Copyright (c) 2012-' + (new Date).getFullYear() + ', Appcelerator, Inc.  All Rights Reserved.\n');
+
 	which('jscoverage', function (code) {
 		if (code) {
 			console.error('ERROR: Unable to find "jscoverage".\n\n'.red

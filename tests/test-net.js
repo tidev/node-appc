@@ -1,5 +1,4 @@
-var assert = require("assert"),
-	appc = require('../index');
+var appc = require('../index');
 
 describe('net', function () {
 	it('namespace exists', function () {

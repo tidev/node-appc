@@ -1,13 +1,13 @@
 {
-	"Session file \"%s\" is not writable": "Session file \"%s\" is not writable",
-	"Please ensure the Titanium CLI has access to modify this file.": "Please ensure the Titanium CLI has access to modify this file.",
-	"Directory \"%s\" is not writable": "Directory \"%s\" is not writable",
-	"Please ensure the Titanium CLI has access to this directory.": "Please ensure the Titanium CLI has access to this directory.",
 	"Error communicating with the server: %s": "Error communicating with the server: %s",
 	"Server did not return a session cookie": "Server did not return a session cookie",
 	"Invalid username or password. If you have forgotten your password, please visit %s.": "Invalid username or password. If you have forgotten your password, please visit %s.",
 	"Invalid server response": "Invalid server response",
 	"Error logging out from server: %s": "Error logging out from server: %s",
+	"Session file \"%s\" is not writable": "Session file \"%s\" is not writable",
+	"Please ensure the Titanium CLI has access to modify this file.": "Please ensure the Titanium CLI has access to modify this file.",
+	"Directory \"%s\" is not writable": "Directory \"%s\" is not writable",
+	"Please ensure the Titanium CLI has access to this directory.": "Please ensure the Titanium CLI has access to this directory.",
 	"Copying %s => %s": "Copying %s => %s",
 	"Symlinking %s => %s": "Symlinking %s => %s",
 	"Resizing images: %s": "Resizing images: %s",
@@ -18,6 +18,22 @@
 	"Please verify your system path or that the JAVA_HOME environment variable is correctly defined.": "Please verify your system path or that the JAVA_HOME environment variable is correctly defined.",
 	"You may want to reinstall the JDK by downloading it from %s.": "You may want to reinstall the JDK by downloading it from %s.",
 	"Did you mean this?": "Did you mean this?",
+	"day": {
+		"one": "day",
+		"other": "days"
+	},
+	"hour": {
+		"one": "hour",
+		"other": "hours"
+	},
+	"minute": {
+		"one": "minute",
+		"other": "minutes"
+	},
+	"second": {
+		"one": "second",
+		"other": "seconds"
+	},
 	"Installing module: %s": "Installing module: %s",
 	"Detecting modules in %s": "Detecting modules in %s",
 	"Detected %s module: %s %s @ %s": "Detected %s module: %s %s @ %s",

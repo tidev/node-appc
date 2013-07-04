@@ -18,7 +18,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>testapp</string>
-				
+
 			</array>
 		</dict>
 	</array>
@@ -56,5 +56,40 @@
 	</array>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleDefault</string>
+
+	<key>testnull</key>
+	<key>testinteger</key>
+	<integer>13</integer>
+	<key>testfloat</key>
+	<real>3.14</real>
+	<key>testdate</key>
+	<date>2013-07-03T23:21:50Z</date>
+	<key>testbooltrue</key>
+	<true/>
+	<key>testboolfalse</key>
+	<false/>
+	<key>testnesteddict</key>
+	<dict>
+		<key>nesteddict</key>
+		<dict>
+			<key>key</key>
+			<string>value</string>
+		</dict>
+	</dict>
+	<key>testarray</key>
+	<array>
+		<integer>13</integer>
+		<real>3.14</real>
+		<date>2013-07-03T23:21:50Z</date>
+		<true/>
+		<false/>
+		<dict>
+			<key>key</key>
+			<string>value</string>
+		</dict>
+		<array>
+			<true/>
+		</array>
+	</array>
 </dict>
 </plist>
