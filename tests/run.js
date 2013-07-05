@@ -46,7 +46,7 @@ if (!process.env.APPC_COV) {
 }
 
 // display the help, if needed
-if (optimist.argv.help) {
+if (optimist.argv.help || optimist.argv.h) {
 	console.log('\nUsage: ' + 'forge test [<test-suite>] [options]'.cyan + '\n');
 	console.log(optimist.help());
 	process.exit(0);
@@ -54,7 +54,7 @@ if (optimist.argv.help) {
 
 // load the config, if specified
 global.conf = {};
-var confFile = optimist.argv.conf;
+var confFile = optimist.argv.conf || optimist.argv.c;
 if (confFile) {
 	if (!fs.existsSync(confFile = path.resolve(confFile))) {
 		console.error(('\nERROR: Config file "' + confFile + '" does not exist').red + '\n');
