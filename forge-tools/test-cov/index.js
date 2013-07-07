@@ -55,8 +55,10 @@ module.exports = function () {
 					var coverageFile = path.join(rootDir, 'coverage.html');
 					fs.existsSync(coverageFile) && fs.unlinkSync(coverageFile);
 
+					process.env.APPC_COV = path.join(__dirname, 'templates');
+
 					var test = spawn(process.execPath, [ path.join(rootDir, 'tests', 'run.js') ].concat(args), {
-							env: { APPC_COV: path.join(__dirname, 'templates') },
+							env: process.env,
 							cwd: rootDir
 						}),
 						output = '';

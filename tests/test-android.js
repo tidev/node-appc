@@ -9,6 +9,10 @@ describe('android', function () {
 	describe('#detect()', function () {
 		it('result is valid', function (done) {
 			appc.android.detect(function (result) {
+				if (result == undefined) {
+					return done();
+				}
+
 				result.should.be.a('object');
 
 				if (result.sdkPath !== null) {
