@@ -162,7 +162,7 @@ describe('timodule', function () {
 				for (var i = 0; !found && i < result.found.length; i++) {
 					found = (result.found[i].id == 'dummy');
 				}
-				assert(found);
+				assert(found, '"dummy" module not marked as found');
 
 				done();
 			});

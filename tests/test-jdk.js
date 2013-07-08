@@ -31,6 +31,14 @@ describe('jdk', function () {
 
 				done();
 			});
+
+			appc.jdk.detect({}, function (result) {
+				result.should.be.a('object');
+			});
+
+			appc.jdk.detect({}, { bypassCache: true }, function (result) {
+				result.should.be.a('object');
+			});
 		});
 	});
 });

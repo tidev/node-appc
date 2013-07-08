@@ -8,6 +8,8 @@ describe('android', function () {
 
 	describe('#detect()', function () {
 		it('result is valid', function (done) {
+			this.timeout('5s');
+
 			appc.android.detect(function (result) {
 				if (result == undefined) {
 					return done();
