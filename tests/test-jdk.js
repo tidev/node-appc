@@ -7,7 +7,7 @@ describe('jdk', function () {
 	});
 
 	describe('#detect()', function () {
-		it('result is valid', function (done) {
+		it('should return valid result without specifying a config or options', function (done) {
 			appc.jdk.detect(function (result) {
 				result.should.be.a('object');
 
@@ -31,13 +31,19 @@ describe('jdk', function () {
 
 				done();
 			});
+		});
 
+		it('should return valid result with a config and without specifying options', function (done) {
 			appc.jdk.detect({}, function (result) {
 				result.should.be.a('object');
+				done();
 			});
+		});
 
+		it('should return valid result with a config and options', function (done) {
 			appc.jdk.detect({}, { bypassCache: true }, function (result) {
 				result.should.be.a('object');
+				done();
 			});
 		});
 	});
