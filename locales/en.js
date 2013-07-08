@@ -34,16 +34,18 @@
 		"one": "second",
 		"other": "seconds"
 	},
-	"Installing module: %s": "Installing module: %s",
-	"Detecting modules in %s": "Detecting modules in %s",
-	"Detected %s module: %s %s @ %s": "Detected %s module: %s %s @ %s",
 	"Looking for Titanium module id=%s version=%s platform=%s deploy-type=%s": "Looking for Titanium module id=%s version=%s platform=%s deploy-type=%s",
 	"Found incompatible Titanium module id=%s version=%s platform=%s deploy-type=%s": "Found incompatible Titanium module id=%s version=%s platform=%s deploy-type=%s",
 	"Found Titanium module id=%s version=%s platform=%s deploy-type=%s": "Found Titanium module id=%s version=%s platform=%s deploy-type=%s",
 	"Could not find Titanium module id=%s version=%s platform=%s deploy-type=%s": "Could not find Titanium module id=%s version=%s platform=%s deploy-type=%s",
+	"Installing module: %s": "Installing module: %s",
+	"Failed to unzip module \"%s\"": "Failed to unzip module \"%s\"",
+	"Detecting modules in %s": "Detecting modules in %s",
+	"Detected %s module: %s %s @ %s": "Detected %s module: %s %s @ %s",
+	"Looking for Titanium plugin id=%s version=%s": "Looking for Titanium plugin id=%s version=%s",
+	"Found Titanium plugin id=%s version=%s ": "Found Titanium plugin id=%s version=%s ",
+	"Could not find Titanium plugin id=%s version=%s": "Could not find Titanium plugin id=%s version=%s",
 	"Detecting plugins in %s": "Detecting plugins in %s",
 	"Detected plugin: %s @ %s": "Detected plugin: %s @ %s",
-	"Detected plugin: %s %s @ %s": "Detected plugin: %s %s @ %s",
-	"Looking for Titanium plugin id: %s version: %s": "Looking for Titanium plugin id: %s version: %s",
-	"Could not find Titanium plugin id: %s version: %s": "Could not find Titanium plugin id: %s version: %s"
+	"Detected plugin: %s %s @ %s": "Detected plugin: %s %s @ %s"
 }
