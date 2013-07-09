@@ -15,7 +15,8 @@ describe('android', function () {
 
 	describe('#detect()', function () {
 		it('result is valid', function (done) {
-			this.timeout('5s');
+			this.timeout('10s');
+			this.slow('5s');
 
 			appc.android.detect(function (result) {
 				if (result == undefined) {

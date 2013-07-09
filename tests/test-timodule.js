@@ -12,7 +12,7 @@ var appc = require('../index'),
 	wrench = require('wrench'),
 	colors = require('colors');
 
-function SimpleLogger() {
+function MockLogger() {
 	this.buffer = '';
 	this.debug = function (s) { this.buffer += s + '\n'; };
 	this.info = function (s) { this.buffer += s + '\n'; };
@@ -42,7 +42,7 @@ describe('timodule', function () {
 		// because the internal detectModules() function caches all modules for the
 		// remainder of this test, we must test the zip file stuff first
 		it('should unzip dummy module and report bad zip file failure', function (done) {
-			var logger = new SimpleLogger,
+			var logger = new MockLogger,
 				dummyDir = path.join(__dirname, 'resources', 'timodule', 'modules', 'ios', 'dummy'),
 				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'modules', 'dummy-ios-1.2.3.zip');
 				badZipFile = path.join(__dirname, 'resources', 'timodule', 'modules', 'badzip-ios-1.0.0.zip');
@@ -84,7 +84,7 @@ describe('timodule', function () {
 		});
 
 		it('should find all test modules', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 
 			// now run the detection
 			appc.timodule.scopedDetect({
@@ -113,7 +113,7 @@ describe('timodule', function () {
 
 	describe('#detect()', function () {
 		it('should find the test modules', function (done) {
-			var logger = new SimpleLogger,
+			var logger = new MockLogger,
 				dir = path.join(__dirname, 'resources', 'timodule');
 
 			// we test for dupe search paths, but only one should be searched
@@ -144,7 +144,7 @@ describe('timodule', function () {
 
 	describe('#find()', function () {
 		it('should return immediately if no modules', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([], null, null, null, null, logger, function (result) {
 				result.should.eql({
 					found: [],
@@ -157,7 +157,7 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module using only the id', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -176,7 +176,7 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching version', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', version: '1.2.3' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -197,7 +197,7 @@ describe('timodule', function () {
 		});
 
 		it('should not find "dummy" module with wrong version', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', version: '3.2.1' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -216,7 +216,7 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching deploy type', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', deployType: 'test,production' }
 			], ['ios', 'iphone'], 'production', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -237,7 +237,7 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching deploy type', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', deployType: 'test,production' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -258,7 +258,7 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching platform', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', platform: 'ios,android' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -279,7 +279,7 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching platform', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'dummy', platform: 'android,mobileweb' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -300,7 +300,7 @@ describe('timodule', function () {
 		});
 
 		it('should not find doesnotexist module', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'doesnotexist' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -319,7 +319,7 @@ describe('timodule', function () {
 		});
 
 		it('should find incompatible "toonew" module', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'toonew' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -338,7 +338,7 @@ describe('timodule', function () {
 		});
 
 		it('should find conflicting "ambiguous" module', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.timodule.find([
 				{ id: 'ambiguous' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {

@@ -11,7 +11,7 @@ var appc = require('../index'),
 	path = require('path'),
 	colors = require('colors');
 
-function SimpleLogger() {
+function MockLogger() {
 	this.buffer = '';
 	this.debug = function (s) { this.buffer += s + '\n'; };
 	this.info = function (s) { this.buffer += s + '\n'; };
@@ -35,7 +35,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find all test plugins', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 
 			// now run the detection
 			appc.tiplugin.scopedDetect({
@@ -102,7 +102,7 @@ describe('tiplugin', function () {
 
 	describe('#detect()', function () {
 		it('should find the test plugins', function (done) {
-			var logger = new SimpleLogger,
+			var logger = new MockLogger,
 				projectDir = path.join(__dirname, 'resources', 'tiplugin');
 
 			appc.tiplugin.detect(projectDir, {}, logger, function (result) {
@@ -165,7 +165,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "userlegacytest" plugin in user-defined path', function (done) {
-			var logger = new SimpleLogger,
+			var logger = new MockLogger,
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'userlegacytest');
 
 			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), {
@@ -180,7 +180,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "usercommandtest" plugin in user-defined path', function (done) {
-			var logger = new SimpleLogger,
+			var logger = new MockLogger,
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'usercommandtest');
 
 			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), {
@@ -197,7 +197,7 @@ describe('tiplugin', function () {
 
 	describe('#find()', function () {
 		it('should return immediately if no plugins', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.tiplugin.find([], null, null, logger, function (result) {
 				result.should.eql({
 					found: [],
@@ -208,7 +208,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin using only the id', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.tiplugin.find([
 				{ id: 'commandtest' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -225,7 +225,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin with matching version', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '1.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -244,7 +244,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find "commandtest" plugin with wrong version', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '2.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -261,7 +261,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find doesnotexist plugin', function (done) {
-			var logger = new SimpleLogger;
+			var logger = new MockLogger;
 			appc.tiplugin.find([
 				{ id: 'doesnotexist' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {

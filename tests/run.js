@@ -69,8 +69,16 @@ if (confFile) {
 	}
 }
 
+global.__lib = function (file) {
+	return path.join(__dirname, '..', 'lib', file);
+};
+
 // if we're running coverage testing, then we need to use our custom reporter
 if (process.env.APPC_COV) {
+	global.__lib = function (file) {
+		return path.join(__dirname, '..', 'lib-cov', file);
+	};
+
 	reporter = function (runner) {
 		var jade = require('jade'),
 			JSONCov = require(__dirname + '/../node_modules/mocha/lib/reporters/json-cov'),
