@@ -216,4 +216,104 @@ describe('string', function () {
 				'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.');
 		});
 	});
+
+	describe('#renderColumns()', function () {
+		it('should render a few items in columns', function (){
+			string.renderColumns(['apple', 'orange', 'grape', 'banana'], null, 80).should.equal('apple      orange     grape      banana');
+
+			string.renderColumns([
+				'apple',
+				'apricot',
+				'avocado',
+				'banana',
+				'breadfruit',
+				'bilberry',
+				'blackberry',
+				'blackcurrant',
+				'blueberry',
+				'boysenberry',
+				'currant',
+				'cherry',
+				'cherimoya',
+				'chili',
+				'cloudberry',
+				'coconut',
+				'damson',
+				'date',
+				'dragonfruit',
+				'durian',
+				'elderberry',
+				'feijoa',
+				'fig',
+				'gooseberry',
+				'grape',
+				'grapefruit',
+				'guava',
+				'huckleberry',
+				'honeydew',
+				'jackfruit',
+				'jettamelon',
+				'jambul',
+				'jujube',
+				'kiwi fruit',
+				'kumquat',
+				'legume',
+				'lemon',
+				'lime',
+				'loquat',
+				'lychee',
+				'mango',
+				'melon',
+				'nectarine',
+				'nut',
+				'orange',
+				'papaya',
+				'peach',
+				'pepper',
+				'pear',
+				'persimmon',
+				'physalis',
+				'plum',
+				'pineapple',
+				'pomegranate',
+				'pomelo',
+				'purple mangosteen',
+				'quince',
+				'raspberry',
+				'rambutan',
+				'redcurrant',
+				'salal berry',
+				'satsuma',
+				'star fruit',
+				'strawberry',
+				'tamarillo',
+				'tomato',
+				'ugli fruit'
+			], null, 80).should.equal(
+				'apple                 gooseberry            peach\n' +
+				'apricot               grape                 pepper\n' +
+				'avocado               grapefruit            pear\n' +
+				'banana                guava                 persimmon\n' +
+				'breadfruit            huckleberry           physalis\n' +
+				'bilberry              honeydew              plum\n' +
+				'blackberry            jackfruit             pineapple\n' +
+				'blackcurrant          jettamelon            pomegranate\n' +
+				'blueberry             jambul                pomelo\n' +
+				'boysenberry           jujube                purple mangosteen\n' +
+				'currant               kiwi fruit            quince\n' +
+				'cherry                kumquat               raspberry\n' +
+				'cherimoya             legume                rambutan\n' +
+				'chili                 lemon                 redcurrant\n' +
+				'cloudberry            lime                  salal berry\n' +
+				'coconut               loquat                satsuma\n' +
+				'damson                lychee                star fruit\n' +
+				'date                  mango                 strawberry\n' +
+				'dragonfruit           melon                 tamarillo\n' +
+				'durian                nectarine             tomato\n' +
+				'elderberry            nut                   ugli fruit\n' +
+				'feijoa                orange\n' +
+				'fig                   papaya'
+			);
+		});
+	});
 });
