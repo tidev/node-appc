@@ -24,10 +24,10 @@ describe('zip', function () {
 				assert(!err, 'expected unzip to not error');
 
 				fs.existsSync(path.join(tempDir, 'main.m')).should.be.ok;
-				(fs.statSync(path.join(tempDir, 'main.m')).mode & 0777).should.equal(0644);
+				(fs.statSync(path.join(tempDir, 'main.m')).mode & 0777).should.equal(process.platform == 'win32' ? 0666 : 0644);
 
 				fs.existsSync(path.join(tempDir, 'ios-sim')).should.be.ok;
-				(fs.statSync(path.join(tempDir, 'ios-sim')).mode & 0777).should.equal(0755);
+				(fs.statSync(path.join(tempDir, 'ios-sim')).mode & 0777).should.equal(process.platform == 'win32' ? 0666 : 0755);
 
 				done();
 			});

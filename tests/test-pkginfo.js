@@ -39,7 +39,7 @@ describe('pkginfo', function () {
 
 		it('should not find the manifest.json from temp directory', function () {
 			var file = temp.path(null, 'f-');
-			fs.writeFileSync(file, "module.exports = function () { return require('" + path.resolve(__dirname, '..', 'index.js') + "').pkginfo.manifest(module); };");
+			fs.writeFileSync(file, "module.exports = function () { return require('" + path.resolve(__dirname, '..', 'index.js').replace(/\\/g, '\\\\') + "').pkginfo.manifest(module); };");
 			try {
 				require(file)().should.eql({});
 				fs.unlinkSync(file);
@@ -166,7 +166,7 @@ describe('pkginfo', function () {
 
 		it('should not find the package.json from temp directory', function () {
 			var file = temp.path(null, 'f-');
-			fs.writeFileSync(file, "module.exports = function () { return require('" + path.resolve(__dirname, '..', 'index.js') + "').pkginfo.package(module); };");
+			fs.writeFileSync(file, "module.exports = function () { return require('" + path.resolve(__dirname, '..', 'index.js').replace(/\\/g, '\\\\') + "').pkginfo.package(module); };");
 			try {
 				require(file)().should.eql({});
 				fs.unlinkSync(file);
