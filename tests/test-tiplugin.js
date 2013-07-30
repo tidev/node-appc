@@ -11,6 +11,14 @@ var appc = require('../index'),
 	path = require('path'),
 	colors = require('colors');
 
+function MockConfig() {
+	this.get = function (s) {
+		if (s == 'cli.ignoreDirs') {
+			return '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$';
+		}
+	};
+}
+
 function MockLogger() {
 	this.buffer = '';
 	this.debug = function (s) { this.buffer += s + '\n'; };
@@ -29,7 +37,7 @@ describe('tiplugin', function () {
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
-			appc.tiplugin.scopedDetect(null, null, function (result) {
+			appc.tiplugin.scopedDetect(null, null, null, function (result) {
 				done();
 			});
 		});
@@ -40,7 +48,7 @@ describe('tiplugin', function () {
 			// now run the detection
 			appc.tiplugin.scopedDetect({
 				testResources: testResourcesDir
-			}, logger, function (result) {
+			}, new MockConfig, logger, function (result) {
 				logger.buffer.stripColors.should.include('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.include('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.include('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -105,7 +113,7 @@ describe('tiplugin', function () {
 			var logger = new MockLogger,
 				projectDir = path.join(__dirname, 'resources', 'tiplugin');
 
-			appc.tiplugin.detect(projectDir, {}, logger, function (result) {
+			appc.tiplugin.detect(projectDir, new MockConfig, logger, function (result) {
 				logger.buffer.stripColors.should.include('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.include('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.include('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -165,14 +173,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "userlegacytest" plugin in user-defined path', function (done) {
-			var logger = new MockLogger,
+			var config = new MockConfig,
+				logger = new MockLogger,
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'userlegacytest');
 
-			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), {
-				paths: {
-					plugins: [ dir ]
-				}
-			}, logger, function (result) {
+			config.paths = {
+				plugins: [ dir ]
+			};
+
+			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
 				logger.buffer.stripColors.should.include('Detecting plugins in ' + dir);
 				logger.buffer.stripColors.should.include('Detected plugin: userlegacytest @ ' + dir);
 				done();
@@ -180,14 +189,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "usercommandtest" plugin in user-defined path', function (done) {
-			var logger = new MockLogger,
+			var config = new MockConfig,
+				logger = new MockLogger,
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'usercommandtest');
 
-			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), {
-				paths: {
-					plugins: [ dir ]
-				}
-			}, logger, function (result) {
+			config.paths = {
+				plugins: [ dir ]
+			};
+
+			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
 				logger.buffer.stripColors.should.include('Detecting plugins in ' + dir);
 				logger.buffer.stripColors.should.include('Detected plugin: usercommandtest @ ' + dir);
 				done();

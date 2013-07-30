@@ -12,6 +12,14 @@ var appc = require('../index'),
 	wrench = require('wrench'),
 	colors = require('colors');
 
+function MockConfig() {
+	this.get = function (s) {
+		if (s == 'cli.ignoreDirs') {
+			return '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$';
+		}
+	};
+}
+
 function MockLogger() {
 	this.buffer = '';
 	this.debug = function (s) { this.buffer += s + '\n'; };
@@ -34,7 +42,7 @@ describe('timodule', function () {
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
-			appc.timodule.scopedDetect(null, null, function (result) {
+			appc.timodule.scopedDetect(null, null, null, function (result) {
 				done();
 			});
 		});
@@ -65,7 +73,7 @@ describe('timodule', function () {
 			// now run the detection
 			appc.timodule.scopedDetect({
 				testResources: testResourcesDir
-			}, logger, function (result) {
+			}, new MockConfig, logger, function (result) {
 				fs.existsSync(goodZipFile) && fs.unlinkSync(goodZipFile);
 				fs.existsSync(badZipFile) && fs.unlinkSync(badZipFile);
 
@@ -89,7 +97,7 @@ describe('timodule', function () {
 			// now run the detection
 			appc.timodule.scopedDetect({
 				testResources: testResourcesDir
-			}, logger, function (result) {
+			}, new MockConfig, logger, function (result) {
 				logger.buffer.stripColors.should.include('Detecting modules in ' + testResourcesDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
