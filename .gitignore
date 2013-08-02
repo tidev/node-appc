@@ -1,3 +1,7 @@
 ._*
 .DS_Store
 node_modules
+npm-debug*.log
+lib-cov
+coverage.html
+en-us.js

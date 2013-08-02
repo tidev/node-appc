@@ -1,10 +1,30 @@
-0.1.31
+0.2.0
 -------------------
  * Added try/catch around analytics processing with showErrors flag to display errors
  * Added check to see if session file is writable when logging in or out of Appc network [TIMOB-13908]
  * Improved AppcException to include a toString() function and improved dump() function
  * Added isFileWritable() function to fs library
  * Fixed bug with Android SDK add-ons with missing manifest.ini files to crash the CLI [TIMOB-13634]
+ * Added code coverage reporting
+ * Added unit tests for 30 libraries (currently 72% code coverage)
+ * Added JSDoc comments for nearly entire code base
+ * Complete rewrite of i18n-tool that analyzes Titanium CLI, node-appc, and Titanium SDK Node code and syncs i18n strings with webtranslateit.com
+ * Migrated old zip library from using built-in unzip, zip, and 7zip commands to use the adm-zip module
+ * Updated a number of APIs to have better dependency injection and less hard-coded parameters (needed for unit tests)
+ * Added HAXM environment detection
+ * Moved Java environment detection from Android detection library into standalone library and greatly improved Android SDK detection
+ * Better Titanium CLI plugin detection
+ * Removed deprecated astwalker library
+ * Added new subprocess library to make finding and calling subprocesses easier
+ * Removed deprecated hitch() util function
+ * Major cleanup to authentication library
+ * Added gateway interface detection to network library
+ * Updated nearly all dependencies on appc.fs.exists() to fs.existsSync()
+ * Added i18n support for entire files
+ * Added better plist parsing and serializing support
+ * Added new string utility functions wrap() and renderColumns()
+ * Internationalized strings in the time library
+ * Better/cleaner Titanium module and CLI plugin detection
 
 0.1.30
 -------------------
