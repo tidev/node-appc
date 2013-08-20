@@ -128,6 +128,7 @@ if (runTest) {
 		var ff = [];
 		fs.readdirSync(dir).forEach(function (name) {
 			var file = path.join(dir, name);
+			if (!fs.existsSync(file)) return;
 			if (fs.statSync(file).isDirectory()) {
 				ff = ff.concat(walk(file));
 			} else if ((runTest && name == runTest) || (!runTest && /^test\-.+\.js$/.test(name))) {

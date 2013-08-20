@@ -26,6 +26,7 @@
  * Internationalized strings in the time library
  * Better/cleaner Titanium module and CLI plugin detection
  * Fixed bug in copyFileSync() when copying a file to a directory [TIMOB-14386]
+ * Fixed bug with symlinked modules and plugins not being found [TIMOB-14209]
 
 0.1.30
 -------------------
