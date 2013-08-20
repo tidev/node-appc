@@ -9,7 +9,8 @@ var appc = require('../index'),
 	assert = require('assert'),
 	fs = require('fs'),
 	path = require('path'),
-	temp = require('temp');
+	temp = require('temp'),
+	wrench = require('wrench');
 
 function MockLogger() {
 	this.buffer = '';
@@ -42,6 +43,16 @@ describe('fs', function () {
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
 			logger.buffer.stripColors.should.equal('Copying ' + src + ' => ' + dest + '\n');
 			assert(fs.existsSync(dest), 'Destination file does not exist');
+		});
+
+		it('copy file to /tmp', function () {
+			var logger = new MockLogger,
+				src = path.join(__dirname, 'resources', 'testfile.txt'),
+				dest = '/tmp';
+			fs.existsSync(dest) || wrench.mkdirSyncRecursive(dest);
+			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
+			logger.buffer.stripColors.should.equal('Copying ' + src + ' => ' + dest + path.sep + 'testfile.txt\n');
+			assert(fs.existsSync(path.join(dest, 'testfile.txt')), 'Destination file does not exist');
 		});
 
 		it('copy file to existing directory', function () {
