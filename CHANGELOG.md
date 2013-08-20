@@ -25,6 +25,7 @@
  * Added new string utility functions wrap() and renderColumns()
  * Internationalized strings in the time library
  * Better/cleaner Titanium module and CLI plugin detection
+ * Fixed bug in copyFileSync() when copying a file to a directory [TIMOB-14386]
 
 0.1.30
 -------------------
