@@ -30,6 +30,7 @@ global.rootDir = __dirname;
 var tools = {};
 fs.readdirSync(toolsDir = path.resolve(toolsDir)).forEach(function (name) {
 	var m, file = path.join(toolsDir, name);
+	if (!fs.existsSync(file)) return;
 	if (fs.statSync(file).isDirectory()) {
 		if (fs.existsSync(m = path.join(file, 'index.js'))) {
 			tools[name] = m;
