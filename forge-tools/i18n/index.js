@@ -114,6 +114,8 @@ function doAnalyze(config, writeMode) {
 		(function walk(dir, depth) {
 			fs.readdirSync(dir).forEach(function (name) {
 				var file = path.join(dir, name);
+				if (!fs.existsSync(file)) return;
+
 				if (fs.statSync(file).isDirectory()) {
 					if (depth || scannable.test(name)) {
 						walk(file, (depth | 0) + 1);
@@ -335,7 +337,7 @@ actions.pull = function (config) {
 			function (next) {
 				async.parallel(fs.readdirSync(tempDir).filter(function (name) {
 					// skip en-us
-					return name.indexOf('en') != 0;
+					return fs.existsSync(path.join(tempDir, name)) && name.indexOf('en') != 0;
 				}).map(function (name) {
 					return function (cb) {
 						var file = path.join(tempDir, name),
