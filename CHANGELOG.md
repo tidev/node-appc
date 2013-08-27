@@ -28,6 +28,7 @@
  * Fixed bug in copyFileSync() when copying a file to a directory [TIMOB-14386]
  * Fixed bug with symlinked modules and plugins not being found [TIMOB-14209]
  * Fixed bug with visitDirsSync() passing the correct filename and path to the visitor function [TIMOB-14958]
+ * Fixed bug with Red Hat Linux-based distros (Fedora, Centos) not detecting the name and version of the OS [TIMOB-14960]
 
 0.1.30
 -------------------
