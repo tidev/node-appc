@@ -27,6 +27,7 @@
  * Better/cleaner Titanium module and CLI plugin detection
  * Fixed bug in copyFileSync() when copying a file to a directory [TIMOB-14386]
  * Fixed bug with symlinked modules and plugins not being found [TIMOB-14209]
+ * Fixed bug with visitDirsSync() passing the correct filename and path to the visitor function [TIMOB-14958]
 
 0.1.30
 -------------------
