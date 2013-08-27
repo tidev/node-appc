@@ -75,4 +75,19 @@ describe('fs', function () {
 			assert(fs.existsSync(dest), 'Destination file does not exist');
 		});
 	});
+
+	describe('#visitDirsSync', function () {
+		it('visit each subdirectory', function () {
+			var dir = path.join(__dirname, 'resources', 'fs'),
+				visited = {};
+			appc.fs.visitDirsSync(dir, function (file, fullpath) {
+				visited[file] = true;
+				visited[fullpath] = true;
+			});
+			visited.should.have.property('a1');
+			visited.should.have.property(path.join(dir, 'a1'));
+			visited.should.have.property('a2');
+			visited.should.have.property(path.join(dir, 'a2'));
+		})
+	});
 });
