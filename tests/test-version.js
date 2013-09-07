@@ -223,4 +223,16 @@ describe('version', function () {
 			version.gte('1.2.0', '1.2.3').should.not.be.ok;
 		});
 	});
+
+	describe('#parseMin()', function () {
+		it('finds minimum version', function () {
+			version.parseMin('1').should.equal('1');
+			version.parseMin('1.2').should.equal('1.2');
+			version.parseMin('>=1.0').should.equal('1.0');
+			version.parseMin('<1.0').should.equal('1.0');
+			version.parseMin('>=2.3.3 <=4.2').should.equal('2.3.3');
+			version.parseMin('>=2.3.3 <=4.2,>=1.0').should.equal('1.0');
+			version.parseMin('>=2.3.3 <=4.2,2.0').should.equal('2.0');
+		});
+	});
 });
