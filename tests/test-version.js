@@ -231,8 +231,55 @@ describe('version', function () {
 			version.parseMin('>=1.0').should.equal('1.0');
 			version.parseMin('<1.0').should.equal('1.0');
 			version.parseMin('>=2.3.3 <=4.2').should.equal('2.3.3');
-			version.parseMin('>=2.3.3 <=4.2,>=1.0').should.equal('1.0');
-			version.parseMin('>=2.3.3 <=4.2,2.0').should.equal('2.0');
+			version.parseMin('>=2.3.3 <=4.2 || >=1.0').should.equal('1.0');
+			version.parseMin('>=2.3.3 <=4.2 || 2.0').should.equal('2.0');
+		});
+	});
+
+	describe('#parseMax()', function () {
+		it('finds maximum version', function () {
+			version.parseMax('1').should.equal('1');
+			version.parseMax('1.2').should.equal('1.2');
+			version.parseMax('>=1.0').should.equal('1.0');
+			version.parseMax('<1.0').should.equal('1.0');
+			version.parseMax('<18').should.equal('<18');
+			version.parseMax('>=2.3.3 <=4.2').should.equal('4.2');
+			version.parseMax('>=2.3.3 <=4.2 || >=1.0').should.equal('4.2');
+			version.parseMax('>=2.3.3 <=4.2 || 5.0').should.equal('5.0');
+		});
+	});
+
+	describe('#satisfies()', function () {
+		it('in range', function () {
+			version.satisfies('1.0.0', '1.0.0').should.equal(true);
+			version.satisfies('1.0.0', '*').should.equal(true);
+			version.satisfies('1.0.0', '>=2.0.0 || *').should.equal(true);
+			version.satisfies('1.0.0', '>=1.0.0').should.equal(true);
+			version.satisfies('3.0.0', '>=2.3.3 <=4.2').should.equal(true);
+			version.satisfies('4', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(true);
+			version.satisfies('5', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(true);
+			version.satisfies('6', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(true);
+			version.satisfies('7', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(true);
+			version.satisfies('18.0.1', '<=18.x').should.equal(true);
+			version.satisfies('18.0.1', '>=18.x').should.equal(true);
+			version.satisfies('18.0.1', '>=19.x').should.equal(false);
+		});
+
+		it('not in range', function () {
+			version.satisfies('2.0.0', '1.0.0').should.equal(false);
+			version.satisfies('2.0.0', '>=2.3.3 <=4.2').should.equal(false);
+			version.satisfies('2.3', '>=2.3.3 <=4.2').should.equal(false);
+			version.satisfies('4.3', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(false);
+			version.satisfies('5.1', '>=2.3.3 <=4.2 || 5.0 || >=6.0').should.equal(false);
+		});
+
+		it('maybe', function () {
+			version.satisfies('2.0', '1.0', true).should.equal('maybe');
+			version.satisfies('2.0', '>=1.0', true).should.equal(true);
+			version.satisfies('2.0', '<1.0', true).should.equal('maybe');
+			version.satisfies('2.0', '>=2.3.3 <=4.2', true).should.equal(false);
+			version.satisfies('5.0', '>=2.3.3 <=4.2', true).should.equal('maybe');
+			version.satisfies('18', '>=10 <=18', true).should.equal(true);
 		});
 	});
 });
