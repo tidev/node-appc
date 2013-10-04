@@ -3,6 +3,8 @@
 This is a common library used by Appcelerator Node.js-based software products such as the
 [Titanium CLI](http://github.com/appcelerator/titanium).
 
+[![NPM](https://nodei.co/npm/node-appc.png?downloads=true&stars=true)](https://nodei.co/npm/node-appc/)
+
 ## Prerequisites
 
 node-appc requires [Node.js 0.8.x](http://nodejs.org/dist/) or newer.
