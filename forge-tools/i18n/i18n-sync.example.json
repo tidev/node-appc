@@ -4,8 +4,8 @@
 		"projects": {
 			"node-appc": "path/to/node-appc",
 			"titanium": "path/to/titanium",
-			"titanium-sdk": "path/to/titanium_mobile/support/node_modules/titanium-sdk",
-			"titanium-sdk-lib": "path/to/titanium_mobile/support/node_modules/titanium-sdk",
+			"titanium-sdk": "path/to/titanium_mobile/cli",
+			"titanium-sdk-lib": "path/to/titanium_mobile/node_modules/titanium-sdk",
 			"titanium-sdk-android": "path/to/titanium_mobile/android/cli",
 			"titanium-sdk-iphone": "path/to/titanium_mobile/iphone/cli",
 			"titanium-sdk-mobileweb": "path/to/titanium_mobile/mobileweb/cli"
