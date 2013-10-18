@@ -64,9 +64,10 @@ describe('tiplugin', function () {
 								pluginPath: path.join(testResourcesDir, 'commandtest', '1.0'),
 								commands: [ { name: 'dummy' } ],
 								hooks: [],
+								legacyPluginFile: null,
 								manifest: {
-									"name": "commandtest",
-									"version": "1.0"
+									'name': 'commandtest',
+									'version': '1.0'
 								}
 							}
 						},
@@ -75,9 +76,10 @@ describe('tiplugin', function () {
 								pluginPath: path.join(testResourcesDir, 'emptytest', '1.0'),
 								commands: [],
 								hooks: [],
+								legacyPluginFile: null,
 								manifest: {
-									"name": "emptytest",
-									"version": "1.0"
+									'name': 'emptytest',
+									'version': '1.0'
 								}
 							}
 						},
@@ -85,10 +87,11 @@ describe('tiplugin', function () {
 							'1.0': {
 								pluginPath: path.join(testResourcesDir, 'hooktest', '1.0'),
 								commands: [],
-								hooks: [ { name: 'hooktest', cliVersion: '>=3.X' } ],
+								hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
+								legacyPluginFile: null,
 								manifest: {
-									"name": "hooktest",
-									"version": "1.0"
+									'name': 'hooktest',
+									'version': '1.0'
 								}
 							}
 						},
@@ -97,7 +100,8 @@ describe('tiplugin', function () {
 								pluginPath: path.join(testResourcesDir, 'legacytest'),
 								commands: [],
 								hooks: [],
-								legacyPluginFile: path.join(testResourcesDir, 'legacytest', 'plugin.py')
+								legacyPluginFile: path.join(testResourcesDir, 'legacytest', 'plugin.py'),
+								manifest: {}
 							}
 						}
 					}
@@ -130,9 +134,10 @@ describe('tiplugin', function () {
 							pluginPath: path.join(testResourcesDir, 'commandtest', '1.0'),
 							commands: [ { name: 'dummy' } ],
 							hooks: [],
+							legacyPluginFile: null,
 							manifest: {
-								"name": "commandtest",
-								"version": "1.0"
+								'name': 'commandtest',
+								'version': '1.0'
 							}
 						}
 					},
@@ -141,9 +146,10 @@ describe('tiplugin', function () {
 							pluginPath: path.join(testResourcesDir, 'emptytest', '1.0'),
 							commands: [],
 							hooks: [],
+							legacyPluginFile: null,
 							manifest: {
-								"name": "emptytest",
-								"version": "1.0"
+								'name': 'emptytest',
+								'version': '1.0'
 							}
 						}
 					},
@@ -151,10 +157,11 @@ describe('tiplugin', function () {
 						'1.0': {
 							pluginPath: path.join(testResourcesDir, 'hooktest', '1.0'),
 							commands: [],
-							hooks: [ { name: 'hooktest', cliVersion: '>=3.X' } ],
+							hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
+							legacyPluginFile: null,
 							manifest: {
-								"name": "hooktest",
-								"version": "1.0"
+								'name': 'hooktest',
+								'version': '1.0'
 							}
 						}
 					},
@@ -163,7 +170,8 @@ describe('tiplugin', function () {
 							pluginPath: path.join(testResourcesDir, 'legacytest'),
 							commands: [],
 							hooks: [],
-							legacyPluginFile: path.join(testResourcesDir, 'legacytest', 'plugin.py')
+							legacyPluginFile: path.join(testResourcesDir, 'legacytest', 'plugin.py'),
+							manifest: {}
 						}
 					}
 				});
