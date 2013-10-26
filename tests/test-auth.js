@@ -19,7 +19,37 @@ describe('auth', function () {
 	});
 
 	describe('#login()', function () {
-		//
+		it('should fail with invalid login', function(done){
+			// test invalid login
+			this.timeout(30000);
+			appc.auth.login({
+				username: 'appctestlogin1234@appcelerator.com',
+				password: 'whoknows',
+				titaniumHomeDir: temp.mkdirSync(),	
+				callback: function(result) {
+					result.should.have.property('code');
+					result.code.should.equal(appc.auth.AUTH_ERR_BAD_UN_OR_PW);
+					appc.auth.resetMID();
+					done();
+				}
+			});
+		});
+		it('should fail with invalid url', function(done){
+			// test invalid login url
+			this.timeout(10000);
+			appc.auth.login({
+				loginUrl: 'http://monkeyfart.fooasdadsasdasda.com',
+				username: 'appctestlogin1234@appcelerator.com',
+				password: 'whoknows',
+				titaniumHomeDir: temp.mkdirSync(),	
+				callback: function(result) {
+					result.should.have.property('code');
+					result.code.should.equal(appc.auth.AUTH_ERR_CONNECT_FAILURE);
+					appc.auth.resetMID();
+					done();
+				}
+			});
+		});
 	});
 
 	describe('#logout()', function () {
