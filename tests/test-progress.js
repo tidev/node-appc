@@ -17,7 +17,7 @@ describe('progress', function () {
 		this.slow('3s');
 
 		var origWrite = process.stdout.write,
-			origCursorTo = process.stdout.cursorTo,
+			origCursorTo = process.stdout.cursorTo || function () {},
 			buffer = '';
 
 		process.stdout.write = function (s) {
@@ -62,7 +62,7 @@ describe('progress', function () {
 		this.slow('3s');
 
 		var origWrite = process.stdout.write,
-			origCursorTo = process.stdout.cursorTo,
+			origCursorTo = process.stdout.cursorTo || function () {},
 			buffer = '';
 
 		process.stdout.write = function (s) {
@@ -107,7 +107,7 @@ describe('progress', function () {
 		this.slow('3s');
 
 		var origWrite = process.stdout.write,
-			origCursorTo = process.stdout.cursorTo,
+			origCursorTo = process.stdout.cursorTo || function () {},
 			buffer = '';
 
 		process.stdout.write = function (s) {
