@@ -44,6 +44,7 @@
 	},
 	"Looking for Titanium module id=%s version=%s platform=%s deploy-type=%s": "Looking for Titanium module id=%s version=%s platform=%s deploy-type=%s",
 	"Found incompatible Titanium module id=%s version=%s platform=%s deploy-type=%s": "Found incompatible Titanium module id=%s version=%s platform=%s deploy-type=%s",
+	"Found better matching module id=%s version=%s platform=%s deploy-type=%s path=%s": "Found better matching module id=%s version=%s platform=%s deploy-type=%s path=%s",
 	"Found Titanium module id=%s version=%s platform=%s deploy-type=%s path=%s": "Found Titanium module id=%s version=%s platform=%s deploy-type=%s path=%s",
 	"Could not find Titanium module id=%s version=%s platform=%s deploy-type=%s": "Could not find Titanium module id=%s version=%s platform=%s deploy-type=%s",
 	"Installing module: %s": "Installing module: %s",
