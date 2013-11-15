@@ -13,7 +13,6 @@
  * Updated a number of APIs to have better dependency injection and less hard-coded parameters (needed for unit tests)
  * Added HAXM environment detection
  * Moved Java environment detection from Android detection library into standalone library and greatly improved Android SDK detection
- * Better Titanium CLI plugin detection
  * Removed deprecated astwalker library
  * Added new subprocess library to make finding and calling subprocesses easier
  * Removed deprecated hitch() util function
@@ -29,8 +28,29 @@
  * Fixed bug with symlinked modules and plugins not being found [TIMOB-14209]
  * Fixed bug with visitDirsSync() passing the correct filename and path to the visitor function [TIMOB-14958]
  * Fixed bug with Red Hat Linux-based distros (Fedora, Centos) not detecting the name and version of the OS [TIMOB-14960]
+ * Added ampersand escaping in subprocess.run() for Windows [TIMOB-2527]
+ * Added hashfile() function to fs lib
+ * Added more version handling functions: parseMin(), parseMax(), satisfies(), sort()
+ * Updated async lib to allow both arrays and objects of tasks
+ * Added a scopedDetect() function to the tiplugin lib and updated find() to use that if searchPaths is an object
+ * Added support to the copy directory functions in the fs lib for both array and regex ignore files/dirs
+ * Added a sort-of-async copy file function to the fs lib
+ * Added forEachAttr() to xml lib
+ * Fixed bug in recursive copy with opts not being passed to itself
+ * Added ability for unzip visitor to return false to prevent a file from being decompressed
+ * Added getRealName() function to subprocess lib that gets a path's 8.3 formatted name on Windows
+ * Updated timodule lib to use the module's version directory as the version number instead of the version in the manifest
+ * Added Mac OS X CLI tools detection lib [TIMOB-15562]
+ * Fixed bug in timodule lib where the best candidate for a module was not being selected if it found more than one match
+ * Fixed bug when piping the output of an app using node-appc into another app
+ * Added JDK home directory to JDK detection info
+ * Fixed bug with auth lib when authenticating for the first time and .titanium home directory does not exist
+ * Shorten all third party URLs to appcelerator.com/<shortcut> URLs
+ * Added ability to override JAVA_HOME environment variable with one in the CLI config
+ * Fixed bug with module zip files not being automatically unzipped into the modules directory [TIMOB-15714]
+ * Updated third party Node.js module dependency version where safe to do so
 
-0.1.30
+0.1.30 (6/17/2013)
 -------------------
  * Fixed bug with the Android SDK path not being stored back in the Android detection results object after being converted to an absolute path [TIMOB-13549]
  * Fixed a bug with not catching write exceptions in analytics [TIMOB-13908]
