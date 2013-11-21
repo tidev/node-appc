@@ -49,6 +49,8 @@
  * Added ability to override JAVA_HOME environment variable with one in the CLI config
  * Fixed bug with module zip files not being automatically unzipped into the modules directory [TIMOB-15714]
  * Updated third party Node.js module dependency version where safe to do so
+ * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15743]
+ * Added online() function to net lib to detect if you are online
 
 0.1.30 (6/17/2013)
 -------------------
