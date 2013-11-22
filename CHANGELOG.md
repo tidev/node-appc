@@ -1,4 +1,8 @@
-0.1.30
+0.1.X
+-------------------
+ * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15783]
+
+0.1.30 (6/17/2013)
 -------------------
  * Fixed bug with the Android SDK path not being stored back in the Android detection results object after being converted to an absolute path [TIMOB-13549]
  * Fixed a bug with not catching write exceptions in analytics [TIMOB-13908]
