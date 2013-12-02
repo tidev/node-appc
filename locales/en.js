@@ -25,6 +25,7 @@
 	"Please set the __JAVA_HOME__ is set to the JDK install location and not the JRE (Java Runtime Environment).": "Please set the __JAVA_HOME__ is set to the JDK install location and not the JRE (Java Runtime Environment).",
 	"The __JAVA_HOME__ must point to the JDK and not the JRE (Java Runtime Environment).": "The __JAVA_HOME__ must point to the JDK and not the JRE (Java Runtime Environment).",
 	"You may want to reinstall the JDK by downloading it from %s.": "You may want to reinstall the JDK by downloading it from %s.",
+	"Unable to find a valid Java installation containing a libjvm.so": "Unable to find a valid Java installation containing a libjvm.so",
 	"Did you mean this?": "Did you mean this?",
 	"day": {
 		"one": "day",
