@@ -1,6 +1,8 @@
-0.1.X
+0.1.31 (12/18/2013)
 -------------------
  * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15783]
+ * Added support for Xcode 5.0.1+ and iOS 7.0.1+ detection [TIMOB-15681]
+ * Fixed bug with incorrect provisioning profile value being base64 encoded [TIMOB-15970]
 
 0.1.30 (6/17/2013)
 -------------------
