@@ -53,6 +53,7 @@
  * Added online() function to net lib to detect if you are online
  * Improved jdk lib java home detection [TIMOB-15818]
  * Fixed bug in util.mix() when mixing process.env into an object where process.env is not a real object in Node.js 0.8
+ * Fixed bug that when not all required JDK tools are found, we still try to get the path to the ones that were not found which results in an error [TIMOB-3180]
 
 0.1.31 (12/18/2013)
 -------------------
