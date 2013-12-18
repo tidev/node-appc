@@ -1,4 +1,4 @@
-0.2.0
+0.2.0 (12/18/2013)
 -------------------
  * Added try/catch around analytics processing with showErrors flag to display errors
  * Added check to see if session file is writable when logging in or out of Appc network [TIMOB-13908]
@@ -51,6 +51,14 @@
  * Updated third party Node.js module dependency version where safe to do so
  * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15743]
  * Added online() function to net lib to detect if you are online
+ * Improved jdk lib java home detection [TIMOB-15818]
+ * Fixed bug in util.mix() when mixing process.env into an object where process.env is not a real object in Node.js 0.8
+
+0.1.31 (12/18/2013)
+-------------------
+ * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15783]
+ * Added support for Xcode 5.0.1+ and iOS 7.0.1+ detection [TIMOB-15681]
+ * Fixed bug with incorrect provisioning profile value being base64 encoded [TIMOB-15970]
 
 0.1.30 (6/17/2013)
 -------------------
