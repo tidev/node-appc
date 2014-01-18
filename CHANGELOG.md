@@ -1,3 +1,7 @@
+0.2.x
+-------------------
+ * Fixed bug where JAVA_HOME beginning with a tilde was not being resolved to the home directory before checking if the path exists [TIMOB-16085]
+
 0.2.0 (12/18/2013)
 -------------------
  * Added try/catch around analytics processing with showErrors flag to display errors
