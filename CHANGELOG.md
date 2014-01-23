@@ -1,3 +1,7 @@
+0.1.32
+-------------------
+ * Reverted the fix for the incorrect provisiong profile value which was only meant for 0.2.0 [TIMOB-15970]
+
 0.1.31 (12/18/2013)
 -------------------
  * Added config option "rejectUnauthorized" to auth and analytics libs [TIMOB-15783]
