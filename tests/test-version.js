@@ -48,6 +48,10 @@ describe('version', function () {
 			version.format('1', 0, 2).should.equal('1');
 			version.format('1', 0, 3).should.equal('1');
 			version.format('1', 3, 3).should.equal('1.0.0');
+			version.format('1-beta', 0, 1, true).should.equal('1');
+			version.format('1-beta', 0, 2, true).should.equal('1');
+			version.format('1-beta', 0, 3, true).should.equal('1');
+			version.format('1-beta', 3, 3, true).should.equal('1.0.0');
 		});
 
 		it('format 2 segment versions', function () {
@@ -60,6 +64,10 @@ describe('version', function () {
 			version.format('1.2', 0, 2).should.equal('1.2');
 			version.format('1.2', 0, 3).should.equal('1.2');
 			version.format('1.2', 3, 3).should.equal('1.2.0');
+			version.format('1.2-beta', 0, 1, true).should.equal('1');
+			version.format('1.2-beta', 0, 2, true).should.equal('1.2');
+			version.format('1.2-beta', 0, 3, true).should.equal('1.2');
+			version.format('1.2-beta', 3, 3, true).should.equal('1.2.0');
 		});
 
 		it('format 3 segment versions', function () {
@@ -72,6 +80,11 @@ describe('version', function () {
 			version.format('1.2.3', 0, 2).should.equal('1.2');
 			version.format('1.2.3', 0, 3).should.equal('1.2.3');
 			version.format('1.2.3', 3, 3).should.equal('1.2.3');
+			version.format('1.2.3-beta', 0, 1, true).should.equal('1');
+			version.format('1.2.3-beta', 0, 2, true).should.equal('1.2');
+			version.format('1.2.3-beta', 0, 3, true).should.equal('1.2.3');
+			version.format('1.2.3-beta', 3, 3, true).should.equal('1.2.3');
+			version.format('1.2.3-beta.foo', 3, 3, true).should.equal('1.2.3');
 		});
 
 		it('format 4 segment versions', function () {
