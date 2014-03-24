@@ -53,7 +53,7 @@ describe('android', function () {
 				Object.keys(result.targets).forEach(function (id) {
 					result.targets[id].should.be.a('object');
 
-					var props = ['id', 'name', 'type', 'api-level', 'revision', 'skins', 'abis', 'path', 'based-on', 'libraries', 'vendor', 'description'];
+					var props = ['id', 'name', 'type', 'api-level', 'revision', 'skins', 'abis', 'path', 'based-on', 'libraries', 'vendor', 'description', 'tag/abis'];
 					Object.keys(result.targets[id]).forEach(function (prop) {
 						props.should.include(prop);
 					});
@@ -64,7 +64,7 @@ describe('android', function () {
 				result.avds.forEach(function (avd) {
 					avd.should.be.a('object');
 
-					var props = ['name', 'path', 'target', 'abi', 'skin', 'sdcard', 'based-on'];
+					var props = ['name', 'path', 'target', 'abi', 'skin', 'sdcard', 'based-on', 'tag/abi', 'error', 'id', 'oem'];
 					Object.keys(avd).forEach(function (prop) {
 						props.should.include(prop);
 					});
