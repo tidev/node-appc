@@ -52,7 +52,7 @@ describe('timodule', function () {
 		it('should unzip dummy module and report bad zip file failure', function (done) {
 			var logger = new MockLogger,
 				dummyDir = path.join(__dirname, 'resources', 'timodule', 'modules', 'ios', 'dummy'),
-				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'dummy-ios-1.2.3.zip');
+				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'dummy-ios-1.2.3.zip'),
 				badZipFile = path.join(__dirname, 'resources', 'timodule', 'badzip-ios-1.0.0.zip');
 
 			// remove the dummy directory and existing zip file
