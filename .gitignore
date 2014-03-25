@@ -5,3 +5,4 @@ npm-debug*.log
 lib-cov
 coverage.html
 en-us.js
+tests/resources/timodule/modules/ios/dummy

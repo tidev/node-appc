@@ -34,11 +34,11 @@ describe('timodule', function () {
 		appc.timodule.should.be.a('object');
 	});
 
-	var testResourcesDir = path.join(__dirname, 'resources', 'timodule', 'modules'),
-		dummyModuleDir = path.join(testResourcesDir, 'ios', 'dummy', '1.2.3'),
-		toonewModuleDir = path.join(testResourcesDir, 'ios', 'toonew', '1.0'),
-		ambiguousModuleDir = path.join(testResourcesDir, 'ios', 'ambiguous', '1.0'),
-		ambiguousCommonJSModuleDir = path.join(testResourcesDir, 'commonjs', 'ambiguous', '1.0');
+	var testResourcesDir = path.join(__dirname, 'resources', 'timodule'),
+		dummyModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'dummy', '1.2.3'),
+		toonewModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'toonew', '1.0'),
+		ambiguousModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'ambiguous', '1.0'),
+		ambiguousCommonJSModuleDir = path.join(testResourcesDir, 'modules', 'commonjs', 'ambiguous', '1.0');
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
@@ -52,8 +52,8 @@ describe('timodule', function () {
 		it('should unzip dummy module and report bad zip file failure', function (done) {
 			var logger = new MockLogger,
 				dummyDir = path.join(__dirname, 'resources', 'timodule', 'modules', 'ios', 'dummy'),
-				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'modules', 'dummy-ios-1.2.3.zip');
-				badZipFile = path.join(__dirname, 'resources', 'timodule', 'modules', 'badzip-ios-1.0.0.zip');
+				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'dummy-ios-1.2.3.zip'),
+				badZipFile = path.join(__dirname, 'resources', 'timodule', 'badzip-ios-1.0.0.zip');
 
 			// remove the dummy directory and existing zip file
 			fs.existsSync(dummyDir) && wrench.rmdirSyncRecursive(dummyDir);
@@ -63,16 +63,16 @@ describe('timodule', function () {
 			// duplicate the zip files
 			fs.writeFileSync(
 				goodZipFile,
-				fs.readFileSync(path.join(__dirname, 'resources', 'timodule', 'modules', 'dummy-ios-1.2.3.zip.orig'))
+				fs.readFileSync(path.join(__dirname, 'resources', 'timodule', 'dummy-ios-1.2.3.zip.orig'))
 			);
 			fs.writeFileSync(
 				badZipFile,
-				fs.readFileSync(path.join(__dirname, 'resources', 'timodule', 'modules', 'badzip-ios-1.0.0.zip.orig'))
+				fs.readFileSync(path.join(__dirname, 'resources', 'timodule', 'badzip-ios-1.0.0.zip.orig'))
 			);
 
 			// now run the detection
 			appc.timodule.scopedDetect({
-				testResources: testResourcesDir
+				testResources: path.join(testResourcesDir, 'modules')
 			}, new MockConfig, logger, function (result) {
 				fs.existsSync(goodZipFile) && fs.unlinkSync(goodZipFile);
 				fs.existsSync(badZipFile) && fs.unlinkSync(badZipFile);
@@ -96,9 +96,9 @@ describe('timodule', function () {
 
 			// now run the detection
 			appc.timodule.scopedDetect({
-				testResources: testResourcesDir
+				testResources: path.join(testResourcesDir, 'modules')
 			}, new MockConfig, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting modules in ' + testResourcesDir);
+				logger.buffer.stripColors.should.include('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
 				logger.buffer.stripColors.should.include('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
@@ -126,7 +126,7 @@ describe('timodule', function () {
 
 			// we test for dupe search paths, but only one should be searched
 			appc.timodule.detect([ dir, dir ], logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting modules in ' + testResourcesDir);
+				logger.buffer.stripColors.should.include('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
 				logger.buffer.stripColors.should.include('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
 				logger.buffer.stripColors.should.include('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
@@ -355,6 +355,27 @@ describe('timodule', function () {
 					found = result.conflict[i].id == 'ambiguous';
 				}
 				assert(found, '"ambiguous" module was not marked as conflict');
+
+				done();
+			});
+		});
+
+		it('should find only one "baz" module', function (done) {
+			var logger = new MockLogger;
+			appc.timodule.find([
+				{ id: 'baz' }
+			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir, path.join(__dirname, 'resources', 'timodule2') ], logger, function (result) {
+				logger.buffer.stripColors.should.include(
+					'Found Titanium module id=baz version=latest platform=ios deploy-type=development'
+				);
+
+				var found = 0;
+				for (var i = 0; !found && i < result.found.length; i++) {
+					if (result.found[i].id == 'baz') {
+						found++;
+					}
+				}
+				assert(found == 1, '"baz" module not marked as found');
 
 				done();
 			});
