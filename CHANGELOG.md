@@ -2,6 +2,8 @@
 -------------------
  * Fixed bug where JAVA_HOME beginning with a tilde was not being resolved to the home directory before checking if the path exists [TIMOB-16085]
  * Fixed version.satisfies() function to accept versions with a -label suffix [TIMOB-16365]
+ * Fixed bug where 'ipconfig /all' output was incorrectly being parsed on Windows and thus the mac addresses were not being properly extracted [TIMOB-16747]
+ * Fixed bug in the net.online() function to perform a simple single DNS check instead of once per interface
 
 0.2.0 (12/18/2013)
 -------------------
