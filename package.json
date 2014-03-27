@@ -8,7 +8,7 @@
 	"version": "0.2.1-dev",
 	"author": {
 		"name": "Appcelerator, Inc.",
-		"email": "info@appcelerator.com"
+		"email": "npmjs@appcelerator.com"
 	},
 	"maintainers": [
 		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
