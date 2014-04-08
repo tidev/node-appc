@@ -1,4 +1,4 @@
-0.2.1
+0.2.1 (4/8/2014)
 -------------------
  * Fixed bug where JAVA_HOME beginning with a tilde was not being resolved to the home directory before checking if the path exists [TIMOB-16085]
  * Fixed version.satisfies() function to accept versions with a -label suffix [TIMOB-16365]
