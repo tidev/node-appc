@@ -1,3 +1,7 @@
+0.2.4 (5/16/2014)
+-------------------
+ * Added better error handling around the analytics event files [TIMOB-16979]
+
 0.2.3 (5/14/2014)
 -------------------
  * Only send analytics by one process at a time and write each event to separate files to avoid conflicts [TIMOB-16960]
