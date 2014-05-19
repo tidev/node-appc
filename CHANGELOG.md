@@ -1,3 +1,7 @@
+0.2.5 (5/19/2014)
+-------------------
+ * More tweaks to the analytics handling to prevent analytics from being run more than once at a time [TIMOB-16979]
+
 0.2.4 (5/16/2014)
 -------------------
  * Added better error handling around the analytics event files [TIMOB-16979]
