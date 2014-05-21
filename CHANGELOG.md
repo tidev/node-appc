@@ -1,3 +1,7 @@
+0.2.6 (5/21/2014)
+-------------------
+ * Fixed bug where analytics would get stuck in an infinite loop if another process was trying to send analytics [TIMOB-17007]
+
 0.2.5 (5/19/2014)
 -------------------
  * More tweaks to the analytics handling to prevent analytics from being run more than once at a time [TIMOB-16979]
