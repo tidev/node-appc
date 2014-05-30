@@ -1,6 +1,11 @@
-0.2.7
+0.2.8
 -------------------
  * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
+
+0.2.7 (5/30/2014)
+-------------------
+ * Fixed filename bug when writing analytics events to disk [TIMOB-17052]
+>>>>>>> master
 
 0.2.6 (5/21/2014)
 -------------------
