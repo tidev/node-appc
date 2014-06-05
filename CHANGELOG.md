@@ -1,3 +1,7 @@
+0.2.8 (6/4/2014)
+-------------------
+ * Added support to version.parseMax() for keeping the X in the version number [TIMOB-17066]
+
 0.2.7 (5/30/2014)
 -------------------
  * Fixed filename bug when writing analytics events to disk [TIMOB-17052]
