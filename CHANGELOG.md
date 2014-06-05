@@ -1,10 +1,14 @@
-0.2.9
--------------------
- *
-
-0.2.8 (6/4/2014)
+0.2.10 (6/4/2014)
 -------------------
  * Added support to version.parseMax() for keeping the X in the version number [TIMOB-17066]
+
+0.2.9
+-------------------
+ * Botched release, unpublished
+
+0.2.8
+-------------------
+ * Botched release, unpublished
 
 0.2.7 (5/30/2014)
 -------------------
