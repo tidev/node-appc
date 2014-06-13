@@ -1,3 +1,7 @@
+0.2.11 (6/13/2014)
+-------------------
+ * Fixed bug with detecting and unzipping modules when project does not have any modules already [TIMOB-17144]
+
 0.2.10 (6/4/2014)
 -------------------
  * Added support to version.parseMax() for keeping the X in the version number [TIMOB-17066]
