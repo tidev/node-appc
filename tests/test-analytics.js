@@ -26,7 +26,7 @@ describe('analytics', function () {
 
 	describe('#send()', function () {
 		it('should fail to send because missing arguments', function (done) {
-			this.timeout(3000);
+			this.timeout(6000);
 			this.slow(3000);
 
 			appc.analytics.events = [];
@@ -42,7 +42,7 @@ describe('analytics', function () {
 				childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup();
-				}, 1000);
+				}, 5000);
 
 			function cleanup(err) {
 				clearTimeout(successTimer);
@@ -64,7 +64,7 @@ describe('analytics', function () {
 		});
 
 		it('should post ti.start event', function (done) {
-			this.timeout(3000);
+			this.timeout(6000);
 			this.slow(3000);
 
 			appc.analytics.events = [];
@@ -107,7 +107,7 @@ describe('analytics', function () {
 				childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup(new Error('analytics timed out'));
-				}, 2000);
+				}, 5000);
 
 			function cleanup(err) {
 				clearTimeout(successTimer);
