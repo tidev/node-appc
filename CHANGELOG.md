@@ -1,3 +1,7 @@
+0.2.12
+-------------------
+ * Added Java architecture detection to JDK library
+
 0.2.11 (6/13/2014)
 -------------------
  * Fixed bug with detecting and unzipping modules when project does not have any modules already [TIMOB-17144]

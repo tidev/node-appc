@@ -34,6 +34,11 @@ describe('jdk', function () {
 					result.build.should.match(/^\d+$/);
 				}
 
+				if (result.architecture !== null) {
+					result.architecture.should.be.a('string');
+					result.architecture.should.match(/^(32|64)bit$/);
+				}
+
 				if (result.executables !== null) {
 					result.executables.should.be.a('object');
 				}
