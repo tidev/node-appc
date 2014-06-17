@@ -37,6 +37,10 @@ describe('analytics', function () {
 					cleanup(new Error('analytics sent despite missing arguments'));
 				});
 
+			server.on('error', function (err) {
+				cleanup(new Error(err));
+			});
+
 			server.listen(1337, '127.0.0.1');
 
 			var childRunning = true,
@@ -101,6 +105,10 @@ console.error('got connection!');
 						setTimeout(cleanup, 100);
 					});
 				});
+
+			server.on('error', function (err) {
+				cleanup(new Error(err));
+			});
 
 			server.listen(1337, '127.0.0.1');
 
