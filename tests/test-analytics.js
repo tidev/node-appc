@@ -79,6 +79,7 @@ describe('analytics', function () {
 			var finished = false,
 				tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
+console.log('connection!');
 					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
 
 					var body = '';
@@ -109,20 +110,9 @@ describe('analytics', function () {
 				cleanup(new Error(err));
 			});
 
-			server.listen(8000);
-
-			var childRunning = true,
-				successTimer = setTimeout(function () {
-					cleanup(new Error('analytics timed out'));
-				}, 8000),
-				child = appc.analytics.send({
-					analyticsUrl: 'http://localhost:8000',
-					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
-					appName: 'Analytics Unit Test',
-					appGuid: '12345678_1234_1234_123456789012',
-					directory: tempDir,
-					version: '1.0.0'
-				});
+			var childRunning = false,
+				successTimer,
+				child;
 
 			function cleanup(err) {
 				if (finished) return;
@@ -138,14 +128,32 @@ describe('analytics', function () {
 				});
 			}
 
-			// check if the child exited
-			child.on('exit', function (code) {
-				childRunning = false;
-				if (code) {
-					cleanup(new Error('analytics send process exited with ' + code));
-				} else if (!finished) {
-					cleanup(new Error('analytics sent, but server never received the request'));
-				}
+			server.listen(8000, function () {
+console.log('listening on port 8000');
+				childRunning = true;
+
+				successTimer = setTimeout(function () {
+					cleanup(new Error('analytics timed out'));
+				}, 8000);
+
+				child = appc.analytics.send({
+					analyticsUrl: 'http://localhost:8000',
+					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
+					appName: 'Analytics Unit Test',
+					appGuid: '12345678_1234_1234_123456789012',
+					directory: tempDir,
+					version: '1.0.0'
+				});
+
+				// check if the child exited
+				child.on('exit', function (code) {
+					childRunning = false;
+					if (code) {
+						cleanup(new Error('analytics send process exited with ' + code));
+					} else if (!finished) {
+						cleanup(new Error('analytics sent, but server never received the request'));
+					}
+				});
 			});
 		});
 
