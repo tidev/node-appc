@@ -21,6 +21,8 @@ describe('jdk', function () {
 
 	describe('#detect()', function () {
 		it('should return valid result without specifying a config or options', function (done) {
+			this.timeout(5000);
+
 			appc.jdk.detect(function (result) {
 				result.should.be.a('object');
 
@@ -32,6 +34,11 @@ describe('jdk', function () {
 				if (result.build !== null) {
 					result.build.should.be.a('string');
 					result.build.should.match(/^\d+$/);
+				}
+
+				if (result.architecture !== null) {
+					result.architecture.should.be.a('string');
+					result.architecture.should.match(/^(32|64)bit$/);
 				}
 
 				if (result.executables !== null) {
@@ -47,6 +54,8 @@ describe('jdk', function () {
 		});
 
 		it('should return valid result with a config and without specifying options', function (done) {
+			this.timeout(5000);
+
 			appc.jdk.detect(new MockConfig, function (result) {
 				result.should.be.a('object');
 				done();
@@ -54,6 +63,8 @@ describe('jdk', function () {
 		});
 
 		it('should return valid result with a config and options', function (done) {
+			this.timeout(5000);
+
 			appc.jdk.detect(new MockConfig, { bypassCache: true }, function (result) {
 				result.should.be.a('object');
 				done();

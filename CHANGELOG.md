@@ -1,6 +1,24 @@
+0.2.12
+-------------------
+ * Added Java architecture detection to JDK library
+ * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
+
+0.2.11 (6/13/2014)
+-------------------
+ * Fixed bug with detecting and unzipping modules when project does not have any modules already [TIMOB-17144]
+
+0.2.10 (6/4/2014)
+-------------------
+ * Added support to version.parseMax() for keeping the X in the version number [TIMOB-17066]
+
+0.2.9
+-------------------
+ * Botched release, unpublished
+
 0.2.8
 -------------------
- * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
+ * Botched release, unpublished
+>>>>>>> master
 
 0.2.7 (5/30/2014)
 -------------------

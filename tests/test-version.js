@@ -257,6 +257,8 @@ describe('version', function () {
 			version.parseMax('<1.0').should.equal('1.0');
 			version.parseMax('<18').should.equal('<18');
 			version.parseMax('>=2.3.3 <=4.2').should.equal('4.2');
+			version.parseMax('>=2.3.3 <=4.2.x').should.equal('4.2');
+			version.parseMax('>=2.3.3 <=4.2.x', true).should.equal('4.2.x');
 			version.parseMax('>=2.3.3 <=4.2 || >=1.0').should.equal('4.2');
 			version.parseMax('>=2.3.3 <=4.2 || 5.0').should.equal('5.0');
 		});
