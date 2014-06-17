@@ -41,14 +41,14 @@ describe('analytics', function () {
 				cleanup(new Error(err));
 			});
 
-			server.listen(8000, '127.0.0.1');
+			server.listen(8000);
 
 			var childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup();
 				}, 5000),
 				child = appc.analytics.send({
-					analyticsUrl: 'http://127.0.0.1:8000'
+					analyticsUrl: 'http://localhost:8000'
 				});
 
 			function cleanup(err) {
@@ -109,14 +109,14 @@ describe('analytics', function () {
 				cleanup(new Error(err));
 			});
 
-			server.listen(8000, '127.0.0.1');
+			server.listen(8000);
 
 			var childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup(new Error('analytics timed out'));
 				}, 8000),
 				child = appc.analytics.send({
-					analyticsUrl: 'http://127.0.0.1:8000',
+					analyticsUrl: 'http://localhost:8000',
 					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
 					appName: 'Analytics Unit Test',
 					appGuid: '12345678_1234_1234_123456789012',
