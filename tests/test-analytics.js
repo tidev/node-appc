@@ -27,7 +27,7 @@ describe('analytics', function () {
 	describe('#send()', function () {
 		it('should fail to send because missing arguments', function (done) {
 			this.timeout(10000);
-			this.slow(8000);
+			this.slow(9000);
 
 			appc.analytics.events = [];
 
@@ -41,14 +41,14 @@ describe('analytics', function () {
 				cleanup(new Error(err));
 			});
 
-			server.listen(1337, '127.0.0.1');
+			server.listen(8000, '127.0.0.1');
 
 			var childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup();
 				}, 5000),
 				child = appc.analytics.send({
-					analyticsUrl: 'http://127.0.0.1:1337'
+					analyticsUrl: 'http://127.0.0.1:8000'
 				});
 
 			function cleanup(err) {
@@ -72,14 +72,13 @@ describe('analytics', function () {
 
 		it('should post ti.start event', function (done) {
 			this.timeout(10000);
-			this.slow(5000);
+			this.slow(9000);
 
 			appc.analytics.events = [];
 
 			var finished = false,
 				tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
-console.error('got connection!');
 					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
 
 					var body = '';
@@ -110,14 +109,14 @@ console.error('got connection!');
 				cleanup(new Error(err));
 			});
 
-			server.listen(1337, '127.0.0.1');
+			server.listen(8000, '127.0.0.1');
 
 			var childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup(new Error('analytics timed out'));
 				}, 8000),
 				child = appc.analytics.send({
-					analyticsUrl: 'http://127.0.0.1:1337',
+					analyticsUrl: 'http://127.0.0.1:8000',
 					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
 					appName: 'Analytics Unit Test',
 					appGuid: '12345678_1234_1234_123456789012',
