@@ -27,7 +27,7 @@ describe('analytics', function () {
 	describe('#send()', function () {
 		it('should fail to send because missing arguments', function (done) {
 			this.timeout(10000);
-			this.slow(5000);
+			this.slow(8000);
 
 			appc.analytics.events = [];
 
@@ -72,9 +72,10 @@ describe('analytics', function () {
 
 			appc.analytics.events = [];
 
-			var tempDir = temp.mkdirSync(),
+			var finished = false,
+				tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
-console.log('got connection!');
+console.error('got connection!');
 					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
 
 					var body = '';
@@ -117,6 +118,8 @@ console.log('got connection!');
 				});
 
 			function cleanup(err) {
+				if (finished) return;
+				finished = true;
 				clearTimeout(successTimer);
 				if (childRunning) {
 					childRunning = false;
@@ -127,6 +130,16 @@ console.log('got connection!');
 					done(err);
 				});
 			}
+
+			// check if the child exited
+			child.on('exit', function (code) {
+				childRunning = false;
+				if (code) {
+					cleanup(new Error('analytics send process exited with ' + code));
+				} else if (!finished) {
+					cleanup(new Error('analytics sent, but server never received the request'));
+				}
+			});
 		});
 
 		// TODO: test sending multiple events
