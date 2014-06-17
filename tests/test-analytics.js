@@ -26,8 +26,8 @@ describe('analytics', function () {
 
 	describe('#send()', function () {
 		it('should fail to send because missing arguments', function (done) {
-			this.timeout(6000);
-			this.slow(3000);
+			this.timeout(10000);
+			this.slow(5000);
 
 			appc.analytics.events = [];
 
@@ -35,14 +35,17 @@ describe('analytics', function () {
 					res.writeHead(200, {'Content-Type': 'text/plain'});
 					res.end('Hello World\n');
 					cleanup(new Error('analytics sent despite missing arguments'));
-				}).listen(1337, '127.0.0.1'),
-				child = appc.analytics.send({
-					analyticsUrl: 'http://127.0.0.1:1337'
-				}),
-				childRunning = true,
+				});
+
+			server.listen(1337, '127.0.0.1');
+
+			var childRunning = true,
 				successTimer = setTimeout(function () {
 					cleanup();
-				}, 5000);
+				}, 5000),
+				child = appc.analytics.send({
+					analyticsUrl: 'http://127.0.0.1:1337'
+				});
 
 			function cleanup(err) {
 				clearTimeout(successTimer);
@@ -64,13 +67,14 @@ describe('analytics', function () {
 		});
 
 		it('should post ti.start event', function (done) {
-			this.timeout(6000);
-			this.slow(3000);
+			this.timeout(10000);
+			this.slow(5000);
 
 			appc.analytics.events = [];
 
 			var tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
+console.log('got connection!');
 					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
 
 					var body = '';
@@ -93,9 +97,16 @@ describe('analytics', function () {
 
 						res.writeHead(204);
 						res.end();
-						cleanup();
+						setTimeout(cleanup, 100);
 					});
-				}).listen(1337, '127.0.0.1'),
+				});
+
+			server.listen(1337, '127.0.0.1');
+
+			var childRunning = true,
+				successTimer = setTimeout(function () {
+					cleanup(new Error('analytics timed out'));
+				}, 8000),
 				child = appc.analytics.send({
 					analyticsUrl: 'http://127.0.0.1:1337',
 					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
@@ -103,11 +114,7 @@ describe('analytics', function () {
 					appGuid: '12345678_1234_1234_123456789012',
 					directory: tempDir,
 					version: '1.0.0'
-				}),
-				childRunning = true,
-				successTimer = setTimeout(function () {
-					cleanup(new Error('analytics timed out'));
-				}, 5000);
+				});
 
 			function cleanup(err) {
 				clearTimeout(successTimer);
