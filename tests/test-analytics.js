@@ -44,30 +44,40 @@ describe('analytics', function () {
 			server.listen(8000);
 
 			var childRunning = true,
+				child,
 				successTimer = setTimeout(function () {
 					cleanup();
-				}, 5000),
-				child = appc.analytics.send({
-					analyticsUrl: 'http://localhost:8000'
+				}, 5000);
+
+			appc.analytics.send({
+				analyticsUrl: 'http://localhost:8000',
+				debug: true,
+				logger: {
+					debug: console.log,
+					log: console.log
+				},
+				loggedIn: true,
+				guid: 'test'
+			}, function (err, _child) {
+				child = _child;
+				// check if the child exited abnormally
+				_child && _child.on('exit', function (code) {
+					childRunning = false;
+					code && cleanup();
 				});
+			});
 
 			function cleanup(err) {
 				clearTimeout(successTimer);
 				if (childRunning) {
 					childRunning = false;
-					child.kill();
+					child && child.kill();
 				}
 				server && server.close(function () {
 					server = null;
 					done(err);
 				});
 			}
-
-			// check if the child exited abnormally
-			child.on('exit', function (code) {
-				childRunning = false;
-				code && cleanup();
-			});
 		});
 
 		it.skip('should post ti.start event', function (done) {
@@ -119,7 +129,7 @@ describe('analytics', function () {
 				clearTimeout(successTimer);
 				if (childRunning) {
 					childRunning = false;
-					child.kill();
+					child && child.kill();
 				}
 				server && server.close(function () {
 					server = null;
@@ -134,23 +144,24 @@ describe('analytics', function () {
 					cleanup(new Error('analytics timed out'));
 				}, 8000);
 
-				child = appc.analytics.send({
+				appc.analytics.send({
 					analyticsUrl: 'http://localhost:8000',
 					appId: 'com.appcelerator.node-appc.unit-tests.test-analytics',
 					appName: 'Analytics Unit Test',
 					appGuid: '12345678_1234_1234_123456789012',
 					directory: tempDir,
 					version: '1.0.0'
-				});
-
-				// check if the child exited
-				child.on('exit', function (code) {
-					childRunning = false;
-					if (code) {
-						cleanup(new Error('analytics send process exited with ' + code));
-					} else if (!finished) {
-						cleanup(new Error('analytics sent, but server never received the request'));
-					}
+				}, function (_child) {
+					child = _child;
+					// check if the child exited
+					_child && _child.on('exit', function (code) {
+						childRunning = false;
+						if (code) {
+							cleanup(new Error('analytics send process exited with ' + code));
+						} else if (!finished) {
+							cleanup(new Error('analytics sent, but server never received the request'));
+						}
+					});
 				});
 			});
 		});
