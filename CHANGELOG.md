@@ -1,7 +1,11 @@
-0.2.12
+0.2.13
+-------------------
+ * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
+
+0.2.12 (6/19/2014)
 -------------------
  * Added Java architecture detection to JDK library
- * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
+ * Fixed a bug caused by TIMOB-17144 when detecting Titanium modules, but no specific modules are being loaded
 
 0.2.11 (6/13/2014)
 -------------------
