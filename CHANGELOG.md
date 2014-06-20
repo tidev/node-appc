@@ -1,4 +1,4 @@
-0.2.13
+0.2.13 (6/20/2014)
 -------------------
  * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
 
