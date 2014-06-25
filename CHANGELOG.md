@@ -1,3 +1,7 @@
+0.2.14 (6/24/2014)
+-------------------
+ * Fixed bug where the analytics child send process doesn't disconnect from the parent allowing the parent to exit [TIMOB-17206]
+
 0.2.13 (6/20/2014)
 -------------------
  * Restructured the analytics lib so the parent writes events to disk, then forks the analytics send process [TIMOB-17046]
