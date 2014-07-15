@@ -1,3 +1,7 @@
+0.2.15 (7/15/2014)
+-------------------
+ * Added support to async lib for zero argument callbacks which will be run sync
+
 0.2.14 (6/24/2014)
 -------------------
  * Fixed bug where the analytics child send process doesn't disconnect from the parent allowing the parent to exit [TIMOB-17206]
@@ -26,12 +30,10 @@
 0.2.8
 -------------------
  * Botched release, unpublished
->>>>>>> master
 
 0.2.7 (5/30/2014)
 -------------------
  * Fixed filename bug when writing analytics events to disk [TIMOB-17052]
->>>>>>> master
 
 0.2.6 (5/21/2014)
 -------------------

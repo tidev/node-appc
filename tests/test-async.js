@@ -14,7 +14,7 @@ describe('async', function () {
 	});
 
 	describe('#parallel()', function () {
-		it('should run tasks in parallel using same context', function (done) {
+		it('should run async tasks in parallel using same context', function (done) {
 			function TestObj() {
 				this.counter = 0;
 			}
@@ -39,10 +39,33 @@ describe('async', function () {
 				done();
 			});
 		});
+
+		it('should run sync tasks in parallel using same context', function (done) {
+			function TestObj() {
+				this.counter = 0;
+			}
+
+			var obj = new TestObj;
+
+			appc.async.parallel(obj, [
+				function () {
+					this.counter++;
+				},
+				function () {
+					this.counter++;
+				},
+				function () {
+					this.counter++;
+				}
+			], function () {
+				obj.counter.should.equal(3);
+				done();
+			});
+		});
 	});
 
 	describe('#series()', function () {
-		it('should run tasks in series using same context', function (done) {
+		it('should run async tasks in series using same context', function (done) {
 			function TestObj() {
 				this.counter = 0;
 			}
@@ -61,6 +84,29 @@ describe('async', function () {
 				function (next) {
 					this.counter++;
 					next();
+				}
+			], function () {
+				obj.counter.should.equal(3);
+				done();
+			});
+		});
+
+		it('should run sync tasks in series using same context', function (done) {
+			function TestObj() {
+				this.counter = 0;
+			}
+
+			var obj = new TestObj;
+
+			appc.async.series(obj, [
+				function () {
+					this.counter++;
+				},
+				function () {
+					this.counter++;
+				},
+				function () {
+					this.counter++;
 				}
 			], function () {
 				obj.counter.should.equal(3);
