@@ -1,3 +1,8 @@
+0.2.16 (8/22/2014)
+-------------------
+ * Fixed bug with parseMin() and parseMax() in version module
+ * Updated NPM dependencies
+
 0.2.15 (7/15/2014)
 -------------------
  * Added support to async lib for zero argument callbacks which will be run sync

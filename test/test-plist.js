@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -16,12 +16,12 @@ dt.setTime(1372893710058); // Wed Jul 03 2013 16:21:55 GMT-0700 (PDT)
 describe('plist', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('plist');
-		appc.plist.should.be.a('function');
+		appc.plist.should.be.a.Function;
 	});
 
 	it('create empty plist', function () {
 		var plist = new appc.plist;
-		plist.should.be.a('object');
+		plist.should.be.an.Object;
 
 		plist.toString().should.equal('[object Object]');
 
@@ -110,7 +110,7 @@ describe('plist', function () {
 
 	it('read plist from file', function () {
 		var plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
-		plist.should.be.a('object');
+		plist.should.be.an.Object;
 
 		plist.should.eql({
 			"CFBundleDevelopmentRegion": "English",
@@ -224,7 +224,7 @@ describe('plist', function () {
 
 	it('read big plist from file', function () {
 		var plist = new appc.plist(path.join(__dirname, 'resources', 'InfoBig.plist'));
-		plist.should.be.a('object');
+		plist.should.be.an.Object;
 
 		// since plists do not support milliseconds, we have to force the milliseconds to zero
 		dt.setTime(Math.floor(dt.getTime() / 1000) * 1000);
@@ -464,7 +464,7 @@ describe('plist', function () {
 
 	it('read from file and modify', function () {
 		var plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
-		plist.should.be.a('object');
+		plist.should.be.an.Object;
 
 		plist.testkey = 'testvalue';
 		plist.testarray = ['testvalue1', 'testvalue2'];

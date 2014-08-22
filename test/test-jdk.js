@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -16,7 +16,7 @@ function MockConfig() {
 describe('jdk', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('jdk');
-		appc.jdk.should.be.a('object');
+		appc.jdk.should.be.an.Object;
 	});
 
 	describe('#detect()', function () {
@@ -24,29 +24,29 @@ describe('jdk', function () {
 			this.timeout(5000);
 
 			appc.jdk.detect(function (result) {
-				result.should.be.a('object');
+				result.should.be.an.Object;
 
 				if (result.version !== null) {
-					result.version.should.be.a('string');
+					result.version.should.be.a.String;
 					result.version.should.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
 				}
 
 				if (result.build !== null) {
-					result.build.should.be.a('string');
+					result.build.should.be.a.String;
 					result.build.should.match(/^\d+$/);
 				}
 
 				if (result.architecture !== null) {
-					result.architecture.should.be.a('string');
+					result.architecture.should.be.a.String;
 					result.architecture.should.match(/^(32|64)bit$/);
 				}
 
 				if (result.executables !== null) {
-					result.executables.should.be.a('object');
+					result.executables.should.be.an.Object;
 				}
 
 				if (result.issues !== null) {
-					result.issues.should.be.an.instanceOf(Array);
+					result.issues.should.be.an.Array;
 				}
 
 				done();
@@ -57,7 +57,7 @@ describe('jdk', function () {
 			this.timeout(5000);
 
 			appc.jdk.detect(new MockConfig, function (result) {
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				done();
 			});
 		});
@@ -66,7 +66,7 @@ describe('jdk', function () {
 			this.timeout(5000);
 
 			appc.jdk.detect(new MockConfig, { bypassCache: true }, function (result) {
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				done();
 			});
 		});

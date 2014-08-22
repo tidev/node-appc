@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -15,7 +15,7 @@ var appc = require('../index'),
 describe('auth', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('auth');
-		appc.auth.should.be.a('object');
+		appc.auth.should.be.an.Object;
 	});
 
 	describe('#login()', function () {
@@ -34,7 +34,7 @@ describe('auth', function () {
 		it('creates non-existant mid file', function (done) {
 			var tempDir = temp.mkdirSync();
 			appc.auth.getMID(tempDir, function (mid) {
-				mid.should.be.a('string');
+				mid.should.be.a.String;
 				fs.existsSync(path.join(tempDir, 'mid.json')).should.be.ok;
 				done();
 			});

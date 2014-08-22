@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -23,7 +23,7 @@ function MockLogger() {
 describe('fs', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('fs');
-		appc.fs.should.be.a('object');
+		appc.fs.should.be.an.Object;
 	});
 
 	describe('#copyFileSync()', function () {

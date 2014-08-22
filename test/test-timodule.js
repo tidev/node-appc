@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -31,7 +31,7 @@ function MockLogger() {
 describe('timodule', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('timodule');
-		appc.timodule.should.be.a('object');
+		appc.timodule.should.be.an.Object;
 	});
 
 	var testResourcesDir = path.join(__dirname, 'resources', 'timodule'),
@@ -77,14 +77,14 @@ describe('timodule', function () {
 				fs.existsSync(goodZipFile) && fs.unlinkSync(goodZipFile);
 				fs.existsSync(badZipFile) && fs.unlinkSync(badZipFile);
 
-				logger.buffer.stripColors.should.include('Installing module: dummy-ios-1.2.3.zip');
-				logger.buffer.stripColors.should.include('Installing module: badzip-ios-1.0.0.zip');
-				logger.buffer.stripColors.should.include('Failed to unzip module "' + badZipFile + '"');
+				logger.buffer.stripColors.should.containEql('Installing module: dummy-ios-1.2.3.zip');
+				logger.buffer.stripColors.should.containEql('Installing module: badzip-ios-1.0.0.zip');
+				logger.buffer.stripColors.should.containEql('Failed to unzip module "' + badZipFile + '"');
 
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				result.should.have.property('testResources');
 				result.testResources.should.have.property('ios');
-				result.testResources.ios.should.be.a('object');
+				result.testResources.ios.should.be.an.Object;
 				result.testResources.ios.should.have.property('dummy');
 
 				done();
@@ -98,20 +98,20 @@ describe('timodule', function () {
 			appc.timodule.scopedDetect({
 				testResources: path.join(testResourcesDir, 'modules')
 			}, new MockConfig, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
-				logger.buffer.stripColors.should.include('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
-				logger.buffer.stripColors.should.include('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
-				logger.buffer.stripColors.should.include('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
-				logger.buffer.stripColors.should.include('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
+				logger.buffer.stripColors.should.containEql('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
 
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				result.should.have.property('testResources');
 				result.testResources.should.have.property('ios');
-				result.testResources.ios.should.be.a('object');
+				result.testResources.ios.should.be.an.Object;
 				result.testResources.ios.should.have.property('dummy');
 				result.testResources.ios.should.have.property('toonew');
 				result.testResources.ios.should.have.property('ambiguous');
-				result.testResources.commonjs.should.be.a('object');
+				result.testResources.commonjs.should.be.an.Object;
 				result.testResources.commonjs.should.have.property('ambiguous');
 
 				done();
@@ -126,20 +126,20 @@ describe('timodule', function () {
 
 			// we test for dupe search paths, but only one should be searched
 			appc.timodule.detect([ dir, dir ], logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
-				logger.buffer.stripColors.should.include('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
-				logger.buffer.stripColors.should.include('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
-				logger.buffer.stripColors.should.include('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
-				logger.buffer.stripColors.should.include('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
+				logger.buffer.stripColors.should.containEql('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.dummy 1.2.3 @ ' + dummyModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.toonew 1.0 @ ' + toonewModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected ios module: ti.ambiguous 1.0 @ ' + ambiguousModuleDir);
+				logger.buffer.stripColors.should.containEql('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
 
 				var dupeSearch = logger.buffer.stripColors.split('Detected ios module: ti.dummy 1.2.3 @').length - 1;
 				assert(dupeSearch == 1, 'Path searched ' + dupeSearch + ' times instead of once');
 
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				result.should.have.property('global');
 				result.should.have.property('project');
 				result.project.should.have.property('ios');
-				result.project.ios.should.be.a('object');
+				result.project.ios.should.be.an.Object;
 				result.project.ios.should.have.property('dummy');
 				result.project.ios.should.have.property('toonew');
 				result.project.ios.should.have.property('ambiguous');
@@ -169,7 +169,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'dummy' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found Titanium module id=dummy version=latest platform=ios deploy-type=development'
 				);
 
@@ -188,7 +188,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'dummy', version: '1.2.3' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found Titanium module id=dummy version=1.2.3 platform=ios deploy-type=development'
 				);
 
@@ -209,7 +209,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'dummy', version: '3.2.1' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Could not find Titanium module id=dummy version=3.2.1 platform=ios,iphone,commonjs deploy-type=development'
 				);
 
@@ -228,7 +228,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'dummy', deployType: 'test,production' }
 			], ['ios', 'iphone'], 'production', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found Titanium module id=dummy version=latest platform=ios deploy-type=test,production'
 				);
 
@@ -270,7 +270,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'dummy', platform: 'ios,android' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found Titanium module id=dummy version=latest platform=ios deploy-type=development'
 				);
 
@@ -312,7 +312,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'doesnotexist' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Could not find Titanium module id=doesnotexist version=latest platform=ios,iphone,commonjs deploy-type=development'
 				);
 
@@ -331,7 +331,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'toonew' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found incompatible Titanium module id=toonew version=latest platform=ios,iphone,commonjs deploy-type=development'
 				);
 
@@ -365,7 +365,7 @@ describe('timodule', function () {
 			appc.timodule.find([
 				{ id: 'baz' }
 			], ['ios', 'iphone'], 'development', '3.2.0', [ testResourcesDir, path.join(__dirname, 'resources', 'timodule2') ], logger, function (result) {
-				logger.buffer.stripColors.should.include(
+				logger.buffer.stripColors.should.containEql(
 					'Found Titanium module id=baz version=latest platform=ios deploy-type=development'
 				);
 

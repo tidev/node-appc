@@ -12,7 +12,7 @@ var appc = require('../index'),
 describe('string', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('string');
-		appc.string.should.be.a('object');
+		appc.string.should.be.an.Object;
 	});
 
 	describe('#lpad()', function () {

@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -30,7 +30,7 @@ function MockLogger() {
 describe('tiplugin', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('tiplugin');
-		appc.tiplugin.should.be.a('object');
+		appc.tiplugin.should.be.an.Object;
 	});
 
 	var testResourcesDir = path.join(__dirname, 'resources', 'tiplugin', 'plugins');
@@ -49,13 +49,13 @@ describe('tiplugin', function () {
 			appc.tiplugin.scopedDetect({
 				testResources: testResourcesDir
 			}, new MockConfig, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting plugins in ' + testResourcesDir);
-				logger.buffer.stripColors.should.include('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: hooktest 1.0 @ ' + path.join(testResourcesDir, 'hooktest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: legacytest @ ' + path.join(testResourcesDir, 'legacytest'));
+				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
+				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: hooktest 1.0 @ ' + path.join(testResourcesDir, 'hooktest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: legacytest @ ' + path.join(testResourcesDir, 'legacytest'));
 
-				result.should.be.a('object');
+				result.should.be.an.Object;
 
 				result.should.eql({
 					testResources: {
@@ -118,13 +118,13 @@ describe('tiplugin', function () {
 				projectDir = path.join(__dirname, 'resources', 'tiplugin');
 
 			appc.tiplugin.detect(projectDir, new MockConfig, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting plugins in ' + testResourcesDir);
-				logger.buffer.stripColors.should.include('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: hooktest 1.0 @ ' + path.join(testResourcesDir, 'hooktest', '1.0'));
-				logger.buffer.stripColors.should.include('Detected plugin: legacytest @ ' + path.join(testResourcesDir, 'legacytest'));
+				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
+				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: hooktest 1.0 @ ' + path.join(testResourcesDir, 'hooktest', '1.0'));
+				logger.buffer.stripColors.should.containEql('Detected plugin: legacytest @ ' + path.join(testResourcesDir, 'legacytest'));
 
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				result.should.have.property('project');
 				result.should.have.property('global');
 
@@ -190,8 +190,8 @@ describe('tiplugin', function () {
 			};
 
 			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting plugins in ' + dir);
-				logger.buffer.stripColors.should.include('Detected plugin: userlegacytest @ ' + dir);
+				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + dir);
+				logger.buffer.stripColors.should.containEql('Detected plugin: userlegacytest @ ' + dir);
 				done();
 			}, true);
 		});
@@ -206,8 +206,8 @@ describe('tiplugin', function () {
 			};
 
 			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
-				logger.buffer.stripColors.should.include('Detecting plugins in ' + dir);
-				logger.buffer.stripColors.should.include('Detected plugin: usercommandtest @ ' + dir);
+				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + dir);
+				logger.buffer.stripColors.should.containEql('Detected plugin: usercommandtest @ ' + dir);
 				done();
 			}, true);
 		});
@@ -230,7 +230,7 @@ describe('tiplugin', function () {
 			appc.tiplugin.find([
 				{ id: 'commandtest' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
-				logger.buffer.stripColors.should.include('Found Titanium plugin id=commandtest version=latest');
+				logger.buffer.stripColors.should.containEql('Found Titanium plugin id=commandtest version=latest');
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
@@ -247,7 +247,7 @@ describe('tiplugin', function () {
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '1.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
-				logger.buffer.stripColors.should.include('Found Titanium plugin id=commandtest version=1.0');
+				logger.buffer.stripColors.should.containEql('Found Titanium plugin id=commandtest version=1.0');
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
@@ -266,7 +266,7 @@ describe('tiplugin', function () {
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '2.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
-				logger.buffer.stripColors.should.include('Could not find Titanium plugin id=commandtest version=2.0');
+				logger.buffer.stripColors.should.containEql('Could not find Titanium plugin id=commandtest version=2.0');
 
 				var found = false;
 				for (var i = 0; !found && i < result.missing.length; i++) {
@@ -283,7 +283,7 @@ describe('tiplugin', function () {
 			appc.tiplugin.find([
 				{ id: 'doesnotexist' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
-				logger.buffer.stripColors.should.include('Could not find Titanium plugin id=doesnotexist version=latest');
+				logger.buffer.stripColors.should.containEql('Could not find Titanium plugin id=doesnotexist version=latest');
 
 				var found = false;
 				for (var i = 0; !found && i < result.missing.length; i++) {

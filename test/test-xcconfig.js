@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -11,12 +11,12 @@ var appc = require('../index'),
 describe('xcconfig', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('xcconfig');
-		appc.xcconfig.should.be.a('function');
+		appc.xcconfig.should.be.a.Function;
 	});
 
 	it('should load and parse a xcconfig file', function () {
 		var result = new appc.xcconfig(path.join(__dirname, 'resources', 'project.xcconfig'));
-		result.should.be.a('object');
+		result.should.be.an.Object;
 
 		result.should.eql({
 			TI_VERSION: '3.2.0',

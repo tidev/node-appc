@@ -57,7 +57,7 @@ module.exports = function () {
 
 					process.env.APPC_COV = path.join(__dirname, 'templates');
 
-					var test = spawn(process.execPath, [ path.join(rootDir, 'tests', 'run.js') ].concat(args), {
+					var test = spawn(process.execPath, [ path.join(rootDir, 'test', 'run.js') ].concat(args), {
 							env: process.env,
 							cwd: rootDir
 						}),

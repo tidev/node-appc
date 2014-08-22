@@ -17,9 +17,9 @@ module.exports = function () {
 
 	if (p != -1) {
 		args.splice(p, 1);
-		args.unshift('debug', path.join(rootDir, 'tests', 'run.js'));
+		args.unshift('debug', path.join(rootDir, 'test', 'run.js'));
 	} else {
-		args.unshift(path.join(rootDir, 'tests', 'run.js'));
+		args.unshift(path.join(rootDir, 'test', 'run.js'));
 	}
 
 	var child = spawn(process.execPath, args, {

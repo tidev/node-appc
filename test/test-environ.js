@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -13,7 +13,7 @@ var appc = require('../index'),
 describe('environ', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('environ');
-		appc.environ.should.be.a('object');
+		appc.environ.should.be.an.Object;
 	});
 
 	describe('#scanCommands()', function () {
@@ -44,18 +44,18 @@ describe('environ', function () {
 		it('should return a Titanium SDK or null', function () {
 			var result = appc.environ.getSDK();
 			if (result) {
-				result.should.be.a('object');
+				result.should.be.an.Object;
 				result.should.have.property('commands');
-				result.commands.should.be.a('object');
+				result.commands.should.be.an.Object;
 				result.should.have.property('name');
-				result.name.should.be.a('string');
+				result.name.should.be.a.String;
 				result.name.should.be.ok;
 				result.should.have.property('path');
-				result.path.should.be.a('string');
+				result.path.should.be.a.String;
 				result.path.should.be.ok;
 				fs.existsSync(result.path).should.be.ok;
 				result.should.have.property('platforms');
-				result.platforms.should.be.a('object');
+				result.platforms.should.be.an.Object;
 			} else {
 				assert.equal(result, null);
 			}
@@ -67,19 +67,19 @@ describe('environ', function () {
 			appc.environ.detectTitaniumSDKs();
 			if (Object.keys(appc.environ.sdks).length) {
 				Object.keys(appc.environ.sdks).forEach(function (ver) {
-					appc.environ.sdks[ver].should.be.a('object');
+					appc.environ.sdks[ver].should.be.an.Object;
 
-					appc.environ.sdks[ver].commands.should.be.a('object');
+					appc.environ.sdks[ver].commands.should.be.an.Object;
 
-					appc.environ.sdks[ver].name.should.be.a('string');
+					appc.environ.sdks[ver].name.should.be.a.String;
 					appc.environ.sdks[ver].name.should.be.ok;
 
-					appc.environ.sdks[ver].path.should.be.a('string');
+					appc.environ.sdks[ver].path.should.be.a.String;
 					appc.environ.sdks[ver].path.should.be.ok;
 
 					fs.existsSync(appc.environ.sdks[ver].path).should.be.ok;
 					appc.environ.sdks[ver].should.have.property('platforms');
-					appc.environ.sdks[ver].platforms.should.be.a('object');
+					appc.environ.sdks[ver].platforms.should.be.an.Object;
 				});
 			}
 		});
@@ -88,15 +88,15 @@ describe('environ', function () {
 	describe('#getOSInfo()', function () {
 		it('should find OS and Node.js info', function (done) {
 			appc.environ.getOSInfo(function (results) {
-				results.should.be.a('object');
-				results.os.should.be.a('string');
-				results.platform.should.be.a('string');
-				results.osver.should.be.a('string');
-				results.ostype.should.be.a('string');
-				results.oscpu.should.be.a('number');
-				results.memory.should.be.a('number');
-				results.node.should.be.a('string');
-				results.npm.should.be.a('string');
+				results.should.be.an.Object;
+				results.os.should.be.a.String;
+				results.platform.should.be.a.String;
+				results.osver.should.be.a.String;
+				results.ostype.should.be.a.String;
+				results.oscpu.should.be.a.Number;
+				results.memory.should.be.a.Number;
+				results.node.should.be.a.String;
+				results.npm.should.be.a.String;
 				done();
 			});
 		});

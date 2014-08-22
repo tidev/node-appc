@@ -1,6 +1,6 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2013 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
@@ -14,7 +14,7 @@ var appc = require('../index'),
 describe('zip', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('zip');
-		appc.zip.should.be.a('object');
+		appc.zip.should.be.an.Object;
 	});
 
 	describe('#extractAll()', function () {
