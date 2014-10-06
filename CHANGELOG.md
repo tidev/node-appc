@@ -1,4 +1,4 @@
-0.2.x
+0.2.18 (10/6/2014)
 -------------------
  * Refactored timodule library to address incorrect module caching, support for bypassing cache, and improved API
 
