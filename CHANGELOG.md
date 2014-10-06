@@ -1,3 +1,7 @@
+0.2.x
+-------------------
+ * Refactored timodule library to address incorrect module caching, support for bypassing cache, and improved API
+
 0.2.17 (9/16/2014)
 -------------------
  * Fixed timodule logic to find latest *valid* module instead of latest module [TIMOB-17545]
