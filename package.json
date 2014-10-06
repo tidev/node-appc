@@ -34,6 +34,7 @@
 		"xmldom": "~0.1.19"
 	},
 	"devDependencies": {
+		"jade": "~0.35.0",
 		"mocha": "*",
 		"should": "~4.0.4"
 	},
