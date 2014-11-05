@@ -1,4 +1,4 @@
-0.2.20
+0.2.20 (11/5/2014)
 -------------------
  * Fixed bug with how discovered modules are combined from multiple install locations [TIMOB-17872]
 
