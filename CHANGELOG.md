@@ -1,4 +1,4 @@
-0.2.21
+0.2.21 (11/12/2014)
 -------------------
  * Fixed bug where duplicate paths were searched for Titanium SDKs due to not fully resolving the real path of the search path.
 
