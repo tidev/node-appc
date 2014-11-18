@@ -1,4 +1,4 @@
-Next Release
+0.2.22 (11/17/2014)
 ------------------
  * Fixed bug with the parent process not properly detaching the child analytics process [TIMOB-18046]
 
