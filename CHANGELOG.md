@@ -1,3 +1,7 @@
+Next Release
+------------------
+ * Fixed bug with the parent process not properly detaching the child analytics process [TIMOB-18046]
+
 0.2.21 (11/12/2014)
 -------------------
  * Fixed bug where duplicate paths were searched for Titanium SDKs due to not fully resolving the real path of the search path.
