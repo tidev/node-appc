@@ -1,4 +1,4 @@
-0.2.23
+0.2.23 (18/18/2014)
 ------------------
  * Fixed bug caused by previous release where installPath was no longer properly being set on vanilla environments.
 
