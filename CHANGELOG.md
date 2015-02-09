@@ -1,4 +1,8 @@
-0.2.23 (18/18/2014)
+0.2.24 (1/9/2015)
+------------------
+ * Fixed subprocess run to pass in an empty array of args instead of null [TIMOB-18538]
+
+0.2.23 (12/18/2014)
 ------------------
  * Fixed bug caused by previous release where installPath was no longer properly being set on vanilla environments.
 
