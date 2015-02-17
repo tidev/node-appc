@@ -7,7 +7,7 @@ deploy:
   provider: npm
   email: npmjs@appcelerator.com
   api_key:
-    secure: FrKLiKQ+4M3FqS/atOfYRvlL9QsW3uS6/wEy+vaeJSA3BstgJZJ68f1psqWf3X1//4m8dvY5M5voxiiO5hDwE6W0GwudvT3zEDVznr60URJ4KKuzbmH7I3vpox+jIy93n4ru3eGi1C/hjYp4y0B66Zat+frBIexiFiN0v9S/Kn8=
+    secure: hoF7E/cOgeqanSdu7EuQQt4t0Qlfe/n7kUuXNlsWahjVRsQDqS0x57il/K+9E3Nrrtd6OAGKbef49bb1EC3QCyI1+aayjyFS3usL76Rdxk3pAdftyRBsHFWLlKtllJzAj+L9hdr2cyjMeahz1XUGwjSvvdHqQUrpPWENwkqvj5o=
   on:
     tags: true
     repo: appcelerator/node-appc
