@@ -1,3 +1,7 @@
+0.2.25 (3/2/2015)
+------------------
+ * Added contents of Titanium SDK top-level package.json to the SDK info object [TIMOB-18628]
+
 0.2.24 (1/9/2015)
 ------------------
  * Fixed subprocess run to pass in an empty array of args instead of null [TIMOB-18538]
