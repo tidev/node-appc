@@ -1,3 +1,7 @@
+0.2.26 (3/17/2015)
+------------------
+ * Removed authentication from the analytics and anonymized the data [TIMOB-18711]
+
 0.2.25 (3/2/2015)
 ------------------
  * Added contents of Titanium SDK top-level package.json to the SDK info object [TIMOB-18629]
