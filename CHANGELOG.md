@@ -1,3 +1,15 @@
+0.2.29 (8/28/2015)
+------------------
+ * Improved JDK detection and added ability to find more than one JDK [TIMOB-19400]
+
+0.2.28
+------------------
+ * ?
+
+0.2.27
+------------------
+ * ?
+
 0.2.26 (3/17/2015)
 ------------------
  * Removed authentication from the analytics and anonymized the data [TIMOB-18711]
