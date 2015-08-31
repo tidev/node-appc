@@ -1,3 +1,7 @@
+0.2.30 (8/31/2015)
+------------------
+ * Windows specific bug fixes [TIMOB-19400]
+
 0.2.29 (8/28/2015)
 ------------------
  * Improved JDK detection and added ability to find more than one JDK [TIMOB-19400]
