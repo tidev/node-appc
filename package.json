@@ -5,7 +5,7 @@
 	"keywords": [
 		"appcelerator"
 	],
-	"version": "0.2.32",
+	"version": "0.2.33",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -14,6 +14,9 @@
 		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
 		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
 	],
+	"bugs": {
+		"url": "https://jira.appcelerator.org/browse/TIMOB"
+	},
 	"repository": {
 		"type": "git",
 		"url": "http://github.com/appcelerator/node-appc.git"
