@@ -23,25 +23,25 @@
 	},
 	"dependencies": {
 		"adm-zip": "0.4.7",
-		"async": "1.4.2",
+		"async": "1.5.2",
 		"colors": "1.1.2",
-		"diff": "2.1.0",
-		"node-uuid": "1.4.3",
+		"diff": "2.2.1",
+		"node-uuid": "1.4.7",
 		"optimist": "0.6.1",
-		"request": "2.61.0",
-		"semver": "5.0.1",
+		"request": "2.69.0",
+		"semver": "5.1.0",
 		"sprintf": "0.1.5",
 		"temp": "0.8.3",
 		"wrench": "1.5.8",
-		"uglify-js": "2.4.24",
-		"xmldom": "0.1.19"
+		"uglify-js": "2.6.1",
+		"xmldom": "0.1.22"
 	},
 	"devDependencies": {
 		"jade": "1.11.0",
 		"mocha": "*",
-		"should": "7.1.0"
+		"should": "8.2.2"
 	},
-	"license":"Apache Public License v2",
+	"license": "Apache-2.0",
 	"main": "./index",
 	"engines": {
 		"node": ">=0.8"
