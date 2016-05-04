@@ -1,34 +1,24 @@
-import 'babel-polyfill';
 import 'source-map-support/register';
 
-/**
- * An example of a function.
- */
-export function sum(x, y) {
-	return x + y;
+export const appc = {};
+
+const modules = [
+	'fs',
+	'path',
+	'subprocess',
+	'util'
+];
+
+for (const name of modules) {
+	Object.defineProperty(appc, name, {
+		enumerable: true,
+		configurable: true,
+		get: () => {
+			const module = require('./' + name);
+			Object.defineProperty(appc, name, { enumerable: true, value: module });
+			return module;
+		}
+	});
 }
 
-/**
- * An example of a class.
- */
-export class Example {
-	/**
-	 * Creates the bar instance.
-	 *
-	 * @param {Object} opts - Various settings.
-	 */
-	constructor(opts) {
-		//
-	}
-
-	/**
-	 * Example method.
-	 *
-	 * @param {String} name - The name to uppercase.
-	 * @returns {String}
-	 * @access public
-	 */
-	toUpper(name) {
-		return name.toUpperCase();
-	}
-}
+export default appc;
