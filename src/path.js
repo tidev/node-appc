@@ -1,6 +1,6 @@
 import path from 'path';
 
-const isWindows = process.platform.indexOf('win') === 0;
+const isWindows = /^win/.test(process.platform);
 
 export const commonSearchPaths = (function () {
 	if (isWindows) {

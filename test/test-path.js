@@ -1,5 +1,7 @@
 import appc from '../src/index';
 
+const isWindows = /^win/.test(process.platform);
+
 describe('util', () => {
 	describe('commonSearchPaths', () => {
 		expect(appc.util.searchPaths).to.be.an.Array;
@@ -19,19 +21,19 @@ describe('util', () => {
 		it('should resolve the home directory using HOME', () => {
 			process.env.HOME = '/Users/username';
 			const p = appc.path.expand('~/foo');
-			expect(p).to.equal('/Users/username/foo');
+			expect(p).to.equal(isWindows ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 		});
 
 		it('should resolve the home directory using USERPROFILE', () => {
 			process.env.HOME = '';
 			process.env.USERPROFILE = '/Users/username';
 			const p = appc.path.expand('~/foo');
-			expect(p).to.equal('/Users/username/foo');
+			expect(p).to.equal(isWindows ? 'C:\\Users\\username\\foo' : '/Users/username/foo');
 		});
 
 		it('should collapse relative segments', () => {
 			const p = appc.path.expand('/path/./to/../foo');
-			expect(p).to.equal('/path/foo');
+			expect(p).to.equal(isWindows ? 'C:\\path\\foo' : '/path/foo');
 		});
 	});
 });

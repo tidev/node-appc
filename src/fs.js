@@ -149,12 +149,14 @@ export class Watcher extends EventEmitter {
 
 				// declare our wrapper that wraps the listener and store a reference
 				// so we can remove it if we stop watching
-				const wrapper = this.wrappers[originalPath] = (event, path, details) => {
-					if (!existsSync(originalPath) || path.indexOf(fs.realpathSync(originalPath)) === 0) {
+				const wrapper = this.wrappers[originalPath] = (event, thePath, details) => {
+					const changedPath = details && details.watchedPath ? path.join(details.watchedPath, thePath) : thePath;
+
+					if (!existsSync(originalPath) || changedPath.indexOf(fs.realpathSync(originalPath)) === 0) {
 						clearTimeout(timer);
 						timer = setTimeout(() => {
 							try {
-								const info = { originalPath, event, path, details };
+								const info = { originalPath, event, path: thePath, details };
 								if (this.transform) {
 									this.transform(listener, info);
 								} else {
@@ -164,7 +166,7 @@ export class Watcher extends EventEmitter {
 								this.stop();
 								this.emit('error', err);
 							}
-						}, this.opts.wait || 1000);
+						}, this.opts.wait || 250);
 					}
 				};
 
