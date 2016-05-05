@@ -265,7 +265,7 @@ describe('fs', () => {
 					expect(info).to.be.an.Object;
 					expect(info).to.have.keys('originalPath', 'event', 'path', 'details');
 					expect(info.originalPath).to.equal(tmpDir);
-					expect(info.event).to.equal('modified');
+					expect(info.event).to.be.a.String;
 					expect(info.path).to.match(new RegExp('^' + fs.realpathSync(newFile)));
 					expect(info.details).to.be.an.Object;
 
