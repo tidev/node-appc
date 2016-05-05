@@ -1,11 +1,11 @@
 import { spawn } from 'child_process';
-import { which as _which } from 'which';
+import _which from 'which';
 
-const isWindows = process.platform.indexOf('win') === 0;
+const isWindows = /^win/.test(process.platform);
 
-export const exe = isWindows ? '.exe' : '';
-export const cmd = isWindows ? '.cmd' : '';
-export const bat = isWindows ? '.bat' : '';
+export const exe = (isWindows ? '.exe' : '');
+export const cmd = (isWindows ? '.cmd' : '');
+export const bat = (isWindows ? '.bat' : '');
 
 /**
  * Wraps `which()` with a promise.

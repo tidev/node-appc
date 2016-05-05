@@ -16,7 +16,7 @@ export function mergeDeep(dest, src) {
 		return dest;
 	}
 
-	Object.keys(src).forEach(key => {
+	for (const key of Object.keys(src)) {
 		const value = src[key];
 		if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
 			if (typeof dest[key] !== 'object' || dest[key] === null || Array.isArray(dest[key])) {
@@ -26,24 +26,37 @@ export function mergeDeep(dest, src) {
 		} else if (typeof value !== 'undefined') {
 			dest[key] = value;
 		}
-	});
+	}
 
 	return dest;
 }
 
-const cacheStore = {};
+export let cacheStore = {};
 
 /**
  * Helper function that handles the caching of a value and multiple requests.
  *
- * @param {String} name - The name of the module caching values.
- * @param {Boolean} bypassCache - When true, bypasses the cache and runs the
+ * @param {String} namespace - The cache namespace.
+ * @param {Boolean} [bypassCache=false] - When true, bypasses the cache and runs the
  * function.
  * @param {Function} fn - A function to call if value is not cached.
- * @returns {Promise}
+ * @returns {Promise|*}
  */
-export function cache(name, bypassCache, fn) {
-	const entry = cacheStore[name] || (cacheStore[name] = {
+export function cache(namespace, bypassCache, fn) {
+	if (typeof namespace !== 'string' || !namespace) {
+		throw new TypeError('Expected namespace to be a non-empty string');
+	}
+
+	if (typeof bypassCache === 'function') {
+		fn = bypassCache;
+		bypassCache = false;
+	}
+
+	if (typeof fn !== 'function') {
+		throw new TypeError('Expected fn to be a function');
+	}
+
+	const entry = cacheStore[namespace] || (cacheStore[namespace] = {
 		pending: false,
 		requests: [],
 		value: null
@@ -61,7 +74,7 @@ export function cache(name, bypassCache, fn) {
 
 	entry.pending = true;
 
-	return fn().then(value => {
+	const store = value => {
 		entry.pending = false;
 		entry.value = value;
 
@@ -71,7 +84,31 @@ export function cache(name, bypassCache, fn) {
 		entry.requests = [];
 
 		return value;
-	});
+	};
+
+	try {
+		const result = fn();
+		if (result instanceof Promise) {
+			return result.then(store);
+		} else {
+			return Promise.resolve(result).then(store);
+		}
+	} catch (err) {
+		return Promise.reject(err);
+	}
+}
+
+/**
+ * Clears a key in the cache store or the entire store.
+ *
+ * @param {String} [namespace] - The cache namespace to clear.
+ */
+export function clearCache(namespace) {
+	if (typeof namespace === 'string' && namespace) {
+		delete cacheStore[namespace];
+	} else {
+		cacheStore = {};
+	}
 }
 
 /**

@@ -28,23 +28,28 @@ export function existsSync(file) {
  * @returns {String|null}
  */
 export function locate(dir, filename, depth) {
-	for (const name of fs.readdirSync(dir)) {
-		const file = path.join(dir, name);
-
-		try {
-			if (fs.statSync(file).isDirectory()) {
-				if (typeof depth === undefined || depth > 0) {
-					const result = locate(file, filename, typeof depth === undefined ? depth : depth - 1);
-					if (result) {
-						return result;
+	try {
+		if (fs.statSync(dir).isDirectory()) {
+			for (const name of fs.readdirSync(dir)) {
+				const file = path.join(dir, name);
+				try {
+					if (fs.statSync(file).isDirectory()) {
+						if (typeof depth === 'undefined' || depth > 0) {
+							const result = locate(file, filename, typeof depth === 'undefined' ? undefined : depth - 1);
+							if (result) {
+								return result;
+							}
+						}
+					} else if ((typeof filename === 'string' && name === filename) || (filename instanceof RegExp && filename.test(name))) {
+						return file;
 					}
+				} catch (e) {
+					// probably a permission issue, go to next file
 				}
-			} else if ((typeof filename === 'string' && name === filename) || (filename instanceof RegExp && filename.test(name))) {
-				return file;
 			}
-		} catch (e) {
-			// squeltch
 		}
+	} catch (e) {
+		// dir does not exist or permission issue
 	}
 	return null;
 }
@@ -74,23 +79,47 @@ export class Watcher extends EventEmitter {
 	/**
 	 * Constructs the watcher.
 	 *
-	 * @param {Object} opts - Options to pass into chokidar.
-	 * @param {Array} opts.searchPaths - An array of full-resolved paths to watch.
+	 * @param {String|Array} paths - An array of full-resolved paths to watch.
+	 * @param {Object} [opts] - Options to pass into chokidar.
 	 * @param {Function} [transform] - A function to transform an event.
 	 */
-	constructor(opts, transform) {
+	constructor(paths, opts, transform) {
 		super();
 
-		if (typeof opts !== 'object' || opts === null) {
-			throw new TypeError('Expected opts to be an object');
+		if (Array.isArray(paths)) {
+			if (paths.length === 0) {
+				throw new TypeError('Expected paths to be an array containing one or more strings');
+			}
+			for (const p of paths) {
+				if (typeof p !== 'string' || !p) {
+					throw new TypeError('Expected paths to be a string or array of strings');
+				}
+			}
+		} else if (typeof paths === 'string') {
+			if (!paths) {
+				throw new TypeError('Expected paths to not be empty');
+			}
+			paths = [ paths ];
+		} else {
+			throw new TypeError('Expected paths to be a string or array of strings');
 		}
 
-		if (!Array.isArray(opts.searchPaths)) {
-			throw new TypeError('Expected search paths to be an array');
+		if (opts && typeof opts === 'function') {
+			transform = opts;
+			opts = {};
 		}
 
-		this.opts = opts;
-		this.transform = typeof transform === 'function' ? transform : null;
+		if (opts && typeof opts !== 'object') {
+			throw new TypeError('Expected options to be an object');
+		}
+
+		if (transform && typeof transform !== 'function') {
+			throw new TypeError('Expected transform to be a function');
+		}
+
+		this.paths     = paths;
+		this.opts      = opts || {};
+		this.transform = transform;
 	}
 
 	/**
@@ -114,43 +143,49 @@ export class Watcher extends EventEmitter {
 		}
 		this.wrappers = {};
 
-		return Promise.all(this.opts.searchPaths.map(originalPath => new Promise((resolve, reject) => {
-			let timer;
+		return Promise
+			.all(this.paths.map(originalPath => new Promise(resolve => {
+				let timer;
 
-			// declare our wrapper that wraps the listener and store a reference
-			// so we can remove it if we stop watching
-			const wrapper = this.wrappers[originalPath] = (evt, path, details) => {
-				if (!existsSync(originalPath) || path.indexOf(fs.realpathSync(originalPath)) === 0) {
-					clearTimeout(timer);
-					timer = setTimeout(() => {
-						const info = { originalPath, evt, path, details };
-						if (this.transform) {
-							this.transform(listener, info);
-						} else {
-							listener(info);
-						}
-					}, this.opts.wait || 1000);
+				// declare our wrapper that wraps the listener and store a reference
+				// so we can remove it if we stop watching
+				const wrapper = this.wrappers[originalPath] = (event, path, details) => {
+					if (!existsSync(originalPath) || path.indexOf(fs.realpathSync(originalPath)) === 0) {
+						clearTimeout(timer);
+						timer = setTimeout(() => {
+							try {
+								const info = { originalPath, event, path, details };
+								if (this.transform) {
+									this.transform(listener, info);
+								} else {
+									listener(info);
+								}
+							} catch (err) {
+								this.stop();
+								this.emit('error', err);
+							}
+						}, this.opts.wait || 1000);
+					}
+				};
+
+				const ready = () => {
+					handle.listenerCount++;
+					this.emit('ready', listener);
+					handle.on('raw', wrapper);
+					resolve();
+				};
+
+				let handle = Watcher.handles[originalPath];
+				if (handle) {
+					// we're already watching this path
+					ready();
+				} else {
+					// start watching this path
+					handle = Watcher.handles[originalPath] = chokidar.watch(originalPath, this.opts);
+					handle.listenerCount = 0;
+					handle.on('ready', ready);
 				}
-			};
-
-			const ready = () => {
-				handle.listenerCount++;
-				this.emit('ready', listener);
-				handle.on('raw', wrapper);
-				resolve(this);
-			};
-
-			let handle = Watcher.handles[originalPath];
-			if (handle) {
-				// we're already watching this path
-				ready();
-			} else {
-				// start watching this path
-				handle = Watcher.handles[originalPath] = chokidar.watch(originalPath, this.opts);
-				handle.listenerCount = 0;
-				handle.on('ready', ready);
-			}
-		})));
+			})));
 	}
 
 	/**

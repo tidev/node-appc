@@ -28,19 +28,19 @@
     "autobind-decorator": "^1.3.3",
     "chokidar": "^1.4.3",
     "source-map-support": "^0.4.0",
-    "which": "^1.2.4"
+    "which": "^1.2.7"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.4",
-    "babel-plugin-transform-class-properties": "^6.6.0",
     "babel-plugin-transform-decorators-legacy": "^1.3.4",
-    "babel-preset-nodejs-lts": "^2.0.0",
+    "babel-preset-nodejs-lts": "^1.2.2",
     "chai": "^3.5.0",
     "del": "^2.2.0",
     "esdoc-es7-plugin": "^0.0.3",
+    "fs-extra": "^0.30.0",
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
-    "gulp-babel-istanbul": "^1.1.0",
+    "gulp-babel-istanbul": "^1.2.0",
     "gulp-debug": "^2.1.2",
     "gulp-esdoc": "^0.2.0",
     "gulp-eslint": "^2.0.0",
@@ -50,8 +50,9 @@
     "gulp-mocha": "^2.2.0",
     "gulp-plumber": "^1.1.0",
     "gulp-sourcemaps": "^2.0.0-alpha",
-    "sinon": "^1.17.3",
-    "sinon-chai": "^2.8.0"
+    "sinon": "^1.17.4",
+    "sinon-chai": "^2.8.0",
+    "temp": "^0.8.3"
   },
   "homepage": "https://github.com/appcelerator/node-appc#readme",
   "bugs": "https://github.com/appcelerator/node-appc/issues",
