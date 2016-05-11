@@ -1,4 +1,3 @@
-import autobind from 'autobind-decorator';
 import crypto from 'crypto';
 
 /**

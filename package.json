@@ -1,6 +1,6 @@
 {
   "name": "node-appc",
-  "version": "2.0.0-alpha",
+  "version": "2.0.0",
   "description": "Appcelerator Common Node Library",
   "main": "./dist/index.js",
   "author": {
@@ -25,14 +25,11 @@
     "test": "gulp test"
   },
   "dependencies": {
-    "autobind-decorator": "^1.3.3",
-    "chokidar": "^1.4.3",
     "source-map-support": "^0.4.0",
-    "which": "^1.2.7"
+    "which": "^1.2.8"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.4",
-    "babel-plugin-transform-decorators-legacy": "^1.3.4",
     "babel-preset-nodejs-lts": "^1.2.2",
     "chai": "^3.5.0",
     "del": "^2.2.0",
@@ -45,7 +42,7 @@
     "gulp-esdoc": "^0.2.0",
     "gulp-eslint": "^2.0.0",
     "gulp-filter": "^4.0.0",
-    "gulp-inject-modules": "^0.1.1",
+    "gulp-inject-modules": "^0.2.0",
     "gulp-load-plugins": "^1.2.2",
     "gulp-mocha": "^2.2.0",
     "gulp-plumber": "^1.1.0",
