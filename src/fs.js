@@ -117,14 +117,33 @@ export class Watcher {
 			throw e;
 		}
 
-		this.fswatcher = fs.watch(this.path, this.onChange.bind(this));
+		this.fswatcher = fs
+			.watch(this.path, this.onChange.bind(this))
+			.on('error', err => {
+				// on Windows, it's possible for the internal FSEvent to return
+				// an EPERM exception, so just ignore it
+			});
 
 		// we have a directory, so stat every file in it and if this
 		// directory was just added, send out notifications for all files
 		this.files = {};
 		for (const filename of fs.readdirSync(this.path)) {
 			const file = nodePath.join(this.path, filename);
-			const stat = this.files[filename] = fs.statSync(file);
+			let stat = null;
+
+			try {
+				stat = this.files[filename] = fs.statSync(file);
+			} catch (e) {
+				if (e.code === 'EBUSY') {
+					// this can happen on Windows when trying to access files
+					// such as the hiberfil.sys
+				} else {
+					// file doesn't exist? skip it
+					continue;
+				}
+			}
+
+			this.files[filename] = stat;
 
 			if (isAdd) {
 				// send notification that this file is new
@@ -207,14 +226,6 @@ export class Watcher {
 	 * @param {String} filename - The name of the file or directory that changed.
 	 */
 	onChange(event, filename) {
-		const evt = {
-			action: null,
-			filename,
-			file: nodePath.join(this.path, filename),
-			stat: null,
-			prevStat: this.files && this.files[filename] || null
-		};
-
 		try {
 			// sanity check that this path still exists because apparently Linux
 			// will let the watcher know that itself was deleted
@@ -222,6 +233,14 @@ export class Watcher {
 		} catch (e) {
 			return;
 		}
+
+		const evt = {
+			action: null,
+			filename,
+			file: nodePath.join(this.path, filename),
+			stat: null,
+			prevStat: this.files && this.files[filename] || null
+		};
 
 		try {
 			evt.stat = fs.statSync(evt.file);
