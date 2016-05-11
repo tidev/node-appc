@@ -283,34 +283,24 @@ describe('fs', () => {
 			fs.mkdirsSync(fooDir);
 
 			appc.fs.watch(fooDir, evt => {
-				counter++;
+				expect(evt).to.be.an.Object;
 
-				try {
+				if (evt.action === 'add') {
+					expect(evt.file).to.equal(barFile);
+
+					counter++;
 					if (counter === 1) {
-						expect(evt).to.be.an.Object;
-						expect(evt.action).to.equal('add');
-						expect(evt.file).to.equal(barFile);
-
 						del([ tmp ], { force: true });
-
 					} else if (counter === 2) {
-						expect(evt).to.be.an.Object;
-						expect(evt.action).to.equal('delete');
-						expect(evt.file).to.equal(barFile);
-
-						setTimeout(() => {
-							fs.mkdirsSync(fooDir);
-							fs.writeFileSync(barFile, 'bar again!');
-						}, 100);
-
-					} else if (counter === 3) {
-						expect(evt).to.be.an.Object;
-						expect(evt.action).to.equal('add');
-						expect(evt.file).to.equal(barFile);
 						done();
 					}
-				} catch (e) {
-					done(e);
+				} else if (evt.action === 'delete') {
+					expect(evt.file).to.equal(barFile);
+
+					setTimeout(() => {
+						fs.mkdirsSync(fooDir);
+						fs.writeFileSync(barFile, 'bar again!');
+					}, 100);
 				}
 			});
 

@@ -216,6 +216,14 @@ export class Watcher {
 		};
 
 		try {
+			// sanity check that this path still exists because apparently Linux
+			// will let the watcher know that itself was deleted
+			fs.statSync(this.path);
+		} catch (e) {
+			return;
+		}
+
+		try {
 			evt.stat = fs.statSync(evt.file);
 			this.files[filename] = evt.stat;
 			evt.action = evt.prevStat ? 'change' : 'add';
