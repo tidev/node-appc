@@ -1,18 +1,7 @@
+import fs from 'fs';
 import path from 'path';
 
 const isWindows = /^win/.test(process.platform);
-
-export const commonSearchPaths = (function () {
-	if (isWindows) {
-		return ['%SystemDrive%', '%ProgramFiles%', '%ProgramFiles(x86)%', '%ProgramW6432%'];
-	}
-
-	let searchDirs = ['/opt', '/opt/local', '/usr', '/usr/local', '~'];
-	if (process.platform === 'darwin') {
-		searchDirs.push('/Applications', '~/Applications', '~/Library');
-	}
-	return searchDirs;
-}());
 
 const homeDirRegExp = /^~([\\|/].*)?$/;
 const winEnvVarRegExp = /(%([^%]*)%)/g;
@@ -32,3 +21,35 @@ export function expand(...segments) {
 	}
 	return path.resolve.apply(null, segments);
 }
+
+/**
+ * A platform specific array of common paths to search for programs. The paths
+ * are not guaranteed to exist, but if they do, it will resolve the real path.
+ * @type {Array}
+ */
+export const commonSearchPaths = (function () {
+	let dirs;
+
+	if (isWindows) {
+		dirs = ['%SystemDrive%', '%ProgramFiles%', '%ProgramFiles(x86)%', '%ProgramW6432%'];
+	} else {
+		dirs = ['/opt', '/opt/local', '/usr', '/usr/local', '~'];
+		if (process.platform === 'darwin') {
+			dirs.push('/Applications', '~/Applications', '/Library', '~/Library');
+		}
+	}
+
+	// create a map to remove duplicates
+	const searchDirs = {};
+
+	for (const dir of dirs) {
+		try {
+			searchDirs[fs.realpathSync(expand(dir))] = 1;
+		} catch (e) {
+			// path does not exist, oh well
+			searchDirs[expand(dir)] = 1;
+		}
+	}
+
+	return Object.keys(searchDirs).sort();
+}());
