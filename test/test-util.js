@@ -57,24 +57,24 @@ describe('util', () => {
 			appc.util.clearCache();
 		});
 
-		it('should error if namespace is not a string', () => {
-			expect(() => {
-				appc.util.cache();
-			}).to.throw(TypeError, 'Expected namespace to be a non-empty string');
-
-			expect(() => {
-				appc.util.cache(123);
-			}).to.throw(TypeError, 'Expected namespace to be a non-empty string');
+		it('should error if namespace is not a string', done => {
+			appc.util.cache()
+				.then(() => done(new Error('Expected rejection')))
+				.catch(err => {
+					expect(err).to.be.a.TypeError;
+					expect(err.message).to.equal('Expected namespace to be a non-empty string');
+					done();
+				});
 		});
 
-		it('should error if fn is not a function', () => {
-			expect(() => {
-				appc.util.cache('foo', 'bar');
-			}).to.throw(TypeError, 'Expected fn to be a function');
-
-			expect(() => {
-				appc.util.cache('foo', true, 'bar');
-			}).to.throw(TypeError, 'Expected fn to be a function');
+		it('should error if fn is not a function', done => {
+			appc.util.cache('foo', 'bar')
+				.then(() => done(new Error('Expected rejection')))
+				.catch(err => {
+					expect(err).to.be.a.TypeError;
+					expect(err.message).to.equal('Expected fn to be a function');
+					done();
+				});
 		});
 
 		it('should cache a value', done => {

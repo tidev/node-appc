@@ -42,59 +42,62 @@ export let cacheStore = {};
  * @returns {Promise}
  */
 export function cache(namespace, bypassCache, fn) {
-	if (typeof namespace !== 'string' || !namespace) {
-		throw new TypeError('Expected namespace to be a non-empty string');
-	}
+	// wrap everything in a setImmediate() call to guarantee this function is async
+	return new Promise((resolve, reject) => setImmediate(() => {
+		if (typeof namespace !== 'string' || !namespace) {
+			return reject(new TypeError('Expected namespace to be a non-empty string'));
+		}
 
-	if (typeof bypassCache === 'function') {
-		fn = bypassCache;
-		bypassCache = false;
-	}
+		if (typeof bypassCache === 'function') {
+			fn = bypassCache;
+			bypassCache = false;
+		}
 
-	if (typeof fn !== 'function') {
-		throw new TypeError('Expected fn to be a function');
-	}
+		if (typeof fn !== 'function') {
+			return reject(new TypeError('Expected fn to be a function'));
+		}
 
-	const entry = cacheStore[namespace] || (cacheStore[namespace] = {
-		pending: false,
-		requests: [],
-		value: null
-	});
-
-	if (entry && entry.value && !bypassCache) {
-		return Promise.resolve(entry.value);
-	}
-
-	if (entry.pending) {
-		return new Promise(resolve => {
-			entry.requests.push(resolve);
+		const entry = cacheStore[namespace] || (cacheStore[namespace] = {
+			pending: false,
+			requests: [],
+			value: null
 		});
-	}
 
-	entry.pending = true;
-
-	const store = value => {
-		entry.pending = false;
-		entry.value = value;
-
-		for (const resolve of entry.requests) {
-			resolve(value);
+		if (entry && entry.value && !bypassCache) {
+			return resolve(entry.value);
 		}
-		entry.requests = [];
 
-		return value;
-	};
-
-	try {
-		const result = fn();
-		if (result instanceof Promise) {
-			return result.then(store);
-		} else {
-			return Promise.resolve(result).then(store);
+		if (entry.pending) {
+			// resolve this promise with another promise that will be resolved
+			// once the active cache call is resolved
+			return resolve(new Promise(resolve => entry.requests.push(resolve)));
 		}
-	} catch (err) {
-		return Promise.reject(err);
-	}
+
+		entry.pending = true;
+
+		const store = value => {
+			entry.pending = false;
+			entry.value = value;
+
+			for (const resolve of entry.requests) {
+				resolve(value);
+			}
+			entry.requests = [];
+
+			return value;
+		};
+
+		try {
+			const result = fn();
+			if (result instanceof Promise) {
+				result.then(store).then(resolve).catch(reject);
+			} else {
+				resolve(store(result));
+			}
+		} catch (err) {
+			reject(err);
+		}
+	}));
 }
 
 /**
