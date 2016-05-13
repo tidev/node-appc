@@ -1,7 +1,7 @@
 import { spawn } from 'child_process';
 import _which from 'which';
 
-const isWindows = /^win/.test(process.platform);
+const isWindows = process.platform === 'win32';
 
 export const exe = (isWindows ? '.exe' : '');
 export const cmd = (isWindows ? '.cmd' : '');

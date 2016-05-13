@@ -39,7 +39,7 @@ export let cacheStore = {};
  * @param {Boolean} [bypassCache=false] - When true, bypasses the cache and runs the
  * function.
  * @param {Function} fn - A function to call if value is not cached.
- * @returns {Promise|*}
+ * @returns {Promise}
  */
 export function cache(namespace, bypassCache, fn) {
 	if (typeof namespace !== 'string' || !namespace) {
@@ -128,4 +128,26 @@ export function sha1(str) {
  */
 export function randomBytes(howMany) {
 	return crypto.randomBytes(howMany).toString('hex');
+}
+
+/**
+ * Removes duplicates from an array and returns a new array.
+ *
+ * @param {Array} arr - The array to remove duplicates.
+ * @returns {Array}
+ */
+export function unique(arr) {
+	const len = Array.isArray(arr) ? arr.length : 0;
+
+	if (len === 0) {
+		return [];
+	}
+
+	return arr.reduce((prev, cur, i, arr) => {
+		if (typeof cur === 'undefined' || cur === null) {
+			return prev;
+		}
+		prev[cur] = cur;
+		return i + 1 < len ? prev : Object.keys(prev).map(key => prev[key]);
+	}, {});
 }

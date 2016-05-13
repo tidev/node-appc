@@ -1,8 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const isWindows = /^win/.test(process.platform);
-
+const isWindows = process.platform === 'win32';
 const homeDirRegExp = /^~([\\|/].*)?$/;
 const winEnvVarRegExp = /(%([^%]*)%)/g;
 
