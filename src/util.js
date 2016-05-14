@@ -30,14 +30,62 @@ export function mergeDeep(dest, src) {
 	return dest;
 }
 
+export let pendingMutexes = {};
+
+/**
+ * Ensures that only a function is executed by a single task at a time. If the
+ * function is currently being run, then additional requests are queued and are
+ * resolved when the function completes.
+ *
+ * @param {String} name - The mutex name.
+ * @param {Function} fn - A function to call if value is not cached.
+ * @returns {Promise}
+ */
+export function mutex(name, fn) {
+	return new Promise((resolve, reject) => setImmediate(() => {
+		if (typeof name !== 'string' || !name) {
+			return reject(new TypeError('Expected name to be a non-empty string'));
+		}
+
+		if (typeof fn !== 'function') {
+			return reject(new TypeError('Expected fn to be a function'));
+		}
+
+		if (pendingMutexes.hasOwnProperty(name)) {
+			return resolve(new Promise(resolve => pendingMutexes[name].push(resolve)));
+		}
+
+		pendingMutexes[name] = [];
+
+		const dispatch = value => {
+			for (const resolve of pendingMutexes[name]) {
+				resolve(value);
+			}
+			delete pendingMutexes[name];
+			return value;
+		};
+
+		try {
+			const result = fn();
+			if (result instanceof Promise) {
+				result.then(dispatch).then(resolve).catch(reject);
+			} else {
+				resolve(dispatch(result));
+			}
+		} catch (err) {
+			reject(err);
+		}
+	}));
+}
+
 export let cacheStore = {};
 
 /**
  * Helper function that handles the caching of a value and multiple requests.
  *
  * @param {String} namespace - The cache namespace.
- * @param {Boolean} [bypassCache=false] - When true, bypasses the cache and runs the
- * function.
+ * @param {Boolean} [bypassCache=false] - When true, bypasses the cache and runs
+ * the function.
  * @param {Function} fn - A function to call if value is not cached.
  * @returns {Promise}
  */

@@ -52,6 +52,89 @@ describe('util', () => {
 		});
 	});
 
+	describe('mutex()', () => {
+		it('should error if name is not a string', done => {
+			appc.util.mutex()
+				.then(() => done(new Error('Expected rejection')))
+				.catch(err => {
+					expect(err).to.be.a.TypeError;
+					expect(err.message).to.equal('Expected name to be a non-empty string');
+					done();
+				});
+		});
+
+		it('should error if fn is not a function', done => {
+			appc.util.mutex('foo', 'bar')
+				.then(() => done(new Error('Expected rejection')))
+				.catch(err => {
+					expect(err).to.be.a.TypeError;
+					expect(err.message).to.equal('Expected fn to be a function');
+					done();
+				});
+		});
+
+		it('should queue up multiple calls', done => {
+			let count = 0;
+
+			const fn = () => {
+				return appc.util.mutex('foo', () => {
+					count++;
+					return Math.random();
+				});
+			};
+
+			Promise
+				.all([ fn(), fn(), fn() ])
+				.then(results => {
+					expect(count).to.equal(3);
+					expect(results).to.have.lengthOf(3);
+					expect(results[1]).to.not.equal(results[0]);
+					expect(results[2]).to.not.equal(results[0]);
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should queue up multiple async calls', done => {
+			let count = 0;
+
+			const fn = () => {
+				return appc.util.mutex('foo', () => {
+					return new Promise(resolve => {
+						count++;
+						resolve(Math.random());
+					});
+				});
+			};
+
+			Promise
+				.all([ fn(), fn(), fn() ])
+				.then(results => {
+					expect(count).to.equal(1);
+					expect(results).to.have.lengthOf(3);
+					expect(results[1]).to.equal(results[0]);
+					expect(results[2]).to.equal(results[0]);
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should catch errors', done => {
+			appc.util
+				.mutex('foo', () => {
+					throw new Error('oh snap');
+				})
+				.then(() => {
+					done(new Error('Expected error to be caught'));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(Error);
+					expect(err.message).to.equal('oh snap');
+					done();
+				});
+		});
+	});
+
 	describe('cache()', () => {
 		afterEach(() => {
 			appc.util.clearCache();
