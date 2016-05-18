@@ -391,8 +391,20 @@ describe('util', () => {
 			expect(r).to.have.lengthOf(0);
 		});
 
+		it('should handle a string and undefined', () => {
+			const r = appc.util.unique(['foo', undefined]);
+			expect(r).to.be.an.Array;
+			expect(r).to.deep.equal(['foo']);
+		});
+
+		it('should handle an empty string', () => {
+			const r = appc.util.unique(['foo', '', 'bar', '']);
+			expect(r).to.be.an.Array;
+			expect(r).to.deep.equal(['foo', '', 'bar']);
+		});
+
 		it('should remove duplicates, null, and undefined elements', () => {
-			let r = appc.util.unique(['a', 1, 'b', 'c', 2, 'a', undefined, 'd', 3, 'b', null, 'b', 1, 3]);
+			const r = appc.util.unique(['a', 1, 'b', 'c', 2, 'a', undefined, 'd', 3, 'b', null, 'b', 1, 3]);
 			expect(r).to.be.an.Array;
 			expect(r).to.deep.equal([1, 2, 3, 'a', 'b', 'c', 'd']);
 		});

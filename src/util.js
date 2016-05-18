@@ -195,10 +195,9 @@ export function unique(arr) {
 	}
 
 	return arr.reduce((prev, cur, i, arr) => {
-		if (typeof cur === 'undefined' || cur === null) {
-			return prev;
+		if (typeof cur !== 'undefined' && cur !== null) {
+			prev[cur] = cur;
 		}
-		prev[cur] = cur;
 		return i + 1 < len ? prev : Object.keys(prev).map(key => prev[key]);
 	}, {});
 }
