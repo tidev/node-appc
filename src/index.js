@@ -3,6 +3,7 @@ import 'source-map-support/register';
 export const appc = {};
 
 const modules = [
+	'detect',
 	'fs',
 	'path',
 	'subprocess',
