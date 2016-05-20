@@ -1,7 +1,7 @@
 import fs from 'fs';
 import { existsSync } from './fs';
 import { which } from './subprocess';
-import { mutex, sha1, unique } from './util';
+import { mutex, unique } from './util';
 import path from 'path';
 
 /**

@@ -1,6 +1,6 @@
 {
   "name": "node-appc",
-  "version": "2.0.0",
+  "version": "2.0.0-alpha10",
   "dependencies": {
     "abab": {
       "version": "1.0.3",
@@ -1293,38 +1293,6 @@
       "version": "1.1.1",
       "from": "formatio@1.1.1",
       "resolved": "https://registry.npmjs.org/formatio/-/formatio-1.1.1.tgz"
-    },
-    "gawk": {
-      "version": "1.6.1",
-      "from": "gawk@>=1.6.1 <2.0.0",
-      "resolved": "https://registry.npmjs.org/gawk/-/gawk-1.6.1.tgz",
-      "dependencies": {
-        "amdefine": {
-          "version": "1.0.0",
-          "from": "amdefine@>=0.0.4",
-          "resolved": "https://registry.npmjs.org/amdefine/-/amdefine-1.0.0.tgz"
-        },
-        "in-publish": {
-          "version": "2.0.0",
-          "from": "in-publish@>=2.0.0 <3.0.0",
-          "resolved": "https://registry.npmjs.org/in-publish/-/in-publish-2.0.0.tgz"
-        },
-        "object-hash": {
-          "version": "1.1.2",
-          "from": "object-hash@>=1.1.2 <2.0.0",
-          "resolved": "https://registry.npmjs.org/object-hash/-/object-hash-1.1.2.tgz"
-        },
-        "source-map": {
-          "version": "0.1.32",
-          "from": "source-map@0.1.32",
-          "resolved": "https://registry.npmjs.org/source-map/-/source-map-0.1.32.tgz"
-        },
-        "source-map-support": {
-          "version": "0.4.0",
-          "from": "source-map-support@>=0.4.0 <0.5.0",
-          "resolved": "https://registry.npmjs.org/source-map-support/-/source-map-support-0.4.0.tgz"
-        }
-      }
     },
     "gaze": {
       "version": "0.5.2",
