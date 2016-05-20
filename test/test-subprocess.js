@@ -1,9 +1,21 @@
 import appc from '../src/index';
+import path from 'path';
+
+const exe = appc.subprocess.exe;
 
 describe('subprocess', () => {
+	before(function () {
+		this.PATH = process.env.PATH;
+		process.env.PATH += path.delimiter + path.join(__dirname, 'mocks', 'detect');
+	});
+
+	after(function () {
+		process.env.PATH = this.PATH;
+	});
+
 	describe('which()', () => {
 		it('should find a well-known executable', done => {
-			appc.subprocess.which('echo')
+			appc.subprocess.which('test' + exe)
 				.then(executable => {
 					expect(executable).to.be.a.String;
 					expect(executable).to.not.equal('');
@@ -50,7 +62,7 @@ describe('subprocess', () => {
 		});
 
 		it('should run a subprocess without args and without options', done => {
-			appc.subprocess.run('echo')
+			appc.subprocess.run('test' + exe)
 				.then(({ code, stdout, stderr }) => {
 					expect(code).to.equal(0);
 					expect(stderr).to.equal('');
@@ -60,7 +72,7 @@ describe('subprocess', () => {
 		});
 
 		it('should run a subprocess without args and with options', done => {
-			appc.subprocess.run('echo', {})
+			appc.subprocess.run('test' + exe, {})
 				.then(({ code, stdout, stderr }) => {
 					expect(code).to.equal(0);
 					expect(stderr).to.equal('');
