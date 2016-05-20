@@ -1,24 +1,26 @@
 import appc from '../src/index';
 import path from 'path';
 
-const exe = appc.subprocess.exe;
+const executable = 'test' + appc.subprocess.exe;
+const dir = path.join(__dirname, 'mocks', 'detect');
+const fullpath = path.join(dir, executable);
 
 describe('subprocess', () => {
-	before(function () {
+	beforeEach(function () {
 		this.PATH = process.env.PATH;
-		process.env.PATH += path.delimiter + path.join(__dirname, 'mocks', 'detect');
 	});
 
-	after(function () {
+	afterEach(function () {
 		process.env.PATH = this.PATH;
 	});
 
 	describe('which()', () => {
 		it('should find a well-known executable', done => {
-			appc.subprocess.which('test' + exe)
-				.then(executable => {
-					expect(executable).to.be.a.String;
-					expect(executable).to.not.equal('');
+			process.env.PATH = path.join(__dirname, 'mocks', 'detect');
+			appc.subprocess.which(executable)
+				.then(result => {
+					expect(result).to.be.a.String;
+					expect(result).to.equal(fullpath);
 					done();
 				})
 				.catch(done);
@@ -39,8 +41,7 @@ describe('subprocess', () => {
 	describe('run()', () => {
 		it('should run a subprocess that exits successfully', done => {
 			appc.subprocess.run(process.execPath, ['-e', 'process.stdout.write("foo");process.stderr.write("bar");process.exit(0);'])
-				.then(({ code, stdout, stderr }) => {
-					expect(code).to.equal(0);
+				.then(({ stdout, stderr }) => {
 					expect(stdout).to.equal('foo');
 					expect(stderr).to.equal('bar');
 					done();
@@ -50,7 +51,7 @@ describe('subprocess', () => {
 
 		it('should run a subprocess that exits unsuccessfully', done => {
 			appc.subprocess.run(process.execPath, ['-e', 'process.stdout.write("foo");process.stderr.write("bar");process.exit(1);'])
-				.then(({ code, stdout, stderr }) => {
+				.then(({ stdout, stderr }) => {
 					done(new Error('Expected subprocess to fail'));
 				})
 				.catch(({ code, stdout, stderr }) => {
@@ -62,9 +63,9 @@ describe('subprocess', () => {
 		});
 
 		it('should run a subprocess without args and without options', done => {
-			appc.subprocess.run('test' + exe)
-				.then(({ code, stdout, stderr }) => {
-					expect(code).to.equal(0);
+			appc.subprocess.run(fullpath)
+				.then(({ stdout, stderr }) => {
+					expect(stdout).to.equal('this is a test\n');
 					expect(stderr).to.equal('');
 					done();
 				})
@@ -72,9 +73,9 @@ describe('subprocess', () => {
 		});
 
 		it('should run a subprocess without args and with options', done => {
-			appc.subprocess.run('test' + exe, {})
+			appc.subprocess.run(fullpath, {})
 				.then(({ code, stdout, stderr }) => {
-					expect(code).to.equal(0);
+					expect(stdout).to.equal('this is a test\n');
 					expect(stderr).to.equal('');
 					done();
 				})

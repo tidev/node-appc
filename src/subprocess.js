@@ -49,10 +49,16 @@ export function run(cmd, args, opts) {
 		child.stderr.on('data', data => stderr += data.toString());
 
 		child.on('close', code => {
-			if (code === 0) {
-				resolve({ code, stdout, stderr });
+			if (!code) {
+				resolve({ stdout, stderr });
 			} else {
-				reject({ code, stdout, stderr });
+				const err = new Error(`Subprocess exited with code ${code}`);
+				err.command = cmd;
+				err.args    = args;
+				err.code    = code;
+				err.stdout  = stdout;
+				err.stderr  = stderr;
+				reject(err);
 			}
 		});
 	});
