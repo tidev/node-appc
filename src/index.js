@@ -1,4 +1,3 @@
-import gawk from 'gawk';
 import 'source-map-support/register';
 
 export const appc = {};
@@ -6,7 +5,6 @@ export const appc = {};
 const modules = {
 	detect:     './detect',
 	fs:         './fs',
-	gawk:       'gawk',
 	path:       './path',
 	subprocess: './subprocess',
 	util:       './util'

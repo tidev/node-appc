@@ -406,7 +406,7 @@ describe('util', () => {
 		it('should remove duplicates, null, and undefined elements', () => {
 			const r = appc.util.unique(['a', 1, 'b', 'c', 2, 'a', undefined, 'd', 3, 'b', null, 'b', 1, 3]);
 			expect(r).to.be.an.Array;
-			expect(r).to.deep.equal([1, 2, 3, 'a', 'b', 'c', 'd']);
+			expect(r).to.deep.equal(['a', 1, 'b', 'c', 2, 'd', 3]);
 		});
 	});
 });
