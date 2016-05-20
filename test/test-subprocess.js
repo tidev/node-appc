@@ -65,8 +65,8 @@ describe('subprocess', () => {
 		it('should run a subprocess without args and without options', done => {
 			appc.subprocess.run(fullpath)
 				.then(({ stdout, stderr }) => {
-					expect(stdout).to.equal('this is a test\n');
-					expect(stderr).to.equal('');
+					expect(stdout.trim()).to.equal('this is a test');
+					expect(stderr.trim()).to.equal('');
 					done();
 				})
 				.catch(done);
@@ -75,8 +75,8 @@ describe('subprocess', () => {
 		it('should run a subprocess without args and with options', done => {
 			appc.subprocess.run(fullpath, {})
 				.then(({ code, stdout, stderr }) => {
-					expect(stdout).to.equal('this is a test\n');
-					expect(stderr).to.equal('');
+					expect(stdout.trim()).to.equal('this is a test');
+					expect(stderr.trim()).to.equal('');
 					done();
 				})
 				.catch(done);
