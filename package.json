@@ -21,11 +21,12 @@
     "build": "gulp build",
     "coverage": "gulp coverage",
     "docs": "gulp docs",
-    "prepublish": "gulp build && npm shrinkwrap",
+    "prepublish": "gulp build && in-publish && npm shrinkwrap || not-in-publish",
     "test": "gulp test"
   },
   "dependencies": {
-    "gawk": "^1.5.0",
+    "gawk": "^1.6.0",
+    "in-publish": "^2.0.0",
     "source-map-support": "^0.4.0",
     "which": "^1.2.9"
   },
