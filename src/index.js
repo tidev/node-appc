@@ -7,7 +7,8 @@ const modules = {
 	fs:         './fs',
 	path:       './path',
 	subprocess: './subprocess',
-	util:       './util'
+	util:       './util',
+	version:    './version'
 };
 
 for (const name of Object.keys(modules)) {
