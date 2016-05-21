@@ -12,9 +12,9 @@ export function compare(v1, v2) {
 		const s1 = ~~v1[i];
 		const s2 = ~~v2[i];
 		if (s1 > s2) {
-			return -1;
-		} if (s1 < s2) {
 			return 1;
+		} if (s1 < s2) {
+			return -1;
 		}
 	}
 	return 0;
