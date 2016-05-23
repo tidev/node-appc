@@ -13,10 +13,22 @@ import path from 'path';
  * @param {String} [opts.executable] - The name of the executable to search the
  * system path for. If found, the directory is returned and the value will be
  * marked as the primary path.
- * @param {String|Array} [opts.path] - One or more paths.
+ * @param {String|Array} [opts.paths] - One or more paths.
  * @returns {Promise}
  */
 export function getPaths(opts={}) {
+	if ((typeof opts.env === 'string' && !opts.env) ||
+		(Array.isArray(opts.env) && opts.env.some(p => typeof p !== 'string')) ||
+		(opts.env && typeof opts.env !== 'string' && !Array.isArray(opts.env))) {
+		return Promise.reject(new TypeError('Expected env to be a string or an array of strings.'));
+	}
+
+	if ((typeof opts.paths === 'string' && !opts.paths) ||
+		(Array.isArray(opts.paths) && opts.paths.some(p => typeof p !== 'string')) ||
+		(opts.paths && typeof opts.paths !== 'string' && !Array.isArray(opts.paths))) {
+		return Promise.reject(new TypeError('Expected paths to be a string or an array of strings.'));
+	}
+
 	return Promise
 		.all([
 			getEnvironmentPath(opts.env),
@@ -50,8 +62,7 @@ function getEnvironmentPath(env) {
 	if (!Array.isArray(env)) {
 		env = [ env ];
 	}
-
-	return Promise.all(env.map(name => name && typeof name === 'string' ? resolveDir(process.env[name]) : null));
+	return Promise.all(env.map(name => resolveDir(process.env[name])));
 }
 
 /**
@@ -64,8 +75,7 @@ function getUserPaths(paths) {
 	if (!Array.isArray(paths)) {
 		paths = [ paths ];
 	}
-
-	return Promise.all(paths.map(dir => dir && typeof dir === 'string' ? resolveDir(dir) : null));
+	return Promise.all(paths.map(resolveDir));
 }
 
 /**

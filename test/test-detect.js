@@ -54,6 +54,34 @@ describe('detect', () => {
 				.catch(done);
 		});
 
+		it('should reject if env is not a string', done => {
+			appc.detect
+				.getPaths({ env: 123 })
+				.then(() => {
+					done(new Error('Expected rejection'));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(TypeError);
+					expect(err.message).to.equal('Expected env to be a string or an array of strings.');
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should reject if env is not an array of strings', done => {
+			appc.detect
+				.getPaths({ env: ['foo', 123] })
+				.then(() => {
+					done(new Error('Expected rejection'));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(TypeError);
+					expect(err.message).to.equal('Expected env to be a string or an array of strings.');
+					done();
+				})
+				.catch(done);
+		});
+
 		it('should return an array with the executable directory', done => {
 			process.env.PATH = path.join(__dirname, 'mocks', 'detect');
 
@@ -65,6 +93,21 @@ describe('detect', () => {
 					expect(results).to.be.an.Array;
 					expect(results).to.have.lengthOf(1);
 					expect(results[0]).to.equal(process.env.PATH);
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should not find a path when executable does not exist', done => {
+			process.env.PATH = path.join(__dirname, 'mocks', 'detect');
+
+			const executable = 'doesnotexist' + appc.subprocess.exe;
+
+			appc.detect
+				.getPaths({ executable })
+				.then(results => {
+					expect(results).to.be.an.Array;
+					expect(results).to.have.lengthOf(0);
 					done();
 				})
 				.catch(done);
@@ -90,6 +133,45 @@ describe('detect', () => {
 					expect(results).to.have.lengthOf(2);
 					expect(results[0]).to.equal(__dirname);
 					expect(results[1]).to.equal(path.join(__dirname, 'foo'));
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should not find a path when the path is not a directory', done => {
+			appc.detect
+				.getPaths({ paths: __filename })
+				.then(results => {
+					expect(results).to.be.an.Array;
+					expect(results).to.have.lengthOf(0);
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should reject if paths is not a string', done => {
+			appc.detect
+				.getPaths({ paths: 123 })
+				.then(() => {
+					done(new Error('Expected rejection'));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(TypeError);
+					expect(err.message).to.equal('Expected paths to be a string or an array of strings.');
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should reject if paths is not an array of strings', done => {
+			appc.detect
+				.getPaths({ paths: ['foo', 123] })
+				.then(() => {
+					done(new Error('Expected rejection'));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(TypeError);
+					expect(err.message).to.equal('Expected paths to be a string or an array of strings.');
 					done();
 				})
 				.catch(done);
