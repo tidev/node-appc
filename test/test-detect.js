@@ -62,7 +62,7 @@ describe('detect', () => {
 				})
 				.catch(err => {
 					expect(err).to.be.instanceof(TypeError);
-					expect(err.message).to.equal('Expected env to be a string or an array of strings.');
+					expect(err.message).to.equal('Expected env to be a string or an array of strings');
 					done();
 				})
 				.catch(done);
@@ -76,7 +76,7 @@ describe('detect', () => {
 				})
 				.catch(err => {
 					expect(err).to.be.instanceof(TypeError);
-					expect(err.message).to.equal('Expected env to be a string or an array of strings.');
+					expect(err.message).to.equal('Expected env to be a string or an array of strings');
 					done();
 				})
 				.catch(done);
@@ -157,7 +157,7 @@ describe('detect', () => {
 				})
 				.catch(err => {
 					expect(err).to.be.instanceof(TypeError);
-					expect(err.message).to.equal('Expected paths to be a string or an array of strings.');
+					expect(err.message).to.equal('Expected paths to be a string or an array of strings');
 					done();
 				})
 				.catch(done);
@@ -171,7 +171,7 @@ describe('detect', () => {
 				})
 				.catch(err => {
 					expect(err).to.be.instanceof(TypeError);
-					expect(err.message).to.equal('Expected paths to be a string or an array of strings.');
+					expect(err.message).to.equal('Expected paths to be a string or an array of strings');
 					done();
 				})
 				.catch(done);

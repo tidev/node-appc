@@ -20,13 +20,13 @@ export function getPaths(opts={}) {
 	if ((typeof opts.env === 'string' && !opts.env) ||
 		(Array.isArray(opts.env) && opts.env.some(p => typeof p !== 'string')) ||
 		(opts.env && typeof opts.env !== 'string' && !Array.isArray(opts.env))) {
-		return Promise.reject(new TypeError('Expected env to be a string or an array of strings.'));
+		return Promise.reject(new TypeError('Expected env to be a string or an array of strings'));
 	}
 
 	if ((typeof opts.paths === 'string' && !opts.paths) ||
 		(Array.isArray(opts.paths) && opts.paths.some(p => typeof p !== 'string')) ||
 		(opts.paths && typeof opts.paths !== 'string' && !Array.isArray(opts.paths))) {
-		return Promise.reject(new TypeError('Expected paths to be a string or an array of strings.'));
+		return Promise.reject(new TypeError('Expected paths to be a string or an array of strings'));
 	}
 
 	return Promise
