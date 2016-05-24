@@ -105,75 +105,79 @@ function resolveDir(dir) {
 }
 
 /**
- * A cache of results per path.
- * @type {Object}
+ * Scans paths for interesting things, then caches them.
  */
-let cache = {};
-
-/**
- * Scans one or more paths and calls the specified detect function. Results are
- * then cached per path.
- *
- * @param {Object} opts - Various options.
- * @param {Function} opts.detectFn - A function that detects if a directory is
- * a whatever we're looking for. This function is passed a directory to check
- * and should return a `Promise`.
- * @param {Array} opts.paths - One or more paths to check.
- * @param {Boolean} [opts.depth=1] - The max depth to recurse until the detect
- * function returns a result.
- * @param {Boolean} [opts.force] - When true, bypasses cache and forces a scan.
- * @returns {Promise}
- */
-export function scan({ detectFn, paths, depth = 0, force }) {
-	if (typeof detectFn !== 'function') {
-		return Promise.reject(new TypeError('Expected detectFn to be a function'));
+export class Scanner {
+	constructor() {
+		/**
+		 * A cache of results per path.
+		 * @type {Object}
+		 */
+		this.cache = {};
 	}
 
-	if (!Array.isArray(paths)) {
-		return Promise.reject(new TypeError('Expected paths to be an array'));
-	}
+	/**
+	 * Scans one or more paths and calls the specified detect function. Results
+	 * are then cached per path.
+	 *
+	 * @param {Object} opts - Various options.
+	 * @param {Function} opts.detectFn - A function that detects if a directory
+	 * is whatever we're looking for. This function is passed a directory to
+	 * check and should return a `Promise`.
+	 * @param {Array} opts.paths - One or more paths to check.
+	 * @param {Boolean} [opts.depth=1] - The max depth to recurse until the
+	 * detect function returns a result.
+	 * @param {Boolean} [opts.force] - When true, bypasses cache and forces a
+	 * scan.
+	 * @returns {Promise}
+	 */
+	scan({ detectFn, paths, depth = 0, force }) {
+		if (typeof detectFn !== 'function') {
+			return Promise.reject(new TypeError('Expected detectFn to be a function'));
+		}
 
-	return Promise
-		.all(paths.map(dir => mutex(dir, () => new Promise((resolve, reject) => {
-			if (cache[dir] && !force) {
-				return resolve(cache[dir]);
-			}
+		if (!Array.isArray(paths)) {
+			return Promise.reject(new TypeError('Expected paths to be an array'));
+		}
 
-			if (!existsSync(dir)) {
-				return resolve();
-			}
-
-			const detect = (dir, depth) => {
-				if (!existsSync(dir)) {
-					return;
+		return Promise
+			.all(paths.map(dir => mutex(dir, () => new Promise((resolve, reject) => {
+				if (this.cache[dir] && !force) {
+					return resolve(this.cache[dir]);
 				}
 
-				depth = ~~depth;
+				if (!existsSync(dir)) {
+					return resolve();
+				}
 
-				return Promise.resolve()
-					.then(() => detectFn(dir))
-					.then(result => {
-						if (result) {
-							return result;
-						}
+				const detect = (dir, depth) => {
+					if (!existsSync(dir)) {
+						return;
+					}
 
-						if (depth <= 0) {
-							return;
-						}
+					depth = ~~depth;
 
-						return Promise.all(fs.readdirSync(dir).map(name => detect(path.join(dir, name), depth - 1)));
-					});
-			};
+					return Promise.resolve()
+						.then(() => detectFn(dir))
+						.then(result => {
+							if (result) {
+								return result;
+							}
 
-			Promise.resolve()
-				.then(() => detect(dir, depth))
-				.then(results => cache[dir] = unique(Array.prototype.concat.call([], results)).sort())
-				.then(resolve)
-				.catch(reject);
-		}))))
-		.then(paths => Array.prototype.concat.apply([], paths).filter(p => p));
-}
+							if (depth <= 0) {
+								return;
+							}
 
-export function resetCache() {
-	cache = {};
+							return Promise.all(fs.readdirSync(dir).map(name => detect(path.join(dir, name), depth - 1)));
+						});
+				};
+
+				Promise.resolve()
+					.then(() => detect(dir, depth))
+					.then(results => this.cache[dir] = unique(Array.prototype.concat.call([], results)).sort())
+					.then(resolve)
+					.catch(reject);
+			}))))
+			.then(paths => Array.prototype.concat.apply([], paths).filter(p => p));
+	}
 }

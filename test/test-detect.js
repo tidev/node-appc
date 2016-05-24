@@ -178,13 +178,9 @@ describe('detect', () => {
 		});
 	});
 
-	describe('scan()', () => {
-		afterEach(() => {
-			appc.detect.resetCache();
-		});
-
+	describe('Scanner', () => {
 		it('should reject if detectFn is not a function', done => {
-			appc.detect
+			new appc.detect.Scanner()
 				.scan({})
 				.then(results => {
 					done(new Error('Expected detect to throw error'));
@@ -201,7 +197,7 @@ describe('detect', () => {
 		});
 
 		it('should reject if paths is not an array', done => {
-			appc.detect
+			new appc.detect.Scanner()
 				.scan({ detectFn: () => {} })
 				.then(results => {
 					done(new Error('Expected detect to throw error'));
@@ -218,7 +214,7 @@ describe('detect', () => {
 		});
 
 		it('should call detect function for each path', done => {
-			appc.detect
+			new appc.detect.Scanner()
 				.scan({
 					detectFn: dir => {
 						expect(dir).to.equal(__dirname);
@@ -245,14 +241,16 @@ describe('detect', () => {
 				force: true
 			};
 
-			appc.detect
+			const scanner = new appc.detect.Scanner();
+
+			scanner
 				.scan(opts)
 				.then(results => {
 					expect(results).to.deep.equal([ { foo: 'bar' } ]);
 
 					opts.force = false;
 
-					return appc.detect
+					return scanner
 						.scan(opts)
 						.then(results => {
 							expect(results).to.deep.equal([ { foo: 'bar' } ]);
@@ -272,11 +270,13 @@ describe('detect', () => {
 				force: true
 			};
 
-			appc.detect
+			const scanner = new appc.detect.Scanner();
+
+			scanner
 				.scan(opts)
 				.then(results => {
 					expect(results).to.deep.equal([ { foo: 'bar' } ]);
-					return appc.detect
+					return scanner
 						.scan(opts)
 						.then(results => {
 							expect(results).to.deep.equal([ { foo: 'bar' } ]);
@@ -288,7 +288,8 @@ describe('detect', () => {
 
 		it('should handle a path that does not exist', done => {
 			const p = path.join(__dirname, 'doesnotexist');
-			appc.detect
+
+			new appc.detect.Scanner()
 				.scan({
 					detectFn: dir => {
 						expect(dir).to.equal(p);
@@ -308,7 +309,7 @@ describe('detect', () => {
 			const m = path.join(__dirname, 'mocks');
 			const p = path.join(__dirname, 'mocks', 'detect');
 
-			appc.detect
+			new appc.detect.Scanner()
 				.scan({
 					detectFn: dir => {
 						if (dir === p) {
@@ -327,7 +328,7 @@ describe('detect', () => {
 		});
 
 		it('should return multiple results', done => {
-			appc.detect
+			new appc.detect.Scanner()
 				.scan({
 					detectFn: dir => {
 						return [
@@ -362,11 +363,13 @@ describe('detect', () => {
 				force: true
 			};
 
-			appc.detect
+			const scanner = new appc.detect.Scanner();
+
+			scanner
 				.scan(opts)
 				.then(results => {
 					expect(results).to.deep.equal([ { foo: 'bar' } ]);
-					return appc.detect
+					return scanner
 						.scan(opts)
 						.then(results => {
 							expect(results).to.deep.equal([ { baz: 'wiz' } ]);
