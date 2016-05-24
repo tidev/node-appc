@@ -379,4 +379,21 @@ describe('detect', () => {
 				.catch(done);
 		});
 	});
+
+	describe('Watcher', () => {
+		it('should unwatch all watchers', () => {
+			const w = new appc.detect.Watcher;
+			const unwatch = sinon.spy();
+			w.addUnwatch(unwatch);
+			w.stop();
+			w.stop();
+			expect(unwatch.calledOnce);
+		});
+
+		it('should throw error if unwatch is not a function', () => {
+			expect(() => {
+				new appc.detect.Watcher().addUnwatch('foo');
+			}).to.throw(TypeError, 'Expected unwatch to be a function');
+		});
+	});
 });

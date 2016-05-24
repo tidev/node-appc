@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { EventEmitter } from 'events';
 import { existsSync } from './fs';
 import { which } from './subprocess';
 import { mutex, unique } from './util';
@@ -179,5 +180,49 @@ export class Scanner {
 					.catch(reject);
 			}))))
 			.then(paths => Array.prototype.concat.apply([], paths).filter(p => p));
+	}
+}
+
+/**
+ * A class that tracks active watchers' unwatch functions. This class is
+ * intended to be returned from a `watch()` function.
+ *
+ * @emits {results} Emits the detection results.
+ * @emits {error} Emitted when an error occurs.
+ */
+export class Watcher extends EventEmitter {
+	/**
+	 * Initializes the Watcher instance.
+	 */
+	constructor() {
+		super();
+		this.unwatchers = [];
+	}
+
+	/**
+	 * Adds a unwatch function to the list of functions to call when `stop()` is
+	 * called.
+	 * @param {Function} unwatch - The unwatch function.
+	 * @returns {Watcher}
+	 */
+	addUnwatch(unwatch) {
+		if (typeof unwatch !== 'function') {
+			throw new TypeError('Expected unwatch to be a function');
+		}
+
+		this.unwatchers.push(unwatch);
+		return this;
+	}
+
+	/**
+	 * Stops all active watchers associated with this handle.
+	 * @returns {Watcher}
+	 */
+	stop() {
+		let unwatch;
+		while (unwatch = this.unwatchers.shift()) {
+			unwatch();
+		}
+		return this;
 	}
 }
