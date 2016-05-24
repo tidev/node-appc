@@ -1,6 +1,6 @@
 {
   "name": "node-appc",
-  "version": "2.0.0",
+  "version": "2.0.0-alpha17",
   "description": "Appcelerator Common Node Library",
   "main": "./dist/index.js",
   "author": {
@@ -43,7 +43,7 @@
     "gulp-esdoc": "^0.2.0",
     "gulp-eslint": "^2.0.0",
     "gulp-filter": "^4.0.0",
-    "gulp-inject-modules": "^0.2.0",
+    "gulp-inject-modules": "^1.0.0",
     "gulp-load-plugins": "^1.2.4",
     "gulp-mocha": "^2.2.0",
     "gulp-plumber": "^1.1.0",

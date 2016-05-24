@@ -1,4 +1,6 @@
-import 'source-map-support/register';
+if (!Error.prepareStackTrace) {
+	require('source-map-support/register');
+}
 
 export const appc = {};
 
