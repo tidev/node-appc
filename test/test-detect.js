@@ -351,6 +351,7 @@ describe('detect', () => {
 
 		it('should update result after second call', done => {
 			let counter = 0;
+			const scanner = new appc.detect.Scanner();
 			const opts = {
 				detectFn: dir => {
 					expect(dir).to.equal(__dirname);
@@ -363,8 +364,6 @@ describe('detect', () => {
 				force: true
 			};
 
-			const scanner = new appc.detect.Scanner();
-
 			scanner
 				.scan(opts)
 				.then(results => {
@@ -373,6 +372,50 @@ describe('detect', () => {
 						.scan(opts)
 						.then(results => {
 							expect(results).to.deep.equal([ { baz: 'wiz' } ]);
+							done();
+						});
+				})
+				.catch(done);
+		});
+
+		it('should only re-detect for a specific path', done => {
+			let counter = 0;
+			const scanner = new appc.detect.Scanner();
+			const fooPath = path.resolve('./test/mocks/detect/foo');
+			const barPath = path.resolve('./test/mocks/detect/bar');
+
+			scanner
+				.scan({
+					detectFn: dir => {
+						expect(dir).to.be.oneOf([ fooPath, barPath ]);
+						counter++;
+						return { path: dir };
+					},
+					paths: [ fooPath, barPath ]
+				})
+				.then(results => {
+					expect(counter).to.equal(2);
+					expect(results).to.deep.equal([
+						{ path: fooPath },
+						{ path: barPath }
+					]);
+
+					return scanner
+						.scan({
+							detectFn: dir => {
+								expect(dir).to.equal(fooPath);
+								expect(++counter).to.equal(3);
+								return { path: 'foo path' };
+							},
+							paths: [ fooPath, barPath ],
+							onlyPaths: [ fooPath ],
+							force: true
+						})
+						.then(results => {
+							expect(results).to.deep.equal([
+								{ path: 'foo path' },
+								{ path: barPath }
+							]);
 							done();
 						});
 				})

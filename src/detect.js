@@ -122,17 +122,20 @@ export class Scanner {
 	 * are then cached per path.
 	 *
 	 * @param {Object} opts - Various options.
+	 * @param {Boolean} [opts.depth=1] - The max depth to recurse until the
+	 * detect function returns a result.
 	 * @param {Function} opts.detectFn - A function that detects if a directory
 	 * is whatever we're looking for. This function is passed a directory to
 	 * check and should return a `Promise`.
-	 * @param {Array} opts.paths - One or more paths to check.
-	 * @param {Boolean} [opts.depth=1] - The max depth to recurse until the
-	 * detect function returns a result.
 	 * @param {Boolean} [opts.force] - When true, bypasses cache and forces a
 	 * scan.
+	 * @param {Array} [opts.onlyPaths] - When set, only calls `detectFn` for
+	 * these paths, but merges the results with the previously cached results of
+	 * other paths.
+	 * @param {Array} opts.paths - One or more paths to check.
 	 * @returns {Promise}
 	 */
-	scan({ detectFn, paths, depth = 0, force }) {
+	scan({ detectFn, paths, onlyPaths, depth = 0, force }) {
 		if (typeof detectFn !== 'function') {
 			return Promise.reject(new TypeError('Expected detectFn to be a function'));
 		}
@@ -141,9 +144,13 @@ export class Scanner {
 			return Promise.reject(new TypeError('Expected paths to be an array'));
 		}
 
+		if (onlyPaths && !Array.isArray(onlyPaths)) {
+			return Promise.reject(new TypeError('Expected onlyPaths to be an array'));
+		}
+
 		return Promise
 			.all(paths.map(dir => mutex(dir, () => new Promise((resolve, reject) => {
-				if (this.cache[dir] && !force) {
+				if (this.cache[dir] && (!force || onlyPaths && onlyPaths.indexOf(dir) === -1)) {
 					return resolve(this.cache[dir]);
 				}
 
