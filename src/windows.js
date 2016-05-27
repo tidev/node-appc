@@ -1,7 +1,7 @@
 let Registry = null;
 
 export const registry = {
-	query
+	get: get
 };
 
 /**
@@ -11,28 +11,44 @@ export const registry = {
  * "HKU", or "HKCC".
  * @param {String} key - The name of the registry key.
  * @param {String} name - The name of the registry value.
- * @returns {Promise} Resolves the value or null if the key is not found.
+ * @returns {Promise} Resolves the key value.
  */
-function query(hive, key, name) {
-	if (process.platform !== 'win32') {
-		return Promise.resolve(null);
-	}
-
-	if (Registry === null) {
-		Registry = require('winreg');
-	}
-
-	if (Registry.hives.indexOf(hive) === -1) {
-		return Promise.reject(new Error(`Invalid hive "${hive}", must be "HKLM", "HKCU", "HKCR", "HKU", or "HKCC"`));
-	}
-
+function get(hive, key, name) {
 	return new Promise((resolve, reject) => {
+		if (process.platform !== 'win32') {
+			return resolve(null);
+		}
+
+		if (Registry === null) {
+			Registry = require('winreg');
+		}
+
+		if (typeof hive !== 'string' || !hive) {
+			throw new TypeError('Expected hive to be a non-empty string');
+		}
+
+		if (Registry.HIVES.indexOf(hive) === -1) {
+			throw new Error(`Invalid hive "${hive}", must be "HKLM", "HKCU", "HKCR", "HKU", or "HKCC"`);
+		}
+
+		if (typeof key !== 'string' || !key) {
+			throw new TypeError('Expected key to be a non-empty string');
+		}
+
+		if (!/^\\/.test(key)) {
+			key = '\\' + key;
+		}
+
+		if (typeof name !== 'string' || !name) {
+			throw new TypeError('Expected name to be a non-empty string');
+		}
+
 		new Registry({ hive, key })
 			.get(name, (err, item) => {
-				if (err) {
+				if (err && err.code === 1) {
 					reject(err);
 				} else {
-					resolve(item.value || null);
+					resolve(item.value);
 				}
 			});
 	});
