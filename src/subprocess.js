@@ -11,7 +11,7 @@ export const bat = (isWindows ? '.bat' : '');
  * Wraps `which()` with a promise.
  *
  * @param {String} executable - The executable to find.
- * @returns {Promise}
+ * @returns {Promise} Resolves the specified executable.
  */
 export function which(executable) {
 	return new Promise((resolve, reject) => {
@@ -31,7 +31,7 @@ export function which(executable) {
  * @param {String} cmd - The command to spawn.
  * @param {Array} [args] - An array of arguments to pass to the subprocess.
  * @param {Object} [opts] - Spawn options.
- * @returns {Promise}
+ * @returns {Promise} Resolves the stdout and stderr output.
  */
 export function run(cmd, args, opts) {
 	if (args && !Array.isArray(args)) {

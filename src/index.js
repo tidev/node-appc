@@ -10,7 +10,8 @@ const modules = {
 	path:       './path',
 	subprocess: './subprocess',
 	util:       './util',
-	version:    './version'
+	version:    './version',
+	windows:    './windows'
 };
 
 for (const name of Object.keys(modules)) {

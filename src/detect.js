@@ -15,7 +15,7 @@ import path from 'path';
  * system path for. If found, the directory is returned and the value will be
  * marked as the primary path.
  * @param {String|Array} [opts.paths] - One or more paths.
- * @returns {Promise}
+ * @returns {Promise} Resolves an array of paths.
  */
 export function getPaths(opts={}) {
 	if ((typeof opts.env === 'string' && !opts.env) ||
@@ -43,7 +43,7 @@ export function getPaths(opts={}) {
  * Resolves the directory containing the specified executable.
  *
  * @param {String} [exe] - The name of the executable to locate.
- * @returns {Promise}
+ * @returns {Promise} Resolves the path to the specified executable.
  */
 function getExecutablePath(exe) {
 	if (exe && typeof exe === 'string') {
@@ -57,7 +57,7 @@ function getExecutablePath(exe) {
  * Resolves the path for the specified environment variable.
  *
  * @param {String|Array} [env] - One or more environment variable names.
- * @returns {Promise}
+ * @returns {Promise} Resolves the path for the specified environment variable.
  */
 function getEnvironmentPath(env) {
 	if (!Array.isArray(env)) {
@@ -70,7 +70,7 @@ function getEnvironmentPath(env) {
  * Resolves all of the specified paths.
  *
  * @param {String|Array} paths - The name of the executable to locate.
- * @returns {Promise}
+ * @returns {Promise} Resolves an array of paths.
  */
 function getUserPaths(paths) {
 	if (!Array.isArray(paths)) {
@@ -83,7 +83,7 @@ function getUserPaths(paths) {
  * Resolves a specific directory.
  *
  * @param {String} dir - The directory to resolve.
- * @returns {Promise}
+ * @returns {Promise} Resolves the directory.
  */
 function resolveDir(dir) {
 	return new Promise((resolve, reject) => {
@@ -133,7 +133,7 @@ export class Scanner {
 	 * these paths, but merges the results with the previously cached results of
 	 * other paths.
 	 * @param {Array} opts.paths - One or more paths to check.
-	 * @returns {Promise}
+	 * @returns {Promise} Resolves the value returned from `detectFn`.
 	 */
 	scan({ detectFn, paths, onlyPaths, depth = 0, force }) {
 		if (typeof detectFn !== 'function') {

@@ -1,8 +1,8 @@
 /**
  * Compares two versions of any artibrary number of segments.
  *
- * @param {String} v1
- * @param {String} v2
+ * @param {String} v1 - The first version number.
+ * @param {String} v2 - The second version number.
  * @returns {Number}
  */
 export function compare(v1, v2) {

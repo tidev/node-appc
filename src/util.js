@@ -39,7 +39,7 @@ export let pendingMutexes = {};
  *
  * @param {String} name - The mutex name.
  * @param {Function} fn - A function to call if value is not cached.
- * @returns {Promise}
+ * @returns {Promise} Resolves whatever value `fn` returns/resolves.
  */
 export function mutex(name, fn) {
 	return new Promise((resolve, reject) => setImmediate(() => {
@@ -84,21 +84,21 @@ export let cacheStore = {};
  * Helper function that handles the caching of a value and multiple requests.
  *
  * @param {String} namespace - The cache namespace.
- * @param {Boolean} [bypassCache=false] - When true, bypasses the cache and runs
+ * @param {Boolean} [force=false] - When true, bypasses the cache and runs
  * the function.
  * @param {Function} fn - A function to call if value is not cached.
- * @returns {Promise}
+ * @returns {Promise} Resolves whatever value `fn` returns/resolves.
  */
-export function cache(namespace, bypassCache, fn) {
+export function cache(namespace, force, fn) {
 	// wrap everything in a setImmediate() call to guarantee this function is async
 	return new Promise((resolve, reject) => setImmediate(() => {
 		if (typeof namespace !== 'string' || !namespace) {
 			return reject(new TypeError('Expected namespace to be a non-empty string'));
 		}
 
-		if (typeof bypassCache === 'function') {
-			fn = bypassCache;
-			bypassCache = false;
+		if (typeof force === 'function') {
+			fn = force;
+			force = false;
 		}
 
 		if (typeof fn !== 'function') {
@@ -111,7 +111,7 @@ export function cache(namespace, bypassCache, fn) {
 			value: null
 		});
 
-		if (entry && entry.value && !bypassCache) {
+		if (entry && entry.value && !force) {
 			return resolve(entry.value);
 		}
 
