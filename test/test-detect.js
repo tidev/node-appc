@@ -423,26 +423,14 @@ describe('detect', () => {
 		});
 	});
 
-	describe('Watcher', () => {
+	describe('WatchHandle', () => {
 		it('should unwatch all watchers', () => {
-			const w = new appc.detect.Watcher;
+			const w = new appc.detect.WatchHandle();
 			const unwatch = sinon.spy();
-			w.addUnwatch('foo', unwatch);
+			w.unwatchers.set('foo', unwatch);
 			w.stop();
 			w.stop();
 			expect(unwatch.calledOnce);
-		});
-
-		it('should throw error if dir is not a string', () => {
-			expect(() => {
-				new appc.detect.Watcher().addUnwatch();
-			}).to.throw(TypeError, 'Expected dir to be a non-empty string');
-		});
-
-		it('should throw error if unwatch is not a function', () => {
-			expect(() => {
-				new appc.detect.Watcher().addUnwatch('foo');
-			}).to.throw(TypeError, 'Expected unwatch to be a function');
 		});
 	});
 });

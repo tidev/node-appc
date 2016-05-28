@@ -197,48 +197,13 @@ export class Scanner {
  * @emits {results} Emits the detection results.
  * @emits {error} Emitted when an error occurs.
  */
-export class Watcher extends EventEmitter {
+export class WatchHandle extends EventEmitter {
 	/**
 	 * Initializes the Watcher instance.
 	 */
 	constructor() {
 		super();
-		this.unwatchers = {};
-	}
-
-	/**
-	 * Adds a unwatch function to the list of functions to call when `stop()` is
-	 * called.
-	 *
-	 * @param {String} dir - The directory associated with the unwatch function.
-	 * @param {Function} unwatch - The unwatch function.
-	 * @returns {Watcher}
-	 */
-	addUnwatch(dir, unwatch) {
-		if (typeof dir !== 'string' || !dir) {
-			throw new TypeError('Expected dir to be a non-empty string');
-		}
-
-		if (typeof unwatch !== 'function') {
-			throw new TypeError('Expected unwatch to be a function');
-		}
-
-		this.unwatchers[dir] = unwatch;
-		return this;
-	}
-
-	/**
-	 * Unwatches the specified directory.
-	 *
-	 * @param {String} dir - The directory watcher to unwatch.
-	 * @returns {Watcher}
-	 */
-	unwatch(dir) {
-		if (dir && this.unwatchers[dir]) {
-			this.unwatchers[dir]();
-			delete this.unwatchers[dir];
-		}
-		return this;
+		this.unwatchers = new Map();
 	}
 
 	/**
@@ -247,10 +212,12 @@ export class Watcher extends EventEmitter {
 	 * @returns {Watcher}
 	 */
 	stop() {
-		for (const dir of Object.keys(this.unwatchers)) {
-			this.unwatchers[dir]();
-			delete this.unwatchers[dir];
+		for (const unwatch of this.unwatchers.values()) {
+			if (typeof unwatch === 'function') {
+				unwatch();
+			}
 		}
+		this.unwatchers.clear();
 		return this;
 	}
 }
