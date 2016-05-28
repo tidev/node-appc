@@ -203,32 +203,53 @@ export class Watcher extends EventEmitter {
 	 */
 	constructor() {
 		super();
-		this.unwatchers = [];
+		this.unwatchers = {};
 	}
 
 	/**
 	 * Adds a unwatch function to the list of functions to call when `stop()` is
 	 * called.
+	 *
+	 * @param {String} dir - The directory associated with the unwatch function.
 	 * @param {Function} unwatch - The unwatch function.
 	 * @returns {Watcher}
 	 */
-	addUnwatch(unwatch) {
+	addUnwatch(dir, unwatch) {
+		if (typeof dir !== 'string' || !dir) {
+			throw new TypeError('Expected dir to be a non-empty string');
+		}
+
 		if (typeof unwatch !== 'function') {
 			throw new TypeError('Expected unwatch to be a function');
 		}
 
-		this.unwatchers.push(unwatch);
+		this.unwatchers[dir] = unwatch;
 		return this;
 	}
 
 	/**
-	 * Stops all active watchers associated with this handle.
+	 * Unwatches the specified directory.
+	 *
+	 * @param {String} dir - The directory watcher to unwatch.
+	 * @returns {Watcher}
+	 */
+	unwatch(dir) {
+		if (dir && this.unwatchers[dir]) {
+			this.unwatchers[dir]();
+			delete this.unwatchers[dir];
+		}
+		return this;
+	}
+
+	/**
+	 * Stops all active watchers.
+	 *
 	 * @returns {Watcher}
 	 */
 	stop() {
-		let unwatch;
-		while (unwatch = this.unwatchers.shift()) {
-			unwatch();
+		for (const dir of Object.keys(this.unwatchers)) {
+			this.unwatchers[dir]();
+			delete this.unwatchers[dir];
 		}
 		return this;
 	}

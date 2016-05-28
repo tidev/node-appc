@@ -427,10 +427,16 @@ describe('detect', () => {
 		it('should unwatch all watchers', () => {
 			const w = new appc.detect.Watcher;
 			const unwatch = sinon.spy();
-			w.addUnwatch(unwatch);
+			w.addUnwatch('foo', unwatch);
 			w.stop();
 			w.stop();
 			expect(unwatch.calledOnce);
+		});
+
+		it('should throw error if dir is not a string', () => {
+			expect(() => {
+				new appc.detect.Watcher().addUnwatch();
+			}).to.throw(TypeError, 'Expected dir to be a non-empty string');
 		});
 
 		it('should throw error if unwatch is not a function', () => {
