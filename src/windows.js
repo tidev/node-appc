@@ -1,19 +1,11 @@
 let Registry = null;
 
 export const registry = {
-	get: get
+	get: get, // need explicitly specify property
+	keys
 };
 
-/**
- * Queries the Windows registry.
- *
- * @param {String} hive - The hive to query. Must be "HKLM", "HKCU", "HKCR",
- * "HKU", or "HKCC".
- * @param {String} key - The name of the registry key.
- * @param {String} name - The name of the registry value.
- * @returns {Promise} Resolves the key value.
- */
-function get(hive, key, name) {
+function boilerplate(hive, key, fn) {
 	return new Promise((resolve, reject) => {
 		if (process.platform !== 'win32') {
 			return resolve(null);
@@ -39,16 +31,52 @@ function get(hive, key, name) {
 			key = '\\' + key;
 		}
 
+		fn(resolve, reject);
+	});
+}
+
+/**
+ * Gets a key's value from the Windows registry.
+ *
+ * @param {String} hive - The hive to query. Must be "HKLM", "HKCU", "HKCR",
+ * "HKU", or "HKCC".
+ * @param {String} key - The name of the registry key.
+ * @param {String} name - The name of the registry value.
+ * @returns {Promise} Resolves the key value.
+ */
+function get(hive, key, name) {
+	return boilerplate(hive, key, (resolve, reject) => {
 		if (typeof name !== 'string' || !name) {
 			throw new TypeError('Expected name to be a non-empty string');
 		}
 
 		new Registry({ hive, key })
 			.get(name, (err, item) => {
-				if (err && err.code === 1) {
+				if (err) {
 					reject(err);
 				} else {
-					resolve(item.value);
+					resolve(item && item.value || null);
+				}
+			});
+	});
+}
+
+/**
+ * Gets the subkeys for the specified key.
+ *
+ * @param {String} hive - The hive to query. Must be "HKLM", "HKCU", "HKCR",
+ * "HKU", or "HKCC".
+ * @param {String} key - The name of the registry key.
+ * @returns {Promise} Resolves an array of subkeys.
+ */
+function keys(hive, key) {
+	return boilerplate(hive, key, (resolve, reject) => {
+		new Registry({ hive, key })
+			.keys((err, items) => {
+				if (err) {
+					reject(err);
+				} else {
+					resolve(items.map(item => item.key));
 				}
 			});
 	});
