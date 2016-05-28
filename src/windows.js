@@ -31,7 +31,7 @@ function boilerplate(hive, key, fn) {
 			key = '\\' + key;
 		}
 
-		fn(resolve, reject);
+		fn(key, resolve, reject);
 	});
 }
 
@@ -45,7 +45,7 @@ function boilerplate(hive, key, fn) {
  * @returns {Promise} Resolves the key value.
  */
 function get(hive, key, name) {
-	return boilerplate(hive, key, (resolve, reject) => {
+	return boilerplate(hive, key, (key, resolve, reject) => {
 		if (typeof name !== 'string' || !name) {
 			throw new TypeError('Expected name to be a non-empty string');
 		}
@@ -70,7 +70,7 @@ function get(hive, key, name) {
  * @returns {Promise} Resolves an array of subkeys.
  */
 function keys(hive, key) {
-	return boilerplate(hive, key, (resolve, reject) => {
+	return boilerplate(hive, key, (key, resolve, reject) => {
 		new Registry({ hive, key })
 			.keys((err, items) => {
 				if (err) {
