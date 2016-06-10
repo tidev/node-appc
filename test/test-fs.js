@@ -21,6 +21,34 @@ describe('fs', () => {
 		});
 	});
 
+	describe('isDir()', () => {
+		it('should succeed if a directory exists', () => {
+			expect(appc.fs.isDir(__dirname)).to.be.true;
+		});
+
+		it('should fail if a directory does not exist', () => {
+			expect(appc.fs.isDir(path.join(__dirname, 'doesnotexist'))).to.be.false;
+		});
+
+		it('should fail if a directory is a file', () => {
+			expect(appc.fs.isDir(__filename)).to.be.false;
+		});
+	});
+
+	describe('isFile()', () => {
+		it('should succeed if a file exists', () => {
+			expect(appc.fs.isFile(__filename)).to.be.true;
+		});
+
+		it('should fail if a file does not exist', () => {
+			expect(appc.fs.isFile(path.join(__dirname, 'doesnotexist'))).to.be.false;
+		});
+
+		it('should fail if a file is a directory', () => {
+			expect(appc.fs.isFile(__dirname)).to.be.false;
+		});
+	});
+
 	describe('locate()', () => {
 		const baseDir = path.resolve(__dirname, './mocks/locate');
 

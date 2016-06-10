@@ -17,6 +17,36 @@ export function existsSync(file) {
 }
 
 /**
+ * Determines if a directory exists and that it is indeed a directory.
+ *
+ * @param {String} dir - The directory to check.
+ * @returns {Boolean}
+ */
+export function isDir(dir) {
+	try {
+		return fs.statSync(dir).isDirectory();
+	} catch (e) {
+		// squeltch
+	}
+	return false;
+}
+
+/**
+ * Determines if a file exists and that it is indeed a file.
+ *
+ * @param {String} dir - The file to check.
+ * @returns {Boolean}
+ */
+export function isFile(file) {
+	try {
+		return !fs.statSync(file).isDirectory();
+	} catch (e) {
+		// squeltch
+	}
+	return false;
+}
+
+/**
  * Scan a directory for a specified file.
  *
  * @param {String} dir - The directory to start searching from.
