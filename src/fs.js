@@ -39,7 +39,7 @@ export function isDir(dir) {
  */
 export function isFile(file) {
 	try {
-		return !fs.statSync(file).isDirectory();
+		return fs.statSync(file).isFile();
 	} catch (e) {
 		// squeltch
 	}
