@@ -32,11 +32,24 @@ export function getPaths(opts={}) {
 
 	return Promise
 		.all([
-			getEnvironmentPath(opts.env),
+			getUserPaths(opts.paths),
 			getExecutablePath(opts.executable),
-			getUserPaths(opts.paths)
+			getEnvironmentPath(opts.env)
 		])
-		.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)).sort());
+		.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)));
+}
+
+/**
+ * Resolves all of the specified paths.
+ *
+ * @param {String|Array} paths - The name of the executable to locate.
+ * @returns {Promise} Resolves an array of paths.
+ */
+function getUserPaths(paths) {
+	if (!Array.isArray(paths)) {
+		paths = [ paths ];
+	}
+	return Promise.all(paths.map(resolveDir));
 }
 
 /**
@@ -64,19 +77,6 @@ function getEnvironmentPath(env) {
 		env = [ env ];
 	}
 	return Promise.all(env.map(name => resolveDir(process.env[name])));
-}
-
-/**
- * Resolves all of the specified paths.
- *
- * @param {String|Array} paths - The name of the executable to locate.
- * @returns {Promise} Resolves an array of paths.
- */
-function getUserPaths(paths) {
-	if (!Array.isArray(paths)) {
-		paths = [ paths ];
-	}
-	return Promise.all(paths.map(resolveDir));
 }
 
 /**
