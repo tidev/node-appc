@@ -409,4 +409,60 @@ describe('util', () => {
 			expect(r).to.deep.equal(['a', 1, 'b', 'c', 2, 'd', 3]);
 		});
 	});
+
+	describe('arrayify()', () => {
+		it('should convert a string to an array', () => {
+			expect(appc.util.arrayify('foo')).to.deep.equal(['foo']);
+		});
+
+		it('should convert a number to an array', () => {
+			expect(appc.util.arrayify(123)).to.deep.equal([123]);
+		});
+
+		it('should return the original array', () => {
+			expect(appc.util.arrayify(['foo', 'bar'])).to.deep.equal(['foo', 'bar']);
+		});
+
+		it('should return empty array', () => {
+			expect(appc.util.arrayify('', true)).to.deep.equal([]);
+		});
+
+		it('should remove falsey items', () => {
+			expect(appc.util.arrayify(['a', '', 'b', null, 'c', undefined, 'd', true, false, 0, NaN, 1], true)).to.deep.equal(['a', 'b', 'c', 'd', true, 0, 1]);
+		});
+	});
+
+	describe('debounce()', () => {
+		it('should debounce multiple calls', function (done) {
+			this.slow(2000);
+
+			let count = 0;
+			const fn = appc.util.debounce(() => {
+				count++;
+			});
+
+			fn();
+			fn();
+			fn();
+
+			setTimeout(() => {
+				try {
+					expect(count).to.equal(0);
+
+					fn();
+
+					setTimeout(() => {
+						try {
+							expect(count).to.equal(1);
+							done();
+						} catch (e) {
+							done(e);
+						}
+					}, 500);
+				} catch (e) {
+					done(e);
+				}
+			}, 0);
+		});
+	});
 });

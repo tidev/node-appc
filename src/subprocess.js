@@ -10,19 +10,33 @@ export const bat = (isWindows ? '.bat' : '');
 /**
  * Wraps `which()` with a promise.
  *
- * @param {String} executable - The executable to find.
+ * @param {String|Array<String>} executables - An array of executables to search
+ * until it finds a valid executable.
  * @returns {Promise} Resolves the specified executable.
  */
-export function which(executable) {
-	return new Promise((resolve, reject) => {
-		_which(executable, (err, file) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve(file);
+export function which(executables) {
+	if (!Array.isArray(executables)) {
+		executables = [ executables ];
+	}
+
+	return Promise.resolve()
+		.then(function next() {
+			const executable = executables.shift();
+
+			if (!executable) {
+				return executables.length ? next() : Promise.reject(new Error('Unable to find executable'));
 			}
+
+			return new Promise((resolve, reject) => {
+				_which(executable, (err, file) => {
+					if (err) {
+						next().then(resolve).catch(reject);
+					} else {
+						resolve(file);
+					}
+				});
+			});
 		});
-	});
 }
 
 /**

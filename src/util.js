@@ -30,7 +30,7 @@ export function mergeDeep(dest, src) {
 	return dest;
 }
 
-export let pendingMutexes = {};
+export const pendingMutexes = {};
 
 /**
  * Ensures that only a function is executed by a single task at a time. If the
@@ -52,28 +52,39 @@ export function mutex(name, fn) {
 		}
 
 		if (pendingMutexes.hasOwnProperty(name)) {
-			return resolve(new Promise(resolve => pendingMutexes[name].push(resolve)));
+			pendingMutexes[name].push({ resolve, reject });
+			return;
 		}
 
-		pendingMutexes[name] = [];
+		pendingMutexes[name] = [ { resolve, reject } ];
 
-		const dispatch = value => {
-			for (const resolve of pendingMutexes[name]) {
-				resolve(value);
-			}
+		const dispatchSuccess = value => {
+			const pending = pendingMutexes[name];
 			delete pendingMutexes[name];
-			return value;
+			resolve(value);
+			for (const p of pending) {
+				p.resolve(value);
+			}
+		};
+
+		const dispatchError = err => {
+			const pending = pendingMutexes[name];
+			delete pendingMutexes[name];
+			reject(err);
+			for (const p of pending) {
+				p.reject(err);
+			}
 		};
 
 		try {
 			const result = fn();
 			if (result instanceof Promise) {
-				result.then(dispatch).then(resolve).catch(reject);
+				result.then(dispatchSuccess, dispatchError);
 			} else {
-				resolve(dispatch(result));
+				dispatchSuccess(result);
 			}
 		} catch (err) {
-			reject(err);
+			dispatchError(err);
 		}
 	}));
 }
@@ -168,17 +179,18 @@ export function clearCache(namespace) {
  * @returns {String}
  */
 export function sha1(str) {
-	return crypto.createHash('sha1').update(str).digest('hex');
+	return crypto.createHash('sha1').update(typeof str === 'string' ? str : JSON.stringify(str)).digest('hex');
 }
 
 /**
  * Returns the specified number of random bytes as a hex string.
  *
- * @param {Number} howMany - The number of random bytes to generate.
+ * @param {Number} howMany - The number of random bytes to generate. Must be
+ * greater than or equal to zero.
  * @returns {String}
  */
 export function randomBytes(howMany) {
-	return crypto.randomBytes(howMany).toString('hex');
+	return crypto.randomBytes(Math.max(~~howMany, 0)).toString('hex');
 }
 
 /**
@@ -202,4 +214,39 @@ export function unique(arr) {
 		}
 		return prev;
 	}, []);
+}
+
+/**
+ * Ensures that a value is an array. If not, it wraps the value in an array.
+ *
+ * @param {*} it - The value to ensure is an array.
+ * @param {Boolean} [removeFalsey=false] - When true, filters out all falsey
+ * items.
+ * @returns {Array}
+ */
+export function arrayify(it, removeFalsey) {
+	const arr = Array.isArray(it) ? it : [ it ];
+	return removeFalsey ? arr.filter(v => typeof v !== 'undefined' && v !== null && v !== '' && v !== false && (typeof v !== 'number' || !isNaN(v))) : arr;
+}
+
+/**
+ * Prevents a function from being called too many times.
+ *
+ * @param {Function} fn - The function to debounce.
+ * @param {Number} [wait=200] - The number of milliseconds to wait between calls
+ * to the returned function before firing the specified `fn`.
+ * @returns {Function}
+ */
+export function debounce(fn, wait=200) {
+	let timer;
+	wait = Math.max(~~wait, 0);
+
+	return function (...args) {
+		const ctx = this;
+		clearTimeout(timer);
+		timer = setTimeout(() => {
+			timer = null;
+			fn.apply(ctx, args);
+		}, wait);
+	};
 }

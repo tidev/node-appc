@@ -7,6 +7,7 @@ export const appc = {};
 const modules = {
 	detect:     './detect',
 	fs:         './fs',
+	gawk:       'gawk',
 	path:       './path',
 	subprocess: './subprocess',
 	util:       './util',

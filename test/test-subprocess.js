@@ -29,7 +29,29 @@ describe('subprocess', () => {
 		it('should not find an invalid executable', done => {
 			appc.subprocess.which('no_way_does_this_already_exist')
 				.then(executable => {
-					done(new Error('Somehow there\'s an executable called "no_way_does_this_already_exist"'));
+					done(new Error(`Somehow there's an executable called "${executable}"`));
+				})
+				.catch(err => {
+					expect(err).to.be.instanceof(Error);
+					done();
+				});
+		});
+
+		it('should scan list of executables and find well-known executable', done => {
+			process.env.PATH = path.join(__dirname, 'mocks', 'detect');
+			appc.subprocess.which(['no_way_does_this_already_exist', executable])
+				.then(result => {
+					expect(result).to.be.a.String;
+					expect(result).to.equal(fullpath);
+					done();
+				})
+				.catch(done);
+		});
+
+		it('should scan list of invalid executables', done => {
+			appc.subprocess.which(['no_way_does_this_already_exist', 'this_also_should_not_exist'])
+				.then(executable => {
+					done(new Error(`Somehow there's an executable called "${executable}"`));
 				})
 				.catch(err => {
 					expect(err).to.be.instanceof(Error);

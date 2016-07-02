@@ -1,82 +1,570 @@
-import fs from 'fs';
+import { arrayify, debounce, mutex, randomBytes, sha1, unique } from './util';
+import debug from 'debug';
 import { EventEmitter } from 'events';
-import { existsSync } from './fs';
-import { which } from './subprocess';
-import { mutex, unique } from './util';
+import fs from 'fs';
+import { gawk, GawkArray, GawkBase, GawkObject } from 'gawk';
+import { isDir, watch } from './fs';
 import path from 'path';
+import { registry } from './windows';
+import { which } from './subprocess';
+
+const log = debug('detect');
 
 /**
- * Retrieves an array of platform specific paths to search.
+ * A class that tracks active watchers' unwatch functions. This class is
+ * intended to be returned from a `watch()` function.
  *
- * @param {Object} [opts] - Various options.
- * @param {String|Array} [opts.env] - One or more environment variables
- * containing a path.
- * @param {String} [opts.executable] - The name of the executable to search the
- * system path for. If found, the directory is returned and the value will be
- * marked as the primary path.
- * @param {String|Array} [opts.paths] - One or more paths.
- * @returns {Promise} Resolves an array of paths.
+ * @emits {results} Emits the detection results.
+ * @emits {error} Emitted when an error occurs.
  */
-export function getPaths(opts={}) {
-	if ((typeof opts.env === 'string' && !opts.env) ||
-		(Array.isArray(opts.env) && opts.env.some(p => typeof p !== 'string')) ||
-		(opts.env && typeof opts.env !== 'string' && !Array.isArray(opts.env))) {
-		return Promise.reject(new TypeError('Expected env to be a string or an array of strings'));
+export class Handle extends EventEmitter {
+	/**
+	 * Initializes the Watcher instance.
+	 */
+	constructor() {
+		super();
+		this.unwatchers = new Map;
 	}
 
-	if ((typeof opts.paths === 'string' && !opts.paths) ||
-		(Array.isArray(opts.paths) && opts.paths.some(p => typeof p !== 'string')) ||
-		(opts.paths && typeof opts.paths !== 'string' && !Array.isArray(opts.paths))) {
-		return Promise.reject(new TypeError('Expected paths to be a string or an array of strings'));
-	}
-
-	return Promise
-		.all([
-			getUserPaths(opts.paths),
-			getExecutablePath(opts.executable),
-			getEnvironmentPath(opts.env)
-		])
-		.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)));
-}
-
-/**
- * Resolves all of the specified paths.
- *
- * @param {String|Array} paths - The name of the executable to locate.
- * @returns {Promise} Resolves an array of paths.
- */
-function getUserPaths(paths) {
-	if (!Array.isArray(paths)) {
-		paths = [ paths ];
-	}
-	return Promise.all(paths.map(resolveDir));
-}
-
-/**
- * Resolves the directory containing the specified executable.
- *
- * @param {String} [exe] - The name of the executable to locate.
- * @returns {Promise} Resolves the path to the specified executable.
- */
-function getExecutablePath(exe) {
-	if (exe && typeof exe === 'string') {
-		return which(exe)
-			.then(file => path.dirname(fs.realpathSync(file)))
-			.catch(() => Promise.resolve()); // never fail
+	/**
+	 * Stops all active watchers.
+	 *
+	 * @returns {Handle}
+	 * @access public
+	 */
+	stop() {
+		for (const unwatch of this.unwatchers.values()) {
+			if (typeof unwatch === 'function') {
+				unwatch();
+			}
+		}
+		this.unwatchers.clear();
+		return this;
 	}
 }
 
 /**
- * Resolves the path for the specified environment variable.
- *
- * @param {String|Array} [env] - One or more environment variable names.
- * @returns {Promise} Resolves the path for the specified environment variable.
+ * A engine for detecting various things. It walks the search paths and calls
+ * a `checkDir()` function. The results are accumulated and cached. The engine
+ * also supports watching the search paths for changes.
  */
-function getEnvironmentPath(env) {
-	if (!Array.isArray(env)) {
-		env = [ env ];
+export class Engine {
+	/**
+	 * Creates the detect engine instance.
+	 *
+	 * @param {Object} [opts] - Various detect options.
+	 * @param {Function} [opts.checkDir] - A function that is called for each
+	 * directory when scanning to check if the specified directory is of interest.
+	 * @param {Number} [opts.depth=0] - The max depth to scan each search path.
+	 * @param {String|Array<String>} [opts.env] - One or more environment variables
+	 * containing a path.
+	 * @param {String} [opts.exe] - The name of the executable to search the
+	 * system path for. If found, the directory is returned and the value will
+	 * be marked as the primary path.
+	 * @param {Boolean} [opts.multiple=false] - When true, the scanner will
+	 * continue to scan paths even after a result has been found.
+	 * @param {Function} [opts.processResults] - A function that is called after
+	 * the scanning is complete and the results may be modified.
+	 * @param {Object|Array<Object>|Function} [opts.registryKeys] - One or more
+	 * objects containing the registry `root`, `key`, and value `name` to query
+	 * the Windows Registry. If value is a function, it will invoke it and
+	 * expect the return value to be a path (string), array of paths (strings),
+	 * or a promise that resolves a path or array of paths. This function will
+	 * only be invoked on the Windows platform.
+	 * @param {Number} [opts.registryPollInterval=30000] - The number of
+	 * milliseconds to check for updates in the Windows Registry. Only used when
+	 * `detect()` is called with `watch=true`.
+	 * @param {String|Array<String>} [opts.paths] - One or more global
+	 * search paths to apply to all `detect()` calls.
+	 */
+	constructor(opts = {}) {
+		if (opts.checkDir !== undefined && typeof opts.checkDir !== 'function') {
+			throw new TypeError('Expected checkDir to be a function');
+		}
+
+		if (opts.exe !== undefined && (typeof opts.exe !== 'string' || !opts.exe)) {
+			throw new TypeError('Expected exe to be a non-empty string');
+		}
+
+		if (opts.processResults !== undefined && typeof opts.processResults !== 'function') {
+			throw new TypeError('Expected processResults() to be a function');
+		}
+
+		if (opts.registryKeys === null || (opts.registryKeys !== undefined && typeof opts.registryKeys !== 'function' && typeof opts.registryKeys !== 'object')) {
+			throw new TypeError('Expected registryKeys to be an object, array of objects, or a function');
+		} else if (Array.isArray(opts.registryKeys) && opts.registryKeys.some(r => !r || typeof r !== 'object' || Array.isArray(r) || !r.key || !r.name)) {
+			throw new TypeError('Expected registryKeys to be an array of objects with a "key" and "name"');
+		} else if (typeof opts.registryKeys === 'object' && (!opts.registryKeys.key || !opts.registryKeys.name)) {
+			throw new TypeError('Expected registryKeys to be an object with a "key" and "name"');
+		}
+
+		this.options = {
+			checkDir:             typeof opts.checkDir === 'function' ? opts.checkDir : null,
+			depth:                Math.max(~~opts.depth, 0),
+			env:                  arrayify(opts.env, true),
+			exe:                  typeof opts.exe === 'string' && opts.exe || null,
+			multiple:             !!opts.multiple,
+			processResults:       typeof opts.processResults === 'function' ? opts.processResults : null,
+			registryKeys:         (opts.registryKeys && typeof opts.registryKeys === 'object' ? arrayify(opts.registryKeys, true) : []),
+			registryKeysFn:       typeof opts.registryKeys === 'function' ? opts.registryKeys : null,
+			registryPollInterval: Math.max(~~opts.registryPollInterval || 30000, 0),
+			paths:                arrayify(opts.paths, true)
+		};
+
+		if (this.options.env.some(s => !s || typeof s !== 'string')) {
+			throw new TypeError('Expected env to be a string or an array of strings');
+		}
+
+		if (this.options.paths.some(s => !s || typeof s !== 'string')) {
+			throw new TypeError('Expected paths to be a string or an array of strings');
+		}
+
+		this.initialized = false;
+		this.defaultPath = null;
+		this.cache = {};
+		this.rescanTimer = null;
 	}
-	return Promise.all(env.map(name => resolveDir(process.env[name])));
+
+	/**
+	 * Main entry for the detection process flow.
+	 *
+	 * @param {Object} [opts] - An object with various params.
+	 * @param {Boolean} [opts.force=false] - When true, bypasses cache and
+	 * rescans the search paths.
+	 * @param {Boolan} [opts.gawk=false] - If true, emits the gawked result,
+	 * otherwise it emits the plain JavaScript result.
+	 * @param {Array} [opts.paths] - One or more paths to search in addition.
+	 * @param {Boolean} [opts.watch=false] - When true, watches for changes and
+	 * emits the new results when a change occurs.
+	 * @returns {Handle}
+	 * @access public
+	 */
+	detect(opts = {}) {
+		const handle = new Handle;
+		log('detect()');
+
+		// ensure async
+		setImmediate(() => {
+			if (opts.paths && (typeof opts.paths !== 'string' && (!Array.isArray(opts.paths) || opts.paths.some(s => typeof s !== 'string')))) {
+				handle.emit('error', new TypeError('Expected paths to be a string or an array of strings'));
+				return;
+			}
+
+			Promise.resolve()
+				// initialize
+				.then(() => this.initialize(handle))
+
+				// build the list of paths to scan
+				.then(() => this.getPaths(opts.paths))
+
+				// scan all paths for whatever we're looking for
+				.then(paths => this.startScan({ paths, handle, opts }))
+				.catch(err => {
+					log(err);
+					log('  Stopping watchers, emitting error');
+					handle.stop();
+					handle.emit('error', err);
+				});
+
+			if (this.options.watch) {
+				handle.unwatchers.set('__rescan_timer__', () => {
+					clearTimeout(this.rescanTimer);
+					this.rescanTimer = null;
+				});
+			}
+		});
+
+		return handle;
+	}
+
+	/**
+	 * Initializes the engine by cooking the global search paths which are
+	 * essentially static.
+	 *
+	 * @returns {Promise}
+	 * @access private
+	 */
+	initialize() {
+		if (this.initialized) {
+			return Promise.resolve();
+		}
+
+		return mutex('node-appc/detect/engine/initialize', () => {
+			return Promise
+				.all([
+					// search paths
+					...this.options.paths.map(path => {
+						if (typeof path === 'function') {
+							return Promise.resolve()
+								.then(() => path())
+								.then(paths => Promise.all(arrayify(paths, true).map(resolveDir)));
+						}
+						return resolveDir(path);
+					}),
+
+					// environment paths
+					...this.options.env.map(name => {
+						return resolveDir(process.env[name])
+							.then(path => {
+								if (path && typeof path === 'object' && !Array.isArray(path)) {
+									path.defaultPath && (this.defaultPath = path.defaultPath);
+									return path.paths || null;
+								}
+								return path;
+							});
+					}),
+
+					// executable path
+					this.options.exe && which(this.options.exe)
+						.then(file => this.defaultPath = path.dirname(fs.realpathSync(file)))
+						.catch(() => Promise.resolve())
+				])
+				.then(paths => {
+					this.paths = unique(Array.prototype.concat.apply([], paths).filter(p => p));
+					this.initialized = true;
+				});
+		});
+	}
+
+	/**
+	 * Combines the global search paths with the passed in search paths and
+	 * paths from the Windows registry.
+	 *
+	 * @param {Array<String>} [paths] - The paths to scan.
+	 * @returns {Promise}
+	 * @access private
+	 */
+	getPaths(paths) {
+		return this.initialize()
+			.then(() => {
+				return Promise
+					.all([
+						// static global search paths
+						process.env.NODE_APPC_SKIP_GLOBAL_SEARCH_PATHS ? null : Promise.resolve(this.paths),
+
+						// user paths
+						...arrayify(paths, true).map(path => {
+							if (typeof path === 'function') {
+								return Promise.resolve()
+									.then(() => path())
+									.then(paths => Promise.all(arrayify(paths, true).map(resolveDir)));
+							}
+							return resolveDir(path);
+						}),
+
+						// windows registry paths
+						this.queryRegistry()
+					])
+					.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)));
+			});
+	}
+
+	/**
+	 * Main logic for scanning and watching for changes.
+	 *
+	 * @param {Array<String>} paths - The paths to scan.
+	 * @param {Handle} handle - The handle to emit events from.
+	 * @param {Object} opts - Various scan options.
+	 * @returns {Promise}
+	 * @access private
+	 */
+	startScan({ paths, handle, opts }) {
+		const sha = sha1(paths);
+		const id = opts.watch ? randomBytes(10) : sha;
+
+		log('  startScan()');
+		log('    paths:', paths);
+		log('    id:', id);
+		log('    watch:', !!opts.watch);
+
+		const handleError = err => {
+			log(err);
+			log('  Stopping watchers, emitting error');
+			handle.stop();
+			handle.emit('error', err);
+		};
+
+		if (opts.watch) {
+			const active = {};
+
+			// start watching the paths
+			for (const dir of paths) {
+				active[dir] = 1;
+				if (!handle.unwatchers.has(dir)) {
+					handle.unwatchers.set(dir, watch(dir, debounce(evt => {
+						log('  fs event, rescanning', dir);
+						this.scan({ id, handle, paths, force: true, onlyPaths: [ dir ] })
+							.then(container => {
+								log('    scan complete');
+								// no need to emit... the gawk watcher will do it
+							})
+							.catch(handleError);
+					})));
+				}
+			}
+
+			// remove any inactive watchers
+			for (const dir of handle.unwatchers.keys()) {
+				if (dir !== '__rescan_timer__' && !active[dir]) {
+					handle.unwatchers.delete(dir);
+				}
+			}
+		}
+
+		if (handle.lastSha !== sha) {
+			// first scan or we're watching and the paths changed
+			log(handle.lastSha ? '  paths changed, rescanning' : '  performing initial scan');
+			this.scan({ id, handle, paths, force: opts.force && !handle.lastSha })
+				.then(container => {
+					log('  scan complete', container.get('results').toJS());
+					if (opts.watch) {
+						log('  watching gawk object');
+						container.watch(evt => {
+							log('  gawk object changed, emitting:', container.get('results').toJS());
+							handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
+						});
+					}
+					log('  emitting results:', container.get('results').toJS());
+					handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
+				})
+				.catch(handleError);
+		} else if (this.cache[id] && this.lastDefaultPath !== this.defaultPath) {
+			// paths did not change, only the default path
+			log('  default path changed, rescanning');
+			this.processResults(this.cache[id].get('results')._value, id)
+				.catch(handleError);
+		}
+
+		handle.lastSha = sha;
+
+		if (opts.watch && process.platform === 'win32') {
+			log('  watching registry for path changes');
+			this.rescanTimer = setTimeout(() => {
+				this.getPaths(opts.paths)
+					.then(paths => {
+						log('    starting scan to see if paths changed');
+						// this.startScan({ paths, handle, opts });
+					})
+					.catch(handleError);
+			}, this.options.registryPollInterval);
+		}
+	}
+
+	/**
+	 * Scans the paths and invokes the specified `checkDir()` function.
+	 *
+	 * @param {Handle} id - The unique identifier used to cache the results.
+	 * @param {Array<String>} paths - The paths to scan.
+	 * @param {Boolean} [opts.force=false] - When true, bypasses cache and
+	 * rescans the search paths.
+	 * @param {Array<String>} [onlyPaths] - When present, it will only scan
+	 * these paths and mix the results with all paths which are pulled from cache.
+	 * @returns {Promise}
+	 * @access private
+	 */
+	scan({ id, handle, paths, force, onlyPaths }) {
+		const results = [];
+		let index = 0;
+
+		log('  scan()', paths);
+
+		const next = () => {
+			const dir = paths[index++];
+			if (!this.options.checkDir || !dir) {
+				log('    finished scanning paths');
+				return;
+			}
+
+			log('    scanning ' + index + '/' + paths.length + ': ' + dir);
+
+			// check cache first
+			if (this.cache.hasOwnProperty(dir) && (!force || (onlyPaths && onlyPaths.indexOf(dir) === -1))) {
+				log('    result for this directory cached, pushing to results');
+				if (this.cache[dir]) {
+					results.push.apply(results, arrayify(this.cache[dir]));
+				}
+				return this.options.multiple ? next() : null;
+			}
+
+			// not cached, set up our directory walking chain
+			const check = (dir, depth) => {
+				if (!isDir(dir)) {
+					return Promise.resolve();
+				}
+
+				log('    check(\'' + dir + '\', ' + depth + ')');
+
+				return Promise.resolve()
+					.then(() => this.options.checkDir(dir))
+					.then(result => {
+						if (result) {
+							log('      got result, returning:', result);
+							return result;
+						}
+						if (depth <= 0) {
+							log('      no result, hit max depth, returning');
+							return;
+						}
+
+						// dir is not what we're looking for, check subdirectories
+						const subdirs = fs.readdirSync(dir);
+
+						log('      walking subdirs:', subdirs);
+
+						return Promise.resolve()
+							.then(function nextSubDir() {
+								const subdir = subdirs.shift();
+								if (subdir) {
+									return Promise.resolve()
+										.then(() => check(path.join(dir, subdir), depth - 1))
+										.then(result => result || nextSubDir());
+								}
+							});
+					});
+			};
+
+			return check(dir, this.options.depth)
+				.then(result => {
+					log('  done checking ' + dir);
+
+					// even if we don't have a result, we still cache that there was no result
+					log('  caching result');
+					this.cache[dir] = result || null;
+
+					if (result) {
+						results.push.apply(results, Array.isArray(result) ? result : [ result ]);
+					}
+
+					if (!result || this.options.multiple) {
+						log('  checking next directory');
+						return next();
+					}
+				});
+		};
+
+		log('    entering mutex');
+		return mutex('node-appc/detect/engine/' + id + (force ? '/' + randomBytes(5) : ''), () => {
+			log('    walking directories:', paths);
+			return Promise.resolve()
+				.then(next)
+				.then(() => {
+					log('  scanning found ' + results.length + ' results');
+					return this.processResults(results, id);
+				});
+		}).then(v => {
+			log('    exiting mutex');
+			return v;
+		});
+	}
+
+	/**
+	 * Caches the results using the specified id.
+	 *
+	 * @param {Array|*} results - The results to cache. This is an array by
+	 * default, but a custom `processResults()` handler could modify it.
+	 * @param {String} id - The identifier of the results in the cache.
+	 * @returns {Promise} Resolves a `GawkObject` with a key "results" that
+	 * contains the gawked results.
+	 * @access private
+	 */
+	processResults(results, id) {
+		log('  processResults() - ' + results.length + ' results');
+
+		let container = this.cache[id];
+		if (!container) {
+			log('    creating cached GawkObject container');
+			container = this.cache[id] = new GawkObject({ results: null });
+		}
+
+		let existingValue = container.get('results');
+
+		return Promise.resolve()
+			.then(() => {
+				if (this.options.multiple) {
+					log('    ensuring results is an array of results');
+					results = Array.isArray(results) ? results : (results ? [ results ] : []);
+					log('    ', results);
+				} else {
+					log('    ensuring results is a single result');
+					results = Array.isArray(results) ? results[0] : (results || null);
+					log('    ', results);
+				}
+
+				// call processResults() to allow implementations to sort and assign a default
+				if (!this.options.processResults) {
+					return results;
+				}
+
+				existingValue.pause();
+
+				return Promise.resolve()
+					.then(() => this.options.processResults(results, existingValue, this))
+					.then(newResults => newResults || results);
+			})
+			.then(results => {
+				// ensure that the value is a gawked data type
+				if (!(results instanceof GawkBase)) {
+					log('    gawking results');
+					results = gawk(results);
+				}
+
+				if (this.options.multiple) {
+					// results will be a gawked array
+					if (existingValue instanceof GawkArray) {
+						if (results instanceof GawkArray) {
+							log('    overriding internal GawkArray value');
+							// replace the internal array of the GawkArray and manually trigger the hash
+							// to be regenerated and listeners to be notified
+							existingValue._value = results._value;
+							existingValue.notify();
+						} else {
+							log('    pushing results into results array');
+							existingValue.push(results);
+						}
+						existingValue.resume();
+					} else {
+						log('    no existing value, setting');
+						container.set('results', results instanceof GawkArray ? results : new GawkArray([ results ]));
+					}
+				} else {
+					// single result
+					if (existingValue && existingValue instanceof GawkObject && results instanceof GawkObject) {
+						log('    merging results into existing value:', results);
+						existingValue.mergeDeep(results);
+					} else {
+						log('    setting new value:', results);
+						container.set('results', results);
+					}
+				}
+
+				return container;
+			});
+	}
+
+	/**
+	 * Queries the Windows Registyr for the given registry keys or function.
+	 * If the paths change, the results will be re-detected.
+	 *
+	 * @returns {Promise}
+	 * @access private
+	 */
+	queryRegistry() {
+		if (process.platform !== 'win32') {
+			return;
+		}
+
+		return Promise
+			.all([
+				...this.options.registryKeys.map(reg => {
+					return registry
+						.get(reg.root || 'HKLM', reg.key, reg.name)
+						.catch(err => Promise.resolve());
+				}),
+
+				!this.options.registryKeysFn ? null : Promise.resolve()
+					.then(() => this.options.registryKeysFn())
+			]);
+	}
 }
 
 /**
@@ -103,121 +591,4 @@ function resolveDir(dir) {
 			fs.realpath(dir, (err, realpath) => resolve(err ? dir : realpath));
 		});
 	});
-}
-
-/**
- * Scans paths for interesting things, then caches them.
- */
-export class Scanner {
-	constructor() {
-		/**
-		 * A cache of results per path.
-		 * @type {Object}
-		 */
-		this.cache = {};
-	}
-
-	/**
-	 * Scans one or more paths and calls the specified detect function. Results
-	 * are then cached per path.
-	 *
-	 * @param {Object} opts - Various options.
-	 * @param {Boolean} [opts.depth=1] - The max depth to recurse until the
-	 * detect function returns a result.
-	 * @param {Function} opts.detectFn - A function that detects if a directory
-	 * is whatever we're looking for. This function is passed a directory to
-	 * check and should return a `Promise`.
-	 * @param {Boolean} [opts.force] - When true, bypasses cache and forces a
-	 * scan.
-	 * @param {Array} [opts.onlyPaths] - When set, only calls `detectFn` for
-	 * these paths, but merges the results with the previously cached results of
-	 * other paths.
-	 * @param {Array} opts.paths - One or more paths to check.
-	 * @returns {Promise} Resolves the value returned from `detectFn`.
-	 */
-	scan({ detectFn, paths, onlyPaths, depth = 0, force }) {
-		if (typeof detectFn !== 'function') {
-			return Promise.reject(new TypeError('Expected detectFn to be a function'));
-		}
-
-		if (!Array.isArray(paths)) {
-			return Promise.reject(new TypeError('Expected paths to be an array'));
-		}
-
-		if (onlyPaths && !Array.isArray(onlyPaths)) {
-			return Promise.reject(new TypeError('Expected onlyPaths to be an array'));
-		}
-
-		return Promise
-			.all(paths.map(dir => mutex(dir, () => new Promise((resolve, reject) => {
-				if (this.cache[dir] && (!force || onlyPaths && onlyPaths.indexOf(dir) === -1)) {
-					return resolve(this.cache[dir]);
-				}
-
-				if (!existsSync(dir)) {
-					return resolve();
-				}
-
-				const detect = (dir, depth) => {
-					if (!existsSync(dir)) {
-						return;
-					}
-
-					depth = ~~depth;
-
-					return Promise.resolve()
-						.then(() => detectFn(dir))
-						.then(result => {
-							if (result) {
-								return result;
-							}
-
-							if (depth <= 0) {
-								return;
-							}
-
-							return Promise.all(fs.readdirSync(dir).map(name => detect(path.join(dir, name), depth - 1)));
-						});
-				};
-
-				Promise.resolve()
-					.then(() => detect(dir, depth))
-					.then(results => this.cache[dir] = unique(Array.prototype.concat.call([], results)).sort())
-					.then(resolve)
-					.catch(reject);
-			}))))
-			.then(paths => Array.prototype.concat.apply([], paths).filter(p => p));
-	}
-}
-
-/**
- * A class that tracks active watchers' unwatch functions. This class is
- * intended to be returned from a `watch()` function.
- *
- * @emits {results} Emits the detection results.
- * @emits {error} Emitted when an error occurs.
- */
-export class WatchHandle extends EventEmitter {
-	/**
-	 * Initializes the Watcher instance.
-	 */
-	constructor() {
-		super();
-		this.unwatchers = new Map();
-	}
-
-	/**
-	 * Stops all active watchers.
-	 *
-	 * @returns {Watcher}
-	 */
-	stop() {
-		for (const unwatch of this.unwatchers.values()) {
-			if (typeof unwatch === 'function') {
-				unwatch();
-			}
-		}
-		this.unwatchers.clear();
-		return this;
-	}
 }
