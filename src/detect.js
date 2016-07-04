@@ -8,7 +8,7 @@ import path from 'path';
 import { registry } from './windows';
 import { which } from './subprocess';
 
-const log = debug('detect');
+const log = debug('node_appc:detect');
 
 /**
  * A class that tracks active watchers' unwatch functions. This class is
@@ -152,7 +152,7 @@ export class Engine {
 
 			Promise.resolve()
 				// initialize
-				.then(() => this.initialize(handle))
+				.then(() => this.initialize())
 
 				// build the list of paths to scan
 				.then(() => this.getPaths(opts.paths))
@@ -166,7 +166,7 @@ export class Engine {
 					handle.emit('error', err);
 				});
 
-			if (this.options.watch) {
+			if (opts.watch) {
 				handle.unwatchers.set('__rescan_timer__', () => {
 					clearTimeout(this.rescanTimer);
 					this.rescanTimer = null;
@@ -253,7 +253,7 @@ export class Engine {
 						}),
 
 						// windows registry paths
-						this.queryRegistry()
+						process.env.NODE_APPC_SKIP_GLOBAL_SEARCH_PATHS ? null : this.queryRegistry()
 					])
 					.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)));
 			});
@@ -269,12 +269,13 @@ export class Engine {
 	 * @access private
 	 */
 	startScan({ paths, handle, opts }) {
-		const sha = sha1(paths);
+		const sha = handle.lastSha = sha1(paths.sort());
 		const id = opts.watch ? randomBytes(10) : sha;
 
 		log('  startScan()');
 		log('    paths:', paths);
 		log('    id:', id);
+		log('    force:', !!opts.force);
 		log('    watch:', !!opts.watch);
 
 		const handleError = err => {
@@ -283,6 +284,9 @@ export class Engine {
 			handle.stop();
 			handle.emit('error', err);
 		};
+
+		let firstTime = true;
+		this.lastDefaultPath = this.defaultPath;
 
 		if (opts.watch) {
 			const active = {};
@@ -311,43 +315,57 @@ export class Engine {
 			}
 		}
 
-		if (handle.lastSha !== sha) {
-			// first scan or we're watching and the paths changed
-			log(handle.lastSha ? '  paths changed, rescanning' : '  performing initial scan');
-			this.scan({ id, handle, paths, force: opts.force && !handle.lastSha })
-				.then(container => {
-					log('  scan complete', container.get('results').toJS());
-					if (opts.watch) {
-						log('  watching gawk object');
-						container.watch(evt => {
-							log('  gawk object changed, emitting:', container.get('results').toJS());
-							handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
-						});
-					}
-					log('  emitting results:', container.get('results').toJS());
-					handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
-				})
-				.catch(handleError);
-		} else if (this.cache[id] && this.lastDefaultPath !== this.defaultPath) {
-			// paths did not change, only the default path
-			log('  default path changed, rescanning');
-			this.processResults(this.cache[id].get('results')._value, id)
-				.catch(handleError);
-		}
-
-		handle.lastSha = sha;
-
-		if (opts.watch && process.platform === 'win32') {
-			log('  watching registry for path changes');
+		const checkRegistry = () => {
 			this.rescanTimer = setTimeout(() => {
 				this.getPaths(opts.paths)
 					.then(paths => {
 						log('    starting scan to see if paths changed');
-						// this.startScan({ paths, handle, opts });
+						log('    paths:', paths);
+						const sha = sha1(paths.sort());
+						if (handle.lastSha !== sha) {
+							log('  paths changed, rescanning', handle.lastSha, sha);
+							handle.lastSha = sha;
+							return runScan(paths);
+						} else if (this.lastDefaultPath !== this.defaultPath) {
+							log('  default path changed, rescanning');
+							this.lastDefaultPath = this.defaultPath;
+							return this
+								.processResults(this.cache[id].get('results')._value, id)
+								.catch(handleError);
+						}
 					})
+					.then(checkRegistry)
 					.catch(handleError);
 			}, this.options.registryPollInterval);
-		}
+		};
+
+		const runScan = paths => {
+			return this.scan({ id, handle, paths, force: opts.force }).then(container => {
+				log('  scan complete', container.get('results').toJS());
+				if (opts.watch && firstTime) {
+					log('  watching gawk object');
+					container.watch(evt => {
+						log('  gawk object changed, emitting:', container.get('results').toJS());
+						handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
+					});
+
+					if (process.platform === 'win32') {
+						log('  watching registry for path changes');
+						checkRegistry();
+					}
+				}
+
+				if (!opts.watch || firstTime) {
+					log('  emitting results:', container.get('results').toJS());
+					handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
+				}
+
+				firstTime = false;
+			}).catch(handleError);
+		};
+
+		log('  performing initial scan');
+		runScan(paths);
 	}
 
 	/**
@@ -563,7 +581,16 @@ export class Engine {
 
 				!this.options.registryKeysFn ? null : Promise.resolve()
 					.then(() => this.options.registryKeysFn())
-			]);
+			])
+			.then(paths => {
+				return Array.prototype.concat.apply([], paths.map(p => {
+					if (p && typeof p === 'object') {
+						this.defaultPath = p.defaultPath;
+						return p.paths;
+					}
+					return p;
+				}));
+			});
 	}
 }
 
