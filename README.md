@@ -12,6 +12,13 @@
 
     npm install node-appc
 
+## Debugging
+
+node-appc uses [debug][debug-url] to display debug output. Set the following
+environment variable to see the debugging output:
+
+    DEBUG=node_appc:*
+
 ## Reporting Bugs or Submitting Fixes
 
 If you run into problems, and trust us, there are likely plenty of them at this
@@ -57,3 +64,4 @@ details on the license. Also, please take notice of the privacy notice at the en
 [david-url]: https://david-dm.org/appcelerator/node-appc
 [david-dev-image]: https://img.shields.io/david/dev/appcelerator/node-appc.svg
 [david-dev-url]: https://david-dm.org/appcelerator/node-appc#info=devDependencies
+[debug-url]: https://www.npmjs.com/package/debug
