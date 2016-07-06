@@ -17,7 +17,7 @@
 node-appc uses [debug][debug-url] to display debug output. Set the following
 environment variable to see the debugging output:
 
-    DEBUG=node_appc:*
+    DEBUG=node-appc:*
 
 ## Reporting Bugs or Submitting Fixes
 

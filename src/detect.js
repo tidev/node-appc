@@ -8,7 +8,7 @@ import path from 'path';
 import { registry } from './windows';
 import { which } from './subprocess';
 
-const log = debug('node_appc:detect');
+const log = debug('node-appc:detect');
 
 /**
  * A class that tracks active watchers' unwatch functions. This class is
@@ -189,38 +189,51 @@ export class Engine {
 			return Promise.resolve();
 		}
 
+		log('initialize()');
+
 		return mutex('node-appc/detect/engine/initialize', () => {
 			return Promise
 				.all([
 					// search paths
-					...this.options.paths.map(path => {
-						if (typeof path === 'function') {
-							return Promise.resolve()
-								.then(() => path())
-								.then(paths => Promise.all(arrayify(paths, true).map(resolveDir)));
-						}
-						return resolveDir(path);
-					}),
+					Promise.all(
+						this.options.paths.map(path => {
+							if (typeof path === 'function') {
+								return Promise.resolve()
+									.then(() => path())
+									.then(paths => Promise.all(arrayify(paths, true).map(resolveDir)));
+							}
+							return resolveDir(path);
+						})
+					),
 
 					// environment paths
-					...this.options.env.map(name => {
-						return resolveDir(process.env[name])
-							.then(path => {
-								if (path && typeof path === 'object' && !Array.isArray(path)) {
-									path.defaultPath && (this.defaultPath = path.defaultPath);
-									return path.paths || null;
-								}
-								return path;
-							});
-					}),
+					Promise.all(
+						this.options.env.map(name => {
+							return resolveDir(process.env[name])
+								.then(path => {
+									if (path && typeof path === 'object' && !Array.isArray(path)) {
+										path.defaultPath && (this.defaultPath = path.defaultPath);
+										return path.paths || null;
+									}
+									return path;
+								});
+						})
+					),
 
 					// executable path
 					this.options.exe && which(this.options.exe)
 						.then(file => this.defaultPath = path.dirname(fs.realpathSync(file)))
 						.catch(() => Promise.resolve())
 				])
-				.then(paths => {
+				.then(([ paths, envPaths, exePath ]) => {
 					this.paths = unique(Array.prototype.concat.apply([], paths).filter(p => p));
+					this.envPaths = unique(Array.prototype.concat.apply([], envPaths).filter(p => p));
+					this.exePath = exePath;
+
+					log('  Found search paths:', this.paths);
+					log('  Found env paths:', this.envPaths);
+					log('  Found exe paths:', this.exePath);
+
 					this.initialized = true;
 				});
 		});
@@ -239,8 +252,17 @@ export class Engine {
 			.then(() => {
 				return Promise
 					.all([
-						// static global search paths
+						// global search paths
 						process.env.NODE_APPC_SKIP_GLOBAL_SEARCH_PATHS ? null : Promise.resolve(this.paths),
+
+						// windows registry paths
+						process.env.NODE_APPC_SKIP_GLOBAL_SEARCH_PATHS ? null : this.queryRegistry(),
+
+						// global environment paths
+						process.env.NODE_APPC_SKIP_GLOBAL_ENVIRONMENT_PATHS ? null : Promise.resolve(this.envPaths),
+
+						// global executable path
+						process.env.NODE_APPC_SKIP_GLOBAL_EXECUTABLE_PATH ? null : Promise.resolve(this.exePath),
 
 						// user paths
 						...arrayify(paths, true).map(path => {
@@ -250,10 +272,7 @@ export class Engine {
 									.then(paths => Promise.all(arrayify(paths, true).map(resolveDir)));
 							}
 							return resolveDir(path);
-						}),
-
-						// windows registry paths
-						process.env.NODE_APPC_SKIP_GLOBAL_SEARCH_PATHS ? null : this.queryRegistry()
+						})
 					])
 					.then(paths => unique(Array.prototype.concat.apply([], paths).filter(p => p)));
 			});
