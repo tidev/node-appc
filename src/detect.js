@@ -444,16 +444,24 @@ export class Engine {
 						}
 
 						// dir is not what we're looking for, check subdirectories
-						const subdirs = fs.readdirSync(dir);
+						const subdirs = [];
+						for (const name of fs.readdirSync(dir)) {
+							const subdir = path.join(dir, name);
+							isDir(subdir) && subdirs.push(subdir);
+						}
 
-						log('      walking subdirs:', subdirs);
+						if (!subdirs.length) {
+							return;
+						}
+
+						log('      walking subdirs: [ \'' + subdirs.join('\', \'') + '\' ]');
 
 						return Promise.resolve()
 							.then(function nextSubDir() {
 								const subdir = subdirs.shift();
 								if (subdir) {
 									return Promise.resolve()
-										.then(() => check(path.join(dir, subdir), depth - 1))
+										.then(() => check(subdir, depth - 1))
 										.then(result => result || nextSubDir());
 								}
 							});
