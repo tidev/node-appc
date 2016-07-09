@@ -1,5 +1,8 @@
+import debug from 'debug';
 import fs from 'fs';
 import nodePath from 'path';
+
+const log = debug('node-appc:fs');
 
 /**
  * Determines if a file or directory exists.
@@ -96,11 +99,9 @@ export class Watcher {
 	 * Constructs the watcher.
 	 *
 	 * @param {String} path - The directory to watch.
-	 * @param {Watcher} [parent] - The parent watcher.
 	 */
-	constructor(path, parent = null) {
+	constructor(path) {
 		this.path      = path;
-		this.parent    = parent;
 		this.fswatcher = null;
 		this.listeners = [];
 		this.children  = null;
@@ -114,8 +115,12 @@ export class Watcher {
 	 *
 	 * @param {Boolean} [isAdd=false] - When true, recursively sends out event
 	 * notifications for all contained files and directories.
+	 * @access private
 	 */
 	init(isAdd) {
+		log('Watcher.init()');
+		log('  path = ' + this.path);
+
 		this.stat  = null;
 		this.files = null;
 
@@ -146,13 +151,6 @@ export class Watcher {
 			}
 			throw e;
 		}
-
-		this.fswatcher = fs
-			.watch(this.path, this.onChange.bind(this))
-			.on('error', err => {
-				// on Windows, it's possible for the internal FSEvent to return
-				// an EPERM exception, so just ignore it
-			});
 
 		// we have a directory, so stat every file in it and if this
 		// directory was just added, send out notifications for all files
@@ -191,10 +189,72 @@ export class Watcher {
 				this.children[filename].init(isAdd);
 			}
 		}
+
+		log('  is add? ' + !!isAdd);
+		const filenames = Object.keys(this.files);
+		log(`  files (${filenames.length}): ${filenames.length ? filenames.join(', ') : '[]'}`);
+
+		this.fswatcher = fs
+			.watch(this.path, this.onChange.bind(this))
+			.on('error', err => {
+				// on Windows, it's possible for the internal FSEvent to return
+				// an EPERM exception, so just ignore it
+			});
+	}
+
+	/**
+	 * Adds a listener to be notified of any changes.
+	 *
+	 * @param {Object} [opts] - Various options.
+	 * @param {Boolean} [opts.recursive=false] - When true, fires listener if
+	 * any there are changes in any subdirectories.
+	 * @param {Function} listener - The function to call when an event occurs.
+	 * @access public
+	 */
+	addListener(opts, listener) {
+		if (typeof opts === 'function') {
+			listener = opts;
+			opts = {};
+		} else if (!opts || typeof opts !== 'object' || Array.isArray(opts)) {
+			throw TypeError('Expected opts to be an object');
+		}
+
+		if (typeof listener !== 'function') {
+			throw TypeError('Expected listener to be a function');
+		}
+
+		if (!opts.recursive) {
+			this.listeners.push(listener);
+			return;
+		}
+
+		this.listeners.push(evt => {
+			const subdir = evt.file;
+			if (evt.action === 'add' && evt.stat && evt.stat.isDirectory()) {
+				if (!this.children) {
+					this.children = {};
+				}
+
+				if (!this.children[subdir]) {
+					this.children[subdir] = new Watcher(subdir);
+				}
+
+				this.children[subdir].addListener({ recursive: true }, listener);
+			} else if (evt.action === 'delete' && this.children && evt.prevStat && evt.prevStat.isDirectory()) {
+				if (this.children[subdir]) {
+					this.children[subdir].close();
+				}
+				delete this.children[subdir];
+			}
+
+			listener(evt);
+		});
 	}
 
 	/**
 	 * Recursively closes the watcher and all of its children.
+	 *
+	 * @access public
 	 */
 	close() {
 		if (this.fswatcher) {
@@ -218,6 +278,8 @@ export class Watcher {
 	/**
 	 * Recursively handles when a file or directory has been deleted. This
 	 * will close the filesystem watcher, but keeps listeners and children.
+	 *
+	 * @access private
 	 */
 	deleted() {
 		if (this.fswatcher) {
@@ -254,6 +316,7 @@ export class Watcher {
 	 *
 	 * @param {String} event - The event that triggered the change.
 	 * @param {String} filename - The name of the file or directory that changed.
+	 * @access private
 	 */
 	onChange(event, filename) {
 		try {
@@ -284,6 +347,10 @@ export class Watcher {
 			}
 		}
 
+		log(`Watcher.onChange('${event}', '${filename}')`);
+		log('  action = ' + evt.action);
+		log('  path   = ' + evt.filename);
+
 		this.sendEvent(evt);
 
 		let fswatcher;
@@ -300,8 +367,11 @@ export class Watcher {
 	 * Sends an event notification to all listeners.
 	 *
 	 * @param {Object} evt - The event payload to send.
+	 * @access private
 	 */
 	sendEvent(evt) {
+		log('Watcher.sendEvent()');
+		log(`  notifying ${this.listeners.length} listeners`);
 		for (const listener of this.listeners) {
 			listener(evt);
 		}
@@ -343,14 +413,28 @@ function cleanupWatchers() {
  * Registers listener with the file path to watch.
  *
  * @param {String} path - The path to the file to watch.
+ * @param {Object} [opts] - Various options.
+ * @param {Boolean} [opts.recursive=false] - When true, watches for changes in
+ * any subdirectories.
  * @param {Function} listener - The function to call when the watched file
  * changes.
  * @returns {Function} The unwatch function.
  */
-export function watch(path, listener) {
+export function watch(path, opts, listener) {
 	if (typeof path !== 'string') {
 		throw new TypeError('Expected path to be a string');
-	} else if (typeof listener !== 'function') {
+	}
+
+	if (typeof opts === 'function') {
+		listener = opts;
+		opts = {};
+	} else if (!opts) {
+		opts = {};
+	} else if (typeof opts !== 'object' || Array.isArray(opts)) {
+		throw new TypeError('Expected opts to be an object');
+	}
+
+	if (typeof listener !== 'function') {
 		throw new TypeError('Expected listener to be a function');
 	}
 
@@ -387,20 +471,21 @@ export function watch(path, listener) {
 			watcher.children = {};
 		}
 		if (!watcher.children[filename]) {
-			watcher.children[filename] = new Watcher(nodePath.join(watcher.path, filename), watcher);
+			watcher.children[filename] = new Watcher(nodePath.join(watcher.path, filename));
 		}
 		watcher = watcher.children[filename];
 	}
 
 	// add the listener to the top-level watcher
 	if (filename) {
-		watcher.listeners.push(evt => {
+		watcher.addListener(evt => {
 			if (evt.filename === filename) {
 				listener(evt);
 			}
 		});
 	} else {
-		watcher.listeners.push(listener);
+		// watching a directory
+		watcher.addListener({ recursive: opts.recursive }, listener);
 	}
 
 	// return the unwatch function

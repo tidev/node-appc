@@ -113,17 +113,27 @@ describe('fs', () => {
 			}).to.throw(TypeError, 'Expected path to be a string');
 		});
 
+		it('should throw error if options is not an object', () => {
+			expect(() => {
+				appc.fs.watch('foo', 'bar');
+			}).to.throw(TypeError, 'Expected opts to be an object');
+
+			expect(() => {
+				appc.fs.watch('foo', 123);
+			}).to.throw(TypeError, 'Expected opts to be an object');
+		});
+
 		it('should throw error if listener is not a function', () => {
 			expect(() => {
 				appc.fs.watch('foo');
 			}).to.throw(TypeError, 'Expected listener to be a function');
 
 			expect(() => {
-				appc.fs.watch('foo', null);
+				appc.fs.watch('foo', null, null);
 			}).to.throw(TypeError, 'Expected listener to be a function');
 
 			expect(() => {
-				appc.fs.watch('foo', 'bar');
+				appc.fs.watch('foo', null, 'bar');
 			}).to.throw(TypeError, 'Expected listener to be a function');
 		});
 
@@ -452,6 +462,70 @@ describe('fs', () => {
 
 				fs.writeFileSync(filename, 'foo!');
 			}, 100);
+		});
+
+		it('should recursively watch for changes in nested directories', function (done) {
+			this.timeout(10000);
+			this.slow(5000);
+
+			const tmp = temp.mkdirSync('node-appc-test-');
+			const fooDir = path.join(tmp, 'foo');
+			const barDir = path.join(fooDir, 'bar');
+			const filename = path.join(barDir, 'baz.txt');
+			let count = 0;
+
+			appc.fs.watch(tmp, { recursive: true }, evt => {
+				count++;
+				expect(evt).to.be.an.Object;
+
+				if (count === 1) {
+					// "foo" added, add "bar" subdirectory
+					expect(evt.action).to.equal('add');
+					expect(evt.file).to.equal(fooDir);
+					fs.mkdirSync(barDir);
+
+				} else if (count === 2) {
+					// "bar" added, write "baz.txt"
+					expect(evt.action).to.equal('add');
+					expect(evt.file).to.equal(barDir);
+					fs.writeFileSync(filename, 'foo!');
+
+				} else if (count === 3) {
+					// "baz.txt" added, delete "bar" directory
+					expect(evt.action).to.equal('add');
+					expect(evt.file).to.equal(filename);
+					del([ barDir ], { force: true });
+
+				} else if (count === 4) {
+					// "bar" (and "baz.txt") deleted, verify watching has stopped
+					expect(evt.action).to.equal('delete');
+					expect(evt.file).to.equal(barDir);
+
+					let watcher = appc.fs.rootWatcher;
+					for (const segment of tmp.replace(path.resolve('/'), '').split(path.sep)) {
+						watcher = watcher.children[segment];
+						if (!watcher) {
+							return done(new Error('Unable to find tmp dir watcher'));
+						}
+					}
+
+					expect(watcher.files).to.be.an.Object;
+					expect(watcher.files).to.have.property('foo');
+					expect(watcher.children).to.be.an.Object;
+					expect(watcher.children).to.have.property(fooDir);
+
+					const fooWatcher = watcher.children[fooDir];
+					expect(fooWatcher.files).to.be.an.Object;
+					expect(fooWatcher.files).to.be.empty;
+					expect(fooWatcher.children).to.be.an.Object;
+					expect(fooWatcher.children).to.be.empty;
+
+					done();
+				}
+			});
+
+			// create a subdirectory "foo" to kick off the watch
+			fs.mkdirSync(fooDir);
 		});
 	});
 });
