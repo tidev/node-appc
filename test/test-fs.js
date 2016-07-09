@@ -442,7 +442,10 @@ describe('fs', () => {
 			fs.writeFileSync(filename, 'foo!');
 		});
 
-		it('should close and re-watch a directory', done => {
+		it('should close and re-watch a directory', function (done) {
+			this.timeout(10000);
+			this.slow(5000);
+
 			const tmp = temp.mkdirSync('node-appc-test-');
 			const filename = path.join(tmp, 'foo.txt');
 
@@ -496,9 +499,12 @@ describe('fs', () => {
 					expect(evt.file).to.equal(filename);
 					del([ barDir ], { force: true });
 
-				} else if (count === 4) {
+				} else if (count >= 4) {
 					// "bar" (and "baz.txt") deleted, verify watching has stopped
 					expect(evt.action).to.equal('delete');
+					if (evt.file === filename) {
+						return;
+					}
 					expect(evt.file).to.equal(barDir);
 
 					let watcher = appc.fs.rootWatcher;

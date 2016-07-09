@@ -336,9 +336,10 @@ export class Watcher {
 		};
 
 		try {
-			evt.stat = fs.statSync(evt.file);
-			this.files[filename] = evt.stat;
 			evt.action = evt.prevStat ? 'change' : 'add';
+			evt.stat = fs.statSync(evt.file);
+			evt.stat.ts = Date.now();
+			this.files[filename] = evt.stat;
 		} catch (e) {
 			// file was deleted
 			evt.action = 'delete';
@@ -350,6 +351,11 @@ export class Watcher {
 		log(`Watcher.onChange('${event}', '${filename}')`);
 		log('  action = ' + evt.action);
 		log('  path   = ' + evt.filename);
+
+		if (evt.stat && evt.prevStat && evt.stat.size === evt.prevStat.size && (evt.stat.ts - evt.prevStat.ts) < 10) {
+			log('  dropping redundant event');
+			return;
+		}
 
 		this.sendEvent(evt);
 
