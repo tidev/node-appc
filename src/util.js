@@ -241,7 +241,7 @@ export function debounce(fn, wait=200) {
 	let timer;
 	wait = Math.max(~~wait, 0);
 
-	return function (...args) {
+	return function debouncer(...args) {
 		const ctx = this;
 		clearTimeout(timer);
 		timer = setTimeout(() => {

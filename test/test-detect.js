@@ -15,6 +15,7 @@ describe('detect', () => {
 			process.env.PATH = this.PATH;
 			delete process.env.DETECT_TEST_PATH;
 			delete process.env.DETECT_TEST_PATH2;
+			temp.cleanupSync();
 		});
 
 		describe('constructor', () => {
@@ -212,6 +213,12 @@ describe('detect', () => {
 		});
 
 		describe('detect()', () => {
+			afterEach(function () {
+				if (this.handle) {
+					this.handle.stop();
+				}
+			});
+
 			it('should reject if paths is not a string', done => {
 				const engine = new appc.detect.Engine();
 				engine.detect({ paths: 123 })
@@ -469,19 +476,22 @@ describe('detect', () => {
 					}
 				});
 
-				const handle = engine
+				this.handle = engine
 					.detect({ paths: tmp, watch: true })
 					.on('results', results => {
+						this.handle.stop();
 						if (counter === 1) {
-							expect(results).to.be.undefined;
-							fs.writeFileSync(path.join(tmp, 'foo.txt'), 'bar');
-						} else {
-							handle.stop();
+							done(new Error('Expected results to be emitted only if result is not null'));
+						} else if (counter > 1) {
 							expect(results).to.deep.equal({ foo: 'bar' });
 							done();
 						}
 					})
 					.on('error', done);
+
+				setTimeout(() => {
+					fs.writeFileSync(path.join(tmp, 'foo.txt'), 'bar');
+				}, 100);
 			});
 
 			it('should queue up multiple calls', function (done) {
@@ -526,6 +536,46 @@ describe('detect', () => {
 						})
 						.on('error', finish);
 				}, 100);
+			});
+
+			it('should watch for changes in a detected path', function (done) {
+				this.timeout(5000);
+				this.slow(4000);
+
+				let counter = 0;
+				const tmp = temp.mkdirSync('node-appc-test-');
+				const subdir = path.join(tmp, 'test');
+				fs.mkdirSync(subdir);
+				const testFile = path.join(subdir, 'test.txt');
+				fs.writeFileSync(testFile, 'foo');
+
+				const engine = new appc.detect.Engine({
+					checkDir: dir => {
+						const file = path.join(dir, 'test', 'test.txt');
+						if (appc.fs.isFile(file)) {
+							return { contents: fs.readFileSync(file).toString() };
+						}
+					}
+				});
+
+				this.handle = engine
+					.detect({ paths: tmp, watch: true, redetect: true })
+					.on('results', results => {
+						counter++;
+						if (counter === 1) {
+							expect(results).to.deep.equal({ contents: 'foo' });
+						} else if (counter === 2) {
+							expect(results).to.deep.equal({ contents: 'bar' });
+							this.handle.stop();
+							done();
+						}
+					})
+					.on('error', done);
+
+				setTimeout(() => {
+					// update the test file to trigger re-detection
+					fs.writeFileSync(testFile, 'bar');
+				}, 1000);
 			});
 		});
 	});

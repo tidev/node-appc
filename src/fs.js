@@ -4,6 +4,13 @@ import nodePath from 'path';
 
 const log = debug('node-appc:fs');
 
+const origWatch = fs.watch;
+fs.watch = function watch(filename) {
+	const watcher = origWatch.apply(null, arguments);
+	watcher._filename = filename;
+	return watcher;
+};
+
 /**
  * Determines if a file or directory exists.
  *
@@ -133,12 +140,12 @@ export class Watcher {
 		}
 
 		try {
-			// check to see if we can stat the file
+			// check to see if we can stat the file/directory
 			this.stat = fs.statSync(this.path);
 
 			// we only deal in directories, files are filtered from directory
 			// events
-			if (!this.stat.isDirectory()) {
+			if (this.stat.isFile()) {
 				this.path = nodePath.dirname(this.path);
 				this.stat = fs.statSync(this.path);
 			}
@@ -228,18 +235,23 @@ export class Watcher {
 			return;
 		}
 
-		this.listeners.push(evt => {
-			const subdir = evt.file;
+		const add = dir => {
+			if (!this.children) {
+				this.children = {};
+			}
+
+			if (!this.children[dir]) {
+				this.children[dir] = new Watcher(nodePath.join(this.path, dir));
+			}
+
+			this.children[dir].addListener({ recursive: true }, listener);
+		};
+
+		const wrapper = evt => {
+			const subdir = nodePath.basename(evt.file);
+
 			if (evt.action === 'add' && evt.stat && evt.stat.isDirectory()) {
-				if (!this.children) {
-					this.children = {};
-				}
-
-				if (!this.children[subdir]) {
-					this.children[subdir] = new Watcher(subdir);
-				}
-
-				this.children[subdir].addListener({ recursive: true }, listener);
+				add(subdir);
 			} else if (evt.action === 'delete' && this.children && evt.prevStat && evt.prevStat.isDirectory()) {
 				if (this.children[subdir]) {
 					this.children[subdir].close();
@@ -248,7 +260,43 @@ export class Watcher {
 			}
 
 			listener(evt);
-		});
+		};
+
+		wrapper.original = listener;
+
+		// recursive... wrap the listener function so that it will be called if
+		// any subdirectory has a change
+		this.listeners.push(wrapper);
+
+		if (this.files) {
+			for (const subdir of Object.keys(this.files)) {
+				if (this.files[subdir].isDirectory()) {
+					add(subdir);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Removes a listener.
+	 *
+	 * @param {Function} listener - The watch listener.
+	 * @access public
+	 */
+	removeListener(listener) {
+		for (let i = 0; i < this.listeners.length; i++) {
+			if (this.listeners[i].original === listener) {
+				// remove from child!
+				if (this.children) {
+					for (const filename of Object.keys(this.children)) {
+						this.children[filename].removeListener(listener);
+					}
+				}
+				this.listeners.splice(i--, 1);
+			} else if (this.listeners[i] === listener) {
+				this.listeners.splice(i--, 1);
+			}
+		}
 	}
 
 	/**
@@ -350,7 +398,7 @@ export class Watcher {
 
 		log(`Watcher.onChange('${event}', '${filename}')`);
 		log('  action = ' + evt.action);
-		log('  path   = ' + evt.filename);
+		log('  path   = ' + evt.file);
 
 		if (evt.stat && evt.prevStat && evt.stat.size === evt.prevStat.size && (evt.stat.ts - evt.prevStat.ts) < 10) {
 			log('  dropping redundant event');
@@ -387,31 +435,20 @@ export class Watcher {
 /**
  * Purges all unneeded watchers.
  */
-function cleanupWatchers() {
-	function cleanup(watcher) {
-		if (watcher.children) {
-			for (const filename of Object.keys(watcher.children)) {
-				const child = watcher.children[filename];
-
-				if (cleanup(child)) {
-					return true;
-				}
-
-				// if the child watcher has no listeners or children, then we can safely close it and remove it
-				if (child.listeners.length === 0 && (!child.children || Object.keys(child.children).length === 0)) {
-					child.close();
-					delete watcher.children[filename];
-				} else {
-					return true;
-				}
+function cleanupWatchers(watcher) {
+	if (watcher.children) {
+		// close each child
+		for (const filename of Object.keys(watcher.children)) {
+			const child = watcher.children[filename];
+			if (cleanupWatchers(child)) {
+				delete watcher.children[filename];
 			}
 		}
 	}
 
-	cleanup(rootWatcher);
-
-	if (rootWatcher.listeners.length === 0 && (!rootWatcher.children || Object.keys(rootWatcher.children).length === 0)) {
-		rootWatcher.close();
+	if (watcher.listeners.length === 0 && (!watcher.children || Object.keys(watcher.children).length === 0)) {
+		watcher.close();
+		return true;
 	}
 }
 
@@ -491,17 +528,14 @@ export function watch(path, opts, listener) {
 		});
 	} else {
 		// watching a directory
+		log(`watching directory: ${watcher.path} (recursive: ${!!opts.recursive})`);
 		watcher.addListener({ recursive: opts.recursive }, listener);
 	}
 
 	// return the unwatch function
 	return function unwatch() {
-		for (let i = 0; i < watcher.listeners.length; i++) {
-			if (watcher.listeners[i] === listener) {
-				watcher.listeners.splice(i--, 1);
-			}
-		}
-		cleanupWatchers();
+		watcher.removeListener(listener);
+		cleanupWatchers(rootWatcher);
 	};
 }
 

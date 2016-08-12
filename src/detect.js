@@ -33,6 +33,7 @@ export class Handle extends EventEmitter {
 	 * @access public
 	 */
 	stop() {
+		let i = 1;
 		for (const unwatch of this.unwatchers.values()) {
 			if (typeof unwatch === 'function') {
 				unwatch();
@@ -134,6 +135,8 @@ export class Engine {
 	 * @param {Boolan} [opts.gawk=false] - If true, emits the gawked result,
 	 * otherwise it emits the plain JavaScript result.
 	 * @param {Array} [opts.paths] - One or more paths to search in addition.
+	 * @param {Boolean} [opts.redetect=false] - When true, re-runs detection
+	 * when a path changes.
 	 * @param {Boolean} [opts.watch=false] - When true, watches for changes and
 	 * emits the new results when a change occurs.
 	 * @returns {Handle}
@@ -307,17 +310,18 @@ export class Engine {
 		let firstTime = true;
 		this.lastDefaultPath = this.defaultPath;
 
-		if (opts.watch) {
+		const watchPaths = (prefix, paths, recursive) => {
 			const active = {};
 
 			// start watching the paths
 			for (const dir of paths) {
-				active[dir] = 1;
-				if (!handle.unwatchers.has(dir)) {
-					handle.unwatchers.set(dir, watch(dir, debounce(evt => {
+				const key = prefix + ':' + dir;
+				active[key] = 1;
+				if (!handle.unwatchers.has(key)) {
+					handle.unwatchers.set(key, watch(dir, { recursive }, debounce(evt => {
 						log('  fs event, rescanning', dir);
 						this.scan({ id, handle, paths, force: true, onlyPaths: [ dir ] })
-							.then(container => {
+							.then(({ container, pathsFound }) => {
 								log('    scan complete');
 								// no need to emit... the gawk watcher will do it
 							})
@@ -327,13 +331,20 @@ export class Engine {
 			}
 
 			// remove any inactive watchers
-			for (const dir of handle.unwatchers.keys()) {
-				if (dir !== '__rescan_timer__' && !active[dir]) {
-					handle.unwatchers.delete(dir);
+			for (const key of handle.unwatchers.keys()) {
+				if (key.indexOf(prefix + ':') === 0 && !active[key]) {
+					handle.unwatchers.get(key)();
+					handle.unwatchers.delete(key);
 				}
 			}
+		};
+
+		if (opts.watch) {
+			watchPaths('watch', paths);
 		}
 
+		// windows only... checks the registry to see if paths have changed
+		// which will trigger a rescan
 		const checkRegistry = () => {
 			this.rescanTimer = setTimeout(() => {
 				this.getPaths(opts.paths)
@@ -358,29 +369,47 @@ export class Engine {
 			}, this.options.registryPollInterval);
 		};
 
+		// map of all active fs watchers used to detect a rescan
+		const redetectWatchers = new Map;
+
 		const runScan = paths => {
-			return this.scan({ id, handle, paths, force: opts.force }).then(container => {
-				log('  scan complete', container.get('results').toJS());
-				if (opts.watch && firstTime) {
-					log('  watching gawk object');
-					container.watch(evt => {
-						log('  gawk object changed, emitting:', container.get('results').toJS());
-						handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
-					});
+			return this
+				.scan({ id, handle, paths, force: opts.force })
+				.then(({ container, pathsFound }) => {
+					const results = container.get('results');
+					log('  scan complete', results.toJS());
 
-					if (process.platform === 'win32') {
-						log('  watching registry for path changes');
-						checkRegistry();
+					// wire up watch on the gawked results
+					if (opts.watch && firstTime) {
+						log('  watching gawk object');
+						container.watch(evt => {
+							const results = container.get('results');
+							log('  gawk object changed, emitting:', results.toJS());
+							handle.emit('results', opts.gawk ? results : results.toJS());
+						});
+
+						if (process.platform === 'win32') {
+							log('  watching registry for path changes');
+							checkRegistry();
+						}
 					}
-				}
 
-				if (!opts.watch || firstTime) {
-					log('  emitting results:', container.get('results').toJS());
-					handle.emit('results', opts.gawk ? container.get('results') : container.get('results').toJS());
-				}
+					// if we're watching and redetect is enabled, then watch the
+					// found paths for changes
+					if (opts.watch && opts.redetect && pathsFound.length) {
+						log('  recursively watching paths for changes: ' + pathsFound.join(', '));
+						watchPaths('redetect', pathsFound, true);
+					}
 
-				firstTime = false;
-			}).catch(handleError);
+					// emit the results
+					if ((opts.watch && results.toJS()) || (!opts.watch && firstTime)) {
+						log('  emitting results:', results.toJS());
+						handle.emit('results', opts.gawk ? results : results.toJS());
+					}
+
+					firstTime = false;
+				})
+				.catch(handleError);
 		};
 
 		log('  performing initial scan');
@@ -401,6 +430,7 @@ export class Engine {
 	 */
 	scan({ id, handle, paths, force, onlyPaths }) {
 		const results = [];
+		const pathsFound = [];
 		let index = 0;
 
 		log('  scan()', paths);
@@ -436,6 +466,7 @@ export class Engine {
 					.then(result => {
 						if (result) {
 							log('      got result, returning:', result);
+							pathsFound.push(dir);
 							return result;
 						}
 						if (depth <= 0) {
@@ -496,9 +527,9 @@ export class Engine {
 					log('  scanning found ' + results.length + ' results');
 					return this.processResults(results, id);
 				});
-		}).then(v => {
+		}).then(container => {
 			log('    exiting mutex');
-			return v;
+			return { container, pathsFound };
 		});
 	}
 

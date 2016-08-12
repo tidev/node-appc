@@ -467,7 +467,76 @@ describe('fs', () => {
 			}, 100);
 		});
 
-		it('should recursively watch for changes in nested directories', function (done) {
+		it('should recursively watch for changes in existing nested directories', function (done) {
+			this.timeout(10000);
+			this.slow(5000);
+
+			const tmp = temp.mkdirSync('node-appc-test-');
+			const fooDir = path.join(tmp, 'foo');
+			fs.mkdirSync(fooDir);
+
+			const barDir = path.join(fooDir, 'bar');
+			const filename = path.join(barDir, 'baz.txt');
+			let count = 0;
+
+			appc.fs.watch(tmp, { recursive: true }, evt => {
+				count++;
+				expect(evt).to.be.an.Object;
+
+				if (count === 1 && evt.action === 'change' && evt.filename === 'foo') {
+					// sometimes we get an echo of 'foo' being created above
+					count--;
+					return;
+				}
+
+				if (count === 1) {
+					// "bar" added, write "baz.txt"
+					expect(evt.action).to.equal('add');
+					expect(evt.file).to.equal(barDir);
+					fs.writeFileSync(filename, 'foo!');
+
+				} else if (count === 2) {
+					// "baz.txt" added, delete "bar" directory
+					expect(evt.action).to.equal('add');
+					expect(evt.file).to.equal(filename);
+					del([ barDir ], { force: true });
+
+				} else if (count >= 3) {
+					// "bar" (and "baz.txt") deleted, verify watching has stopped
+					expect(evt.action).to.equal('delete');
+					if (evt.file === filename) {
+						return;
+					}
+					expect(evt.file).to.equal(barDir);
+
+					let watcher = appc.fs.rootWatcher;
+					for (const segment of tmp.replace(path.resolve('/'), '').split(path.sep)) {
+						watcher = watcher.children[segment];
+						if (!watcher) {
+							return done(new Error('Unable to find tmp dir watcher'));
+						}
+					}
+
+					expect(watcher.files).to.be.an.Object;
+					expect(watcher.files).to.have.property('foo');
+					expect(watcher.children).to.be.an.Object;
+					expect(watcher.children).to.have.property('foo');
+
+					const fooWatcher = watcher.children['foo'];
+					expect(fooWatcher.files).to.be.an.Object;
+					expect(fooWatcher.files).to.be.empty;
+					expect(fooWatcher.children).to.be.an.Object;
+					expect(fooWatcher.children).to.be.empty;
+
+					done();
+				}
+			});
+
+			// create a subdirectory "bar" to kick off the watch
+			fs.mkdirSync(barDir);
+		});
+
+		it('should recursively watch for changes in new nested directories', function (done) {
 			this.timeout(10000);
 			this.slow(5000);
 
@@ -518,9 +587,9 @@ describe('fs', () => {
 					expect(watcher.files).to.be.an.Object;
 					expect(watcher.files).to.have.property('foo');
 					expect(watcher.children).to.be.an.Object;
-					expect(watcher.children).to.have.property(fooDir);
+					expect(watcher.children).to.have.property('foo');
 
-					const fooWatcher = watcher.children[fooDir];
+					const fooWatcher = watcher.children['foo'];
 					expect(fooWatcher.files).to.be.an.Object;
 					expect(fooWatcher.files).to.be.empty;
 					expect(fooWatcher.children).to.be.an.Object;
