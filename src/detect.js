@@ -15,6 +15,7 @@ const log = debug('node-appc:detect');
  * intended to be returned from a `watch()` function.
  *
  * @emits {results} Emits the detection results.
+ * @emits {ready} Emitted after the first scan has completed.
  * @emits {error} Emitted when an error occurs.
  */
 export class Handle extends EventEmitter {
@@ -407,7 +408,13 @@ export class Engine {
 						handle.emit('results', opts.gawk ? results : results.toJS());
 					}
 
-					firstTime = false;
+					// if we're watching, we only emitted results above if there
+					// were results, but it's handy to emit an event that lets
+					// consumers know that when the first scan has finished
+					if (opts.watch && firstTime) {
+						handle.emit('ready', opts.gawk ? results : results.toJS());
+						firstTime = false;
+					}
 				})
 				.catch(handleError);
 		};
