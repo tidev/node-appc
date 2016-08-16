@@ -192,7 +192,7 @@ export class Engine {
 			return Promise.resolve();
 		}
 
-		log('initialize()');
+		log('  initialize()');
 
 		return mutex('node-appc/detect/engine/initialize', () => {
 			return Promise
@@ -233,9 +233,9 @@ export class Engine {
 					this.envPaths = unique(Array.prototype.concat.apply([], envPaths).filter(p => p));
 					this.exePath = exePath;
 
-					log('  Found search paths:', this.paths);
-					log('  Found env paths:', this.envPaths);
-					log('  Found exe paths:', this.exePath);
+					log('    Found search paths:', this.paths);
+					log('    Found env paths:', this.envPaths);
+					log('    Found exe paths:', this.exePath);
 
 					this.initialized = true;
 				});
@@ -459,7 +459,7 @@ export class Engine {
 					return Promise.resolve();
 				}
 
-				log('    check(\'' + dir + '\', ' + depth + ')');
+				log('      checkDir(\'' + dir + '\', ' + depth + ')');
 
 				return Promise.resolve()
 					.then(() => this.options.checkDir(dir))
@@ -501,10 +501,10 @@ export class Engine {
 
 			return check(dir, this.options.depth)
 				.then(result => {
-					log('  done checking ' + dir);
+					log('      done checking ' + dir);
 
 					// even if we don't have a result, we still cache that there was no result
-					log('  caching result');
+					log('      caching result');
 					this.cache[dir] = result || null;
 
 					if (result) {
