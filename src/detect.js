@@ -360,9 +360,7 @@ export class Engine {
 						} else if (this.lastDefaultPath !== this.defaultPath) {
 							log('  default path changed, rescanning');
 							this.lastDefaultPath = this.defaultPath;
-							return this
-								.processResults(this.cache[id].get('results')._value, id)
-								.catch(handleError);
+							return this.processResults(this.cache[id].get('results')._value, id);
 						}
 					})
 					.then(checkRegistry)

@@ -4,6 +4,10 @@ import nodePath from 'path';
 
 const log = debug('node-appc:fs');
 
+/**
+ * Node's FSWatcher object instance doesn't track the actual path it's watching,
+ * so we'll have to wrap it and add it ourselves.
+ */
 const origWatch = fs.watch;
 fs.watch = function watch(filename) {
 	const watcher = origWatch.apply(null, arguments);
