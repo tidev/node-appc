@@ -217,6 +217,9 @@ export class Watcher {
 	 * Adds a listener to be notified of any changes.
 	 *
 	 * @param {Object} [opts] - Various options.
+	 * @param {Boolean} [opts.ignoreDirectoryTimestampUpdates=false] - When
+	 * true, doesn't emit events for directories where only the timestamps are
+	 * updated.
 	 * @param {Boolean} [opts.recursive=false] - When true, fires listener if
 	 * any there are changes in any subdirectories.
 	 * @param {Function} listener - The function to call when an event occurs.
@@ -234,7 +237,10 @@ export class Watcher {
 			throw TypeError('Expected listener to be a function');
 		}
 
+		const ignoreDirectoryTimestampUpdates = !!opts.ignoreDirectoryTimestampUpdates;
+
 		if (!opts.recursive) {
+			listener.ignoreDirectoryTimestampUpdates = ignoreDirectoryTimestampUpdates;
 			this.listeners.push(listener);
 			return;
 		}
@@ -248,7 +254,7 @@ export class Watcher {
 				this.children[dir] = new Watcher(nodePath.join(this.path, dir));
 			}
 
-			this.children[dir].addListener({ recursive: true }, listener);
+			this.children[dir].addListener({ ignoreDirectoryTimestampUpdates, recursive: true }, listener);
 		};
 
 		const wrapper = evt => {
@@ -266,6 +272,7 @@ export class Watcher {
 			listener(evt);
 		};
 
+		wrapper.ignoreDirectoryTimestampUpdates = ignoreDirectoryTimestampUpdates;
 		wrapper.original = listener;
 
 		// recursive... wrap the listener function so that it will be called if
@@ -430,8 +437,13 @@ export class Watcher {
 	sendEvent(evt) {
 		log('Watcher.sendEvent()');
 		log(`  notifying ${this.listeners.length} listeners`);
+
+		const isTimestampChange = evt.stat && evt.prevStat && evt.stat.isDirectory() && evt.stat.mtime !== evt.prevStat.mtime;
+
 		for (const listener of this.listeners) {
-			listener(evt);
+			if (!listener.ignoreDirectoryTimestampUpdates || !isTimestampChange) {
+				listener(evt);
+			}
 		}
 	}
 }
@@ -461,6 +473,8 @@ function cleanupWatchers(watcher) {
  *
  * @param {String} path - The path to the file to watch.
  * @param {Object} [opts] - Various options.
+ * @param {Boolean} [opts.ignoreDirectoryTimestampUpdates=false] - When true,
+ * doesn't emit events for directories where only the timestamps are updated.
  * @param {Boolean} [opts.recursive=false] - When true, watches for changes in
  * any subdirectories.
  * @param {Function} listener - The function to call when the watched file
@@ -532,8 +546,11 @@ export function watch(path, opts, listener) {
 		});
 	} else {
 		// watching a directory
-		log(`watching directory: ${watcher.path} (recursive: ${!!opts.recursive})`);
-		watcher.addListener({ recursive: opts.recursive }, listener);
+		log(`watching directory: ${watcher.path} (ignoreTimestamps: ${!!opts.ignoreDirectoryTimestampUpdates}, recursive: ${!!opts.recursive})`);
+		watcher.addListener({
+			ignoreDirectoryTimestampUpdates: opts.ignoreDirectoryTimestampUpdates,
+			recursive: opts.recursive
+		}, listener);
 	}
 
 	// return the unwatch function
