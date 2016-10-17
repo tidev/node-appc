@@ -319,7 +319,7 @@ export class Engine {
 				const key = prefix + ':' + dir;
 				active[key] = 1;
 				if (!handle.unwatchers.has(key)) {
-					handle.unwatchers.set(key, watch(dir, { recursive }, debounce(evt => {
+					handle.unwatchers.set(key, watch(dir, { ignoreDirectoryTimestampUpdates: true, recursive }, debounce(evt => {
 						log('  fs event, rescanning', dir);
 						this.scan({ id, handle, paths, force: true, onlyPaths: [ dir ] })
 							.then(({ container, pathsFound }) => {
