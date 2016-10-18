@@ -593,11 +593,15 @@ export class Engine {
 					// results will be a gawked array
 					if (existingValue instanceof GawkArray) {
 						if (results instanceof GawkArray) {
-							log('    overriding internal GawkArray value');
-							// replace the internal array of the GawkArray and manually trigger the hash
-							// to be regenerated and listeners to be notified
-							existingValue._value = results._value;
-							existingValue.notify();
+							if (existingValue._hash !== results._hash) {
+								log('    overriding internal GawkArray value');
+								// replace the internal array of the GawkArray and manually trigger the hash
+								// to be regenerated and listeners to be notified
+								existingValue._value = results._value;
+								existingValue.notify();
+							} else {
+								log('    value hasn\'t changed, skipping notifications');
+							}
 						} else {
 							log('    pushing results into results array');
 							existingValue.push(results);
