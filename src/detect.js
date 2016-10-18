@@ -400,18 +400,20 @@ export class Engine {
 						watchPaths('redetect', pathsFound, true);
 					}
 
-					// emit the results
-					if ((opts.watch && results.toJS()) || (!opts.watch && firstTime)) {
-						log('  emitting results:', results.toJS());
-						handle.emit('results', opts.gawk ? results : results.toJS());
-					}
+					if (firstTime) {
+						if (!opts.watch || results.toJS()) {
+							// emit the results
+							log('  emitting results:', results.toJS());
+							handle.emit('results', opts.gawk ? results : results.toJS());
+						}
 
-					// if we're watching, we only emitted results above if there
-					// were results, but it's handy to emit an event that lets
-					// consumers know that when the first scan has finished
-					if (opts.watch && firstTime) {
-						handle.emit('ready', opts.gawk ? results : results.toJS());
-						firstTime = false;
+						// if we're watching, we only emitted results above if there
+						// were results, but it's handy to emit an event that lets
+						// consumers know that when the first scan has finished
+						if (opts.watch) {
+							handle.emit('ready', opts.gawk ? results : results.toJS());
+							firstTime = false;
+						}
 					}
 				})
 				.catch(handleError);
