@@ -378,6 +378,11 @@ export class Watcher {
 	 * @access private
 	 */
 	onChange(event, filename) {
+		// check that the changed file hasn't been deleted during notification
+		if (filename === null) {
+			return;
+		}
+
 		try {
 			// sanity check that this path still exists because apparently Linux
 			// will let the watcher know that itself was deleted
@@ -409,7 +414,7 @@ export class Watcher {
 
 		log(`Watcher.onChange('${event}', '${filename}')`);
 		log('  action = ' + evt.action);
-		log('  path   = ' + evt.file);
+		log('  file   = ' + evt.file);
 
 		if (evt.stat && evt.prevStat && evt.stat.size === evt.prevStat.size && (evt.stat.ts - evt.prevStat.ts) < 10) {
 			log('  dropping redundant event');

@@ -195,6 +195,8 @@ export class Engine {
 
 		log('  initialize()');
 
+		let defaultPaths = [];
+
 		return mutex('node-appc/detect/engine/initialize', () => {
 			return Promise
 				.all([
@@ -216,7 +218,7 @@ export class Engine {
 							return resolveDir(process.env[name])
 								.then(path => {
 									if (path && typeof path === 'object' && !Array.isArray(path)) {
-										path.defaultPath && (this.defaultPath = path.defaultPath);
+										path.defaultPath && defaultPaths.push(path.defaultPath);
 										return path.paths || null;
 									}
 									return path;
@@ -226,13 +228,15 @@ export class Engine {
 
 					// executable path
 					this.options.exe && which(this.options.exe)
-						.then(file => this.defaultPath = path.dirname(fs.realpathSync(file)))
+						.then(file => defaultPaths.unshift(path.dirname(fs.realpathSync(file))))
 						.catch(() => Promise.resolve())
 				])
 				.then(([ paths, envPaths, exePath ]) => {
 					this.paths = unique(Array.prototype.concat.apply([], paths).filter(p => p));
 					this.envPaths = unique(Array.prototype.concat.apply([], envPaths).filter(p => p));
 					this.exePath = exePath;
+
+					this.defaultPath = defaultPaths[0];
 
 					log('    Found search paths:', this.paths);
 					log('    Found env paths:', this.envPaths);
@@ -309,10 +313,22 @@ export class Engine {
 		};
 
 		let firstTime = true;
+		let activeScan = null;
+
+		log('  default path: ' + String(this.defaultPath));
 		this.lastDefaultPath = this.defaultPath;
 
 		const watchPaths = (prefix, paths, recursive) => {
 			const active = {};
+
+			if (paths.length) {
+				log('watching paths:');
+				for (const dir of paths) {
+					log('  ' + dir);
+				}
+			} else {
+				log('no paths to watch');
+			}
 
 			// start watching the paths
 			for (const dir of paths) {
@@ -359,6 +375,8 @@ export class Engine {
 							return runScan(paths);
 						} else if (this.lastDefaultPath !== this.defaultPath) {
 							log('  default path changed, rescanning');
+							log('    ' + this.lastDefaultPath);
+							log('    ' + this.defaultPath);
 							this.lastDefaultPath = this.defaultPath;
 							return this.processResults(this.cache[id].get('results')._value, id);
 						}
@@ -372,8 +390,12 @@ export class Engine {
 		const redetectWatchers = new Map;
 
 		const runScan = paths => {
-			return this
-				.scan({ id, handle, paths, force: opts.force })
+			if (!activeScan) {
+				activeScan = Promise.resolve();
+			}
+
+			return activeScan
+				.then(() => this.scan({ id, handle, paths, force: opts.force }))
 				.then(({ container, pathsFound }) => {
 					const results = container.get('results');
 					log('  scan complete', results.toJS());
@@ -415,12 +437,13 @@ export class Engine {
 							firstTime = false;
 						}
 					}
-				})
-				.catch(handleError);
+
+					activeScan = null;
+				});
 		};
 
 		log('  performing initial scan');
-		runScan(paths);
+		runScan(paths).catch(handleError);
 	}
 
 	/**
