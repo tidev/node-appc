@@ -137,6 +137,28 @@ describe('fs', () => {
 			}).to.throw(TypeError, 'Expected listener to be a function');
 		});
 
+		it('should throw error if a path is not specified', () => {
+			expect(() => {
+				new appc.fs.Watcher;
+			}).to.throw(TypeError, 'Expected path to be a string');
+
+			expect(() => {
+				new appc.fs.Watcher({});
+			}).to.throw(TypeError, 'Expected path to be a string');
+		});
+
+		it('should throw error if adding invalid listener', () => {
+			const w = new appc.fs.Watcher(__dirname);
+
+			expect(() => {
+				w.addListener(123);
+			}).to.throw(TypeError, 'Expected opts to be an object');
+
+			expect(() => {
+				w.addListener({}, 123);
+			}).to.throw(TypeError, 'Expected listener to be a function');
+		});
+
 		it('should watch an existing directory for a new file', done => {
 			const tmp = temp.mkdirSync('node-appc-test-');
 			const filename = path.join(tmp, 'foo.txt');

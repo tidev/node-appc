@@ -2,7 +2,7 @@ import { arrayify, debounce, mutex, randomBytes, sha1, unique } from './util';
 import debug from 'debug';
 import { EventEmitter } from 'events';
 import fs from 'fs';
-import { gawk, GawkArray, GawkBase, GawkObject } from 'gawk';
+import gawk, { GawkArray, GawkObject } from 'gawk';
 import { isDir, watch } from './fs';
 import path from 'path';
 import { registry } from './windows';
@@ -133,8 +133,6 @@ export class Engine {
 	 * @param {Object} [opts] - An object with various params.
 	 * @param {Boolean} [opts.force=false] - When true, bypasses cache and
 	 * rescans the search paths.
-	 * @param {Boolan} [opts.gawk=false] - If true, emits the gawked result,
-	 * otherwise it emits the plain JavaScript result.
 	 * @param {Array} [opts.paths] - One or more paths to search in addition.
 	 * @param {Boolean} [opts.redetect=false] - When true, re-runs detection
 	 * when a path changes.
@@ -228,7 +226,11 @@ export class Engine {
 
 					// executable path
 					this.options.exe && which(this.options.exe)
-						.then(file => defaultPaths.unshift(path.dirname(fs.realpathSync(file))))
+						.then(file => {
+							file = path.dirname(fs.realpathSync(file));
+							defaultPaths.unshift(file);
+							return file;
+						})
 						.catch(() => Promise.resolve())
 				])
 				.then(([ paths, envPaths, exePath ]) => {
@@ -378,7 +380,7 @@ export class Engine {
 							log('    ' + this.lastDefaultPath);
 							log('    ' + this.defaultPath);
 							this.lastDefaultPath = this.defaultPath;
-							return this.processResults(this.cache[id].get('results')._value, id);
+							return this.processResults(this.cache[id].results, id);
 						}
 					})
 					.then(checkRegistry)
@@ -397,16 +399,15 @@ export class Engine {
 			return activeScan
 				.then(() => this.scan({ id, handle, paths, force: opts.force }))
 				.then(({ container, pathsFound }) => {
-					const results = container.get('results');
-					log('  scan complete', results.toJS());
+					const results = container.results;
+					log('  scan complete', results);
 
 					// wire up watch on the gawked results
 					if (opts.watch && firstTime) {
 						log('  watching gawk object');
-						container.watch(evt => {
-							const results = container.get('results');
-							log('  gawk object changed, emitting:', results.toJS());
-							handle.emit('results', opts.gawk ? results : results.toJS());
+						gawk.watch(container, () => {
+							log('  gawk object changed, emitting:', container.results);
+							handle.emit('results', container.results);
 						});
 
 						if (process.platform === 'win32') {
@@ -423,17 +424,17 @@ export class Engine {
 					}
 
 					if (firstTime) {
-						if (!opts.watch || results.toJS()) {
+						if (!opts.watch || results) {
 							// emit the results
-							log('  emitting results:', results.toJS());
-							handle.emit('results', opts.gawk ? results : results.toJS());
+							log('  emitting results:', results);
+							handle.emit('results', results);
 						}
 
 						// if we're watching, we only emitted results above if there
 						// were results, but it's handy to emit an event that lets
 						// consumers know that when the first scan has finished
 						if (opts.watch) {
-							handle.emit('ready', opts.gawk ? results : results.toJS());
+							handle.emit('ready', results);
 							firstTime = false;
 						}
 					}
@@ -582,7 +583,7 @@ export class Engine {
 			container = this.cache[id] = new GawkObject({ results: null });
 		}
 
-		let existingValue = container.get('results');
+		let existingValue = container.results;
 
 		return Promise.resolve()
 			.then(() => {
@@ -601,49 +602,37 @@ export class Engine {
 					return results;
 				}
 
-				existingValue.pause();
-
 				return Promise.resolve()
 					.then(() => this.options.processResults(results, existingValue, this))
 					.then(newResults => newResults || results);
 			})
 			.then(results => {
 				// ensure that the value is a gawked data type
-				if (!(results instanceof GawkBase)) {
-					log('    gawking results');
-					results = gawk(results);
-				}
+				log('    gawking results');
+				results = gawk(results);
 
 				if (this.options.multiple) {
 					// results will be a gawked array
 					if (existingValue instanceof GawkArray) {
 						if (results instanceof GawkArray) {
-							if (existingValue._hash !== results._hash) {
-								log('    overriding internal GawkArray value');
-								// replace the internal array of the GawkArray and manually trigger the hash
-								// to be regenerated and listeners to be notified
-								existingValue._value = results._value;
-								existingValue.notify();
-							} else {
-								log('    value hasn\'t changed, skipping notifications');
-							}
+							log('    overriding GawkArray value');
+							existingValue.splice(0, existingValue.length, ...results);
 						} else {
 							log('    pushing results into results array');
 							existingValue.push(results);
 						}
-						existingValue.resume();
 					} else {
 						log('    no existing value, setting');
-						container.set('results', results instanceof GawkArray ? results : new GawkArray([ results ]));
+						container.results = results instanceof GawkArray ? results : new GawkArray(results);
 					}
 				} else {
 					// single result
 					if (existingValue && existingValue instanceof GawkObject && results instanceof GawkObject) {
 						log('    merging results into existing value:', results);
-						existingValue.mergeDeep(results);
+						gawk.mergeDeep(existingValue, results);
 					} else {
 						log('    setting new value:', results);
-						container.set('results', results);
+						container.results = results;
 					}
 				}
 

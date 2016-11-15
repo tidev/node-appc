@@ -112,6 +112,10 @@ export class Watcher {
 	 * @param {String} path - The directory to watch.
 	 */
 	constructor(path) {
+		if (!path || typeof path !== 'string') {
+			throw new TypeError('Expected path to be a string');
+		}
+
 		this.path      = path;
 		this.fswatcher = null;
 		this.listeners = [];
@@ -206,7 +210,7 @@ export class Watcher {
 		log(`  files (${filenames.length}): ${filenames.length ? filenames.join(', ') : '[]'}`);
 
 		this.fswatcher = fs
-			.watch(this.path, this.onChange.bind(this))
+			.watch(this.path, { persistent: false }, this.onChange.bind(this))
 			.on('error', err => {
 				// on Windows, it's possible for the internal FSEvent to return
 				// an EPERM exception, so just ignore it
