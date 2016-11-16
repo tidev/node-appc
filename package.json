@@ -1,6 +1,6 @@
 {
   "name": "node-appc",
-  "version": "2.0.0-alpha40",
+  "version": "2.0.0-alpha41",
   "description": "Appcelerator Common Node Library",
   "main": "./dist/index.js",
   "author": {
