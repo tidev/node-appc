@@ -135,7 +135,7 @@ export class Engine {
 	 * rescans the search paths.
 	 * @param {Array} [opts.paths] - One or more paths to search in addition.
 	 * @param {Boolean} [opts.redetect=false] - When true, re-runs detection
-	 * when a path changes.
+	 * when a path changes. Requires `watch` to be `true`.
 	 * @param {Boolean} [opts.watch=false] - When true, watches for changes and
 	 * emits the new results when a change occurs.
 	 * @returns {Handle}
@@ -144,6 +144,11 @@ export class Engine {
 	detect(opts = {}) {
 		const handle = new Handle;
 		log('detect()');
+
+		if (opts.redetect && !opts.watch) {
+			log('  disabling redetect since watch was not enabled');
+			opts.redetect = false;
+		}
 
 		// ensure async
 		setImmediate(() => {
@@ -324,29 +329,29 @@ export class Engine {
 			const active = {};
 
 			if (paths.length) {
-				log('watching paths:');
+				log('  watching paths' + (recursive ? ' recursivly' : '') + ':');
 				for (const dir of paths) {
-					log('  ' + dir);
+					log('    ' + dir);
+				}
+
+				// start watching the paths
+				for (const dir of paths) {
+					const key = prefix + ':' + dir;
+					active[key] = 1;
+					if (!handle.unwatchers.has(key)) {
+						handle.unwatchers.set(key, watch(dir, { ignoreDirectoryTimestampUpdates: true, recursive }, debounce(evt => {
+							log('    fs event, rescanning', dir);
+							this.scan({ id, handle, paths, force: true, onlyPaths: [ dir ] })
+								.then(({ container, pathsFound }) => {
+									log('      scan complete');
+									// no need to emit... the gawk watcher will do it
+								})
+								.catch(handleError);
+						})));
+					}
 				}
 			} else {
-				log('no paths to watch');
-			}
-
-			// start watching the paths
-			for (const dir of paths) {
-				const key = prefix + ':' + dir;
-				active[key] = 1;
-				if (!handle.unwatchers.has(key)) {
-					handle.unwatchers.set(key, watch(dir, { ignoreDirectoryTimestampUpdates: true, recursive }, debounce(evt => {
-						log('  fs event, rescanning', dir);
-						this.scan({ id, handle, paths, force: true, onlyPaths: [ dir ] })
-							.then(({ container, pathsFound }) => {
-								log('    scan complete');
-								// no need to emit... the gawk watcher will do it
-							})
-							.catch(handleError);
-					})));
-				}
+				log('  no paths to watch');
 			}
 
 			// remove any inactive watchers
@@ -419,8 +424,22 @@ export class Engine {
 					// if we're watching and redetect is enabled, then watch the
 					// found paths for changes
 					if (opts.watch && opts.redetect && pathsFound.length) {
-						log('  recursively watching paths for changes: ' + pathsFound.join(', '));
+						// first wire up the recursive watches so that we don't
+						// incur more overhead to unwatching nodes and
+						// re-watching them
 						watchPaths('redetect', pathsFound, true);
+
+						// next remove the non-recursive watch paths since we
+						// just replaced them with recursive watches
+						log('  removing non-recursive watch paths:');
+						for (const dir of pathsFound) {
+							const watchKey = `watch:${dir}`;
+							if (handle.unwatchers.has(watchKey)) {
+								log('    ' + dir);
+								handle.unwatchers.get(watchKey)();
+								handle.unwatchers.delete(watchKey);
+							}
+						}
 					}
 
 					if (firstTime) {
@@ -580,10 +599,10 @@ export class Engine {
 		let container = this.cache[id];
 		if (!container) {
 			log('    creating cached GawkObject container');
-			container = this.cache[id] = new GawkObject({ results: null });
+			container = this.cache[id] = new GawkObject({ results: undefined });
 		}
 
-		let existingValue = container.results;
+		const existingValue = container.results;
 
 		return Promise.resolve()
 			.then(() => {
@@ -617,13 +636,14 @@ export class Engine {
 						if (results instanceof GawkArray) {
 							log('    overriding GawkArray value');
 							existingValue.splice(0, existingValue.length, ...results);
+							log('    done');
 						} else {
 							log('    pushing results into results array');
 							existingValue.push(results);
 						}
 					} else {
 						log('    no existing value, setting');
-						container.results = results instanceof GawkArray ? results : new GawkArray(results);
+						container.results = results instanceof GawkArray ? results : gawk(results);
 					}
 				} else {
 					// single result

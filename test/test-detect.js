@@ -577,6 +577,45 @@ describe('detect', () => {
 					fs.writeFileSync(testFile, 'bar');
 				}, 1000);
 			});
+
+			it('should redetect after initial detection', function (done) {
+				this.timeout(5000);
+				this.slow(4000);
+
+				let checkDirCounter = 0;
+				let resultsCounter = 0;
+				const tmp = temp.mkdirSync('node-appc-test-');
+
+				const engine = new appc.detect.Engine({
+					checkDir: dir => {
+						if (++checkDirCounter === 1) {
+							return Promise.resolve()
+								.then(() => new appc.gawk.GawkObject({ version: '1.0.0' }))
+								.catch(err => Promise.resolve());
+						}
+
+						return Promise.resolve()
+							.then(() => new appc.gawk.GawkObject({ version: '2.0.0' }))
+							.catch(err => Promise.resolve());
+					},
+					depth: 1,
+					multiple: true
+				});
+
+				this.handle = engine
+					.detect({ paths: tmp, watch: true, redetect: true })
+					.on('results', results => {
+						if (++resultsCounter === 1) {
+							expect(results).to.deep.equal([ { version: '1.0.0' } ]);
+
+							// trigger an update
+							fs.writeFileSync(path.join(tmp, 'foo.txt'), 'bar');
+						} else {
+							expect(results).to.deep.equal([ { version: '2.0.0' } ]);
+							done();
+						}
+					});
+			});
 		});
 	});
 

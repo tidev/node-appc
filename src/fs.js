@@ -143,6 +143,7 @@ export class Watcher {
 		// existing filesystem watcher because we don't know if it's watching
 		// a file that has been deleted or moved
 		if (this.fswatcher) {
+			log(`closing fs watcher: ${this.path}`);
 			this.fswatcher.close();
 			this.fswatcher = null;
 		}
@@ -321,6 +322,7 @@ export class Watcher {
 	 */
 	close() {
 		if (this.fswatcher) {
+			log(`closing fs watcher: ${this.path}`);
 			this.fswatcher.close();
 			this.fswatcher = null;
 		}
@@ -346,6 +348,7 @@ export class Watcher {
 	 */
 	deleted() {
 		if (this.fswatcher) {
+			log(`closing fs watcher: ${this.path}`);
 			this.fswatcher.close();
 			this.fswatcher = null;
 		}
@@ -445,7 +448,7 @@ export class Watcher {
 	 */
 	sendEvent(evt) {
 		log('Watcher.sendEvent()');
-		log(`  notifying ${this.listeners.length} listeners`);
+		log(`  notifying at most ${this.listeners.length} listeners (may skip some if ignoring timestamp changes)`);
 
 		const isTimestampChange = evt.stat && evt.prevStat && evt.stat.isDirectory() && evt.stat.mtime !== evt.prevStat.mtime;
 
