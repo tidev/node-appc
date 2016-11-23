@@ -1,52 +1,58 @@
 {
-	"name": "node-appc",
-	"description": "Appcelerator Common Node Library",
-	"homepage":"http://github.com/appcelerator/node-appc",
-	"keywords": [
-		"appcelerator"
-	],
-	"version": "0.2.39",
-	"author": {
-		"name": "Appcelerator, Inc.",
-		"email": "npmjs@appcelerator.com"
-	},
-	"maintainers": [
-		{"name": "Jeff Haynie", "email": "jhaynie@appcelerator.com"},
-		{"name": "Chris Barber", "email": "cbarber@appcelerator.com"}
-	],
-	"bugs": {
-		"url": "https://jira.appcelerator.org/browse/TIMOB"
-	},
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/appcelerator/node-appc.git"
-	},
-	"dependencies": {
-		"adm-zip": "0.4.7",
-		"async": "1.5.2",
-		"colors": "1.1.2",
-		"diff": "2.2.1",
-		"node-uuid": "1.4.7",
-		"optimist": "0.6.1",
-		"request": "2.69.0",
-		"semver": "5.1.0",
-		"sprintf": "0.1.5",
-		"temp": "0.8.3",
-		"wrench": "1.5.8",
-		"uglify-js": "2.6.1",
-		"xmldom": "0.1.22"
-	},
-	"devDependencies": {
-		"jade": "1.11.0",
-		"mocha": "*",
-		"should": "8.2.2"
-	},
-	"license": "Apache-2.0",
-	"main": "./index",
-	"engines": {
-		"node": ">=0.8"
-	},
-	"scripts": {
-	    "test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js"
-	}
+  "name": "node-appc",
+  "description": "Appcelerator Common Node Library",
+  "homepage": "http://github.com/appcelerator/node-appc",
+  "keywords": [
+    "appcelerator"
+  ],
+  "version": "0.2.39",
+  "author": {
+    "name": "Appcelerator, Inc.",
+    "email": "npmjs@appcelerator.com"
+  },
+  "maintainers": [
+    {
+      "name": "Jeff Haynie",
+      "email": "jhaynie@appcelerator.com"
+    },
+    {
+      "name": "Chris Barber",
+      "email": "cbarber@appcelerator.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://jira.appcelerator.org/browse/TIMOB"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/appcelerator/node-appc.git"
+  },
+  "dependencies": {
+    "adm-zip": "0.4.7",
+    "async": "1.5.2",
+    "colors": "1.1.2",
+    "diff": "2.2.1",
+    "optimist": "0.6.1",
+    "request": "2.69.0",
+    "semver": "5.1.0",
+    "sprintf": "0.1.5",
+    "temp": "0.8.3",
+    "uglify-js": "2.6.1",
+    "uuid": "^3.0.0",
+    "wrench": "1.5.8",
+    "xmldom": "0.1.22"
+  },
+  "devDependencies": {
+    "jade": "1.11.0",
+    "mocha": "*",
+    "should": "8.2.2"
+  },
+  "license": "Apache-2.0",
+  "main": "./index",
+  "engines": {
+    "node": ">=0.8"
+  },
+  "scripts": {
+    "test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js"
+  }
 }
