@@ -175,6 +175,8 @@ export class Watcher {
 			const file = nodePath.join(this.path, filename);
 			let stat = null;
 
+			// TODO: if this file is a symlink to a parent path, we need to stop!
+
 			try {
 				stat = this.files[filename] = fs.statSync(file);
 			} catch (e) {

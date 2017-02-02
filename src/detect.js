@@ -509,7 +509,7 @@ export class Engine {
 					return Promise.resolve();
 				}
 
-				log('      checkDir(\'' + dir + '\', ' + depth + ')');
+				log(`      checkDir('${dir}') depth=${depth}`);
 
 				return Promise.resolve()
 					.then(() => this.options.checkDir(dir))
