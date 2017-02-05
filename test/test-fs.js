@@ -7,10 +7,9 @@
 
 var appc = require('../index'),
 	assert = require('assert'),
-	fs = require('fs'),
+	fs = require('fs-extra'),
 	path = require('path'),
-	temp = require('temp'),
-	wrench = require('wrench');
+	temp = require('temp');
 
 function MockLogger() {
 	this.buffer = '';
@@ -49,7 +48,7 @@ describe('fs', function () {
 			var logger = new MockLogger,
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = '/tmp';
-			fs.existsSync(dest) || wrench.mkdirSyncRecursive(dest);
+			fs.ensureDirSync(dest);
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
 			logger.buffer.stripColors.should.equal('Copying ' + src + ' => ' + dest + path.sep + 'testfile.txt\n');
 			assert(fs.existsSync(path.join(dest, 'testfile.txt')), 'Destination file does not exist');

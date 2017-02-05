@@ -10,7 +10,6 @@ var appc = require('../index'),
 	path = require('path'),
 	http = require('http'),
 	temp = require('temp');
-//	wrench = require('wrench');
 
 describe('auth', function () {
 	it('namespace exists', function () {
