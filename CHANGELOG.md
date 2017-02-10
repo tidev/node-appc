@@ -1,6 +1,7 @@
 0.2.41 (2/10/2017)
 ------------------
  * Removed `jade` dev dependency [TIMOB-24398]
+ * Updated NPM dependencies
 
 0.2.35 (2/9/2015)
 -----------------
