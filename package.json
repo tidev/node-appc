@@ -5,7 +5,7 @@
 	"keywords": [
 		"appcelerator"
 	],
-	"version": "0.2.40",
+	"version": "0.2.41",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -37,7 +37,6 @@
 		"xmldom": "0.1.22"
 	},
 	"devDependencies": {
-		"jade": "1.11.0",
 		"mocha": "*",
 		"should": "8.2.2"
 	},
