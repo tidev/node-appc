@@ -112,7 +112,7 @@ describe('plist', function () {
 		var plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
 		plist.should.be.an.Object;
 
-		plist.should.eql({
+		JSON.parse(plist.toString('json')).should.eql({
 			"CFBundleDevelopmentRegion": "English",
 			"CFBundleDisplayName": "${PRODUCT_NAME}",
 			"CFBundleExecutable": "${EXECUTABLE_NAME}",
@@ -229,7 +229,7 @@ describe('plist', function () {
 		// since plists do not support milliseconds, we have to force the milliseconds to zero
 		dt.setTime(Math.floor(dt.getTime() / 1000) * 1000);
 
-		plist.should.eql({
+		JSON.parse(plist.toString('json')).should.eql({
 			"CFBundleDevelopmentRegion": "English",
 			"CFBundleDisplayName": "${PRODUCT_NAME}",
 			"CFBundleExecutable": "${EXECUTABLE_NAME}",
@@ -266,7 +266,7 @@ describe('plist', function () {
 			"testnull": null,
 			"testinteger": 13,
 			"testfloat": 3.14,
-			"testdate": dt,
+			"testdate": JSON.parse(JSON.stringify(dt)),
 			"testbooltrue": true,
 			"testboolfalse": false,
 			"testnesteddict": {
@@ -277,22 +277,14 @@ describe('plist', function () {
 			"testarray": [
 				13,
 				3.14,
-				dt,
+				JSON.parse(JSON.stringify(dt)),
 				true,
 				false,
 				{ "key": "value" },
 				[ true ],
-				{
-					"className": "PlistType",
-					"type": "data",
-					"value": "dGl0YW5pdW0K"
-				}
+				"dGl0YW5pdW0K"
 			],
-			"testdata": {
-				"className": "PlistType",
-				"type": "data",
-				"value": "dGl0YW5pdW0K"
-			}
+			"testdata": "dGl0YW5pdW0K"
 		});
 
 		plist.toString().should.equal('[object Object]');

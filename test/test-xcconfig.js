@@ -18,7 +18,7 @@ describe('xcconfig', function () {
 		var result = new appc.xcconfig(path.join(__dirname, 'resources', 'project.xcconfig'));
 		result.should.be.an.Object;
 
-		result.should.eql({
+		JSON.parse(JSON.stringify(result)).should.eql({
 			TI_VERSION: '3.2.0',
 			TI_SDK_DIR: '/Users/chris/Library/Application Support/Titanium/mobilesdk/osx/$(TI_VERSION)/iphone',
 			TI_APPID: 'com.appcelerator.testapp2',
