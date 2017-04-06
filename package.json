@@ -38,6 +38,7 @@
 	},
 	"devDependencies": {
 		"mocha": "*",
+		"mocha-jenkins-reporter": "0.3.7",
 		"should": "11.2.1"
 	},
 	"license": "Apache-2.0",
@@ -46,6 +47,7 @@
 		"node": ">=0.8"
 	},
 	"scripts": {
-	    "test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js"
+		"test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js",
+		"jenkins-test": "JUNIT_REPORT_PATH=junit_report.xml mocha --require test/init --colors --reporter mocha-jenkins-reporter --check-leaks test/test-*.js"
 	}
 }
