@@ -5,7 +5,7 @@
 	"keywords": [
 		"appcelerator"
 	],
-	"version": "0.2.40",
+	"version": "0.2.43",
 	"author": {
 		"name": "Appcelerator, Inc.",
 		"email": "npmjs@appcelerator.com"
@@ -23,23 +23,23 @@
 	},
 	"dependencies": {
 		"adm-zip": "0.4.7",
-		"async": "1.5.2",
+		"async": "2.3.0",
 		"colors": "1.1.2",
-		"diff": "2.2.1",
+		"diff": "3.2.0",
 		"uuid": "3.0.1",
 		"optimist": "0.6.1",
-		"request": "2.79.0",
-		"semver": "5.1.0",
+		"request": "2.81.0",
+		"semver": "5.3.0",
 		"sprintf": "0.1.5",
 		"temp": "0.8.3",
 		"fs-extra": "2.0.0",
-		"uglify-js": "2.6.1",
+		"uglify-js": "2.8.21",
 		"xmldom": "0.1.22"
 	},
 	"devDependencies": {
-		"jade": "1.11.0",
 		"mocha": "*",
-		"should": "8.2.2"
+		"mocha-jenkins-reporter": "0.3.7",
+		"should": "11.2.1"
 	},
 	"license": "Apache-2.0",
 	"main": "./index",
@@ -47,6 +47,7 @@
 		"node": ">=0.8"
 	},
 	"scripts": {
-	    "test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js"
+		"test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js",
+		"jenkins-test": "JUNIT_REPORT_PATH=junit_report.xml mocha --require test/init --colors --reporter mocha-jenkins-reporter --check-leaks test/test-*.js"
 	}
 }
