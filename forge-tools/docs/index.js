@@ -12,7 +12,7 @@
 module.exports = function () {
 	var spawn = require('child_process').spawn,
 		async = require('async'),
-		wrench = require('wrench'),
+		fs = require('fs-extra'),
 		colors = require('colors'),
 		startTime = Date.now();
 
@@ -30,15 +30,15 @@ module.exports = function () {
 				jsfile = /\.js$/,
 				ignore = /^[\.|_]/;
 
-			wrench.rmdirSyncRecursive(docsdir, true);
-			wrench.mkdirSyncRecursive(docsdir);
+			fs.removeSync(docsdir, true);
+			fs.removeSync(docsdir);
 
-			async.series(wrench.readdirSyncRecursive(libdir).map(function (file) {
+			async.series(fs.readdirSync(libdir).map(function (file) {
 				return function (cb) {
 					if (jsfile.test(file) && !ignore.test(file)) {
 						var src = path.join(libdir, file),
 							dest = path.join(docsdir, path.dirname(file));
-						fs.existsSync(dest) || wrench.mkdirSyncRecursive(dest);
+						fs.ensureDirSync(dest);
 						console.log(src, '=>', path.join(dest, file.replace(jsfile, '.md')));
 						jsdox.generateForDir(src, dest, function () {
 							cb();
@@ -56,13 +56,13 @@ module.exports = function () {
 				jsfile = /\.js$/,
 				ignore = /^[\.|_]/;
 
-			wrench.mkdirSyncRecursive(docsdir);
+			fs.mkdirsSync(docsdir);
 
-			wrench.readdirSyncRecursive(libdir).forEach(function (n) {
+			fs.readdirSync(libdir).forEach(function (n) {
 				if (jsfile.test(n) && !ignore.test(n)) {
 					var src = path.join(libdir, n),
 						dest = path.join(docsdir, n.replace(jsfile, '.md'));
-					fs.existsSync(path.dirname(dest)) || wrench.mkdirSyncRecursive(path.dirname(dest));
+					fs.ensureDirSync(path.dirname(dest));
 					fs.writeFileSync(path.join(docsdir, n.replace(jsfile, '.md')), apidox.create()
 						.set('input', src)
 						.parse()

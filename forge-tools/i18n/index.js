@@ -11,10 +11,9 @@
  * Please see the LICENSE included with this distribution for details.
  */
 
-var fs = require('fs'),
+var fs = require('fs-extra'),
 	path = require('path'),
 	appc = require('../../index'),
-	wrench = require('wrench'),
 	UglifyJS = require('uglify-js'),
 	colors = require('colors'),
 	diff = require('diff'),
@@ -200,10 +199,8 @@ function doAnalyze(config, writeMode) {
 			i18nFile = path.join(localesDir, 'en.js'),
 			newContents = JSON.stringify(entries, null, '\t');
 
-		if (!fs.existsSync(localesDir)) {
-			wrench.mkdirSyncRecursive(localesDir);
-		}
-
+		fs.ensureDirSync(localesDir);
+		
 		if (fs.existsSync(i18nFile)) {
 			var oldContents = fs.readFileSync(i18nFile).toString(),
 				output = diff.createPatch(i18nFile, oldContents, newContents).trim().split('\n').slice(2).map(function (line) {
@@ -254,7 +251,7 @@ actions.prepare = function (config) {
 		dest = process.argv.slice(4).shift() || path.join(process.cwd(), 'en-us.js'),
 		dir = path.dirname(/\.js$/.test(dest) ? dest : dest = path.join(dest, 'en-us.js'));
 
-	fs.existsSync(dir) || wrench.mkdirSyncRecursive(dir);
+	fs.ensureDirSync(dir);
 	console.log('Writing ' + dest.cyan + '\n');
 	fs.writeFileSync(dest, JSON.stringify(masterList, false, '\t'));
 
@@ -446,7 +443,7 @@ actions.pull = function (config) {
 			});
 
 			console.log('Removing temp folder ' + tempDir.cyan + '\n');
-			wrench.rmdirSyncRecursive(tempDir);
+			fs.removeSync(tempDir);
 
 			if (!writeMode && anyChanges) {
 				console.log('Updates detected, but nothing was saved. You must run ' + ('forge i18n pull --write').cyan + ' to save updates.\n');

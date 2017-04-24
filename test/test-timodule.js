@@ -7,9 +7,8 @@
 
 var appc = require('../index'),
 	assert = require('assert'),
-	fs = require('fs'),
+	fs = require('fs-extra'),
 	path = require('path'),
-	wrench = require('wrench'),
 	colors = require('colors');
 
 function MockConfig() {
@@ -56,7 +55,7 @@ describe('timodule', function () {
 				badZipFile = path.join(__dirname, 'resources', 'timodule', 'badzip-ios-1.0.0.zip');
 
 			// remove the dummy directory and existing zip file
-			fs.existsSync(dummyDir) && wrench.rmdirSyncRecursive(dummyDir);
+			fs.existsSync(dummyDir) && fs.removeSync(dummyDir);
 			fs.existsSync(goodZipFile) && fs.unlinkSync(goodZipFile);
 			fs.existsSync(badZipFile) && fs.unlinkSync(badZipFile);
 
