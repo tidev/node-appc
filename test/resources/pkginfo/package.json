@@ -42,7 +42,7 @@
 	"license":"Apache Public License v2",
 	"main": "./index",
 	"engines": {
-		"node": ">=0.8"
+		"node": ">=0.10"
 	},
 	"scripts": {
 		"test": "node forge test"
