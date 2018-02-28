@@ -20,7 +20,7 @@ describe('ios', function () {
 			this.timeout('5s');
 
 			appc.ios.detect(function (result) {
-				if (result == undefined) {
+				if (!result) {
 					return done();
 				}
 

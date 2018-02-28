@@ -4,6 +4,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* global dump */
 /* eslint no-unused-expressions: "off" */
 'use strict';
 

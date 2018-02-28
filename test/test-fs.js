@@ -15,10 +15,18 @@ var appc = require('../index'),
 
 function MockLogger() {
 	this.buffer = '';
-	this.debug = function (s) { this.buffer += s + '\n'; };
-	this.info = function (s) { this.buffer += s + '\n'; };
-	this.warn = function (s) { this.buffer += s + '\n'; };
-	this.error = function (s) { this.buffer += s + '\n'; };
+	this.debug = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.info = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.warn = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.error = function (s) {
+		this.buffer += s + '\n';
+	};
 }
 
 describe('fs', function () {

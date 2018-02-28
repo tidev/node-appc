@@ -15,7 +15,7 @@ var appc = require('../index'),
 
 function MockConfig() {
 	this.get = function (s) {
-		if (s == 'cli.ignoreDirs') {
+		if (s === 'cli.ignoreDirs') {
 			return '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$';
 		}
 	};
@@ -23,10 +23,18 @@ function MockConfig() {
 
 function MockLogger() {
 	this.buffer = '';
-	this.debug = function (s) { this.buffer += s + '\n'; };
-	this.info = function (s) { this.buffer += s + '\n'; };
-	this.warn = function (s) { this.buffer += s + '\n'; };
-	this.error = function (s) { this.buffer += s + '\n'; };
+	this.debug = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.info = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.warn = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.error = function (s) {
+		this.buffer += s + '\n';
+	};
 }
 
 describe('timodule', function () {
@@ -146,7 +154,7 @@ describe('timodule', function () {
 				logger.buffer.stripColors.should.containEql('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
 
 				var dupeSearch = logger.buffer.stripColors.split('Detected ios module: ti.dummy 1.2.3 @').length - 1;
-				assert(dupeSearch == 1, 'Path searched ' + dupeSearch + ' times instead of once');
+				assert(dupeSearch === 1, 'Path searched ' + dupeSearch + ' times instead of once');
 
 				result.should.be.an.Object;
 				result.should.have.property('global');
@@ -179,7 +187,7 @@ describe('timodule', function () {
 					logger.buffer.stripColors.should.containEql('Detected commonjs module: ti.ambiguous 1.0 @ ' + ambiguousCommonJSModuleDir);
 
 					var dupeSearch = logger.buffer.stripColors.split('Detected ios module: ti.dummy 1.2.3 @').length - 1;
-					assert(dupeSearch == 1, 'Path searched ' + dupeSearch + ' times instead of once');
+					assert(dupeSearch === 1, 'Path searched ' + dupeSearch + ' times instead of once');
 
 					result.should.be.an.Object;
 					result.should.have.property('global');
@@ -244,7 +252,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					found = (result.found[i].id == 'dummy');
+					found = (result.found[i].id === 'dummy');
 				}
 				assert(found, '"dummy" module not marked as found');
 
@@ -269,7 +277,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						found = (result.found[i].id == 'dummy');
+						found = (result.found[i].id === 'dummy');
 					}
 					assert(found, '"dummy" module not marked as found');
 
@@ -289,7 +297,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'dummy') {
+					if (result.found[i].id === 'dummy') {
 						found = true;
 					}
 				}
@@ -316,7 +324,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id == 'dummy') {
+						if (result.found[i].id === 'dummy') {
 							found = true;
 						}
 					}
@@ -338,7 +346,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'dummy';
+					found = result.missing[i].id === 'dummy';
 				}
 				assert(found, '"dummy" module not marked as missing');
 
@@ -363,7 +371,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id == 'dummy';
+						found = result.missing[i].id === 'dummy';
 					}
 					assert(found, '"dummy" module not marked as missing');
 
@@ -383,7 +391,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'dummy') {
+					if (result.found[i].id === 'dummy') {
 						found = true;
 					}
 				}
@@ -410,7 +418,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id == 'dummy') {
+						if (result.found[i].id === 'dummy') {
 							found = true;
 						}
 					}
@@ -427,14 +435,14 @@ describe('timodule', function () {
 				{ id: 'dummy', deployType: 'test,production' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				var found = false;
-				for (var i = 0; !found && i < result.found.length; i++) {
-					found = result.found[i].id == 'dummy';
+				for (let i = 0; !found && i < result.found.length; i++) {
+					found = result.found[i].id === 'dummy';
 				}
 				assert(!found, '"dummy" module was marked as found, should have been ignored');
 
 				found = false;
-				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'dummy';
+				for (let i = 0; !found && i < result.missing.length; i++) {
+					found = result.missing[i].id === 'dummy';
 				}
 				assert(!found, '"dummy" module was marked as missing, should have been ignored');
 
@@ -454,14 +462,14 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						found = result.found[i].id == 'dummy';
+					for (let i = 0; !found && i < result.found.length; i++) {
+						found = result.found[i].id === 'dummy';
 					}
 					assert(!found, '"dummy" module was marked as found, should have been ignored');
 
 					found = false;
-					for (var i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id == 'dummy';
+					for (let i = 0; !found && i < result.missing.length; i++) {
+						found = result.missing[i].id === 'dummy';
 					}
 					assert(!found, '"dummy" module was marked as missing, should have been ignored');
 
@@ -481,7 +489,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'dummy') {
+					if (result.found[i].id === 'dummy') {
 						found = true;
 					}
 				}
@@ -508,7 +516,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id == 'dummy') {
+						if (result.found[i].id === 'dummy') {
 							found = true;
 						}
 					}
@@ -525,14 +533,14 @@ describe('timodule', function () {
 				{ id: 'dummy', platform: 'android,mobileweb' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				var found = false;
-				for (var i = 0; !found && i < result.found.length; i++) {
-					found = result.found[i].id == 'dummy';
+				for (let i = 0; !found && i < result.found.length; i++) {
+					found = result.found[i].id === 'dummy';
 				}
 				assert(!found, '"dummy" module was marked as found, should have been ignored');
 
 				found = false;
-				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'dummy';
+				for (let i = 0; !found && i < result.missing.length; i++) {
+					found = result.missing[i].id === 'dummy';
 				}
 				assert(!found, '"dummy" module was marked as missing, should have been ignored');
 
@@ -552,14 +560,14 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						found = result.found[i].id == 'dummy';
+					for (let i = 0; !found && i < result.found.length; i++) {
+						found = result.found[i].id === 'dummy';
 					}
 					assert(!found, '"dummy" module was marked as found, should have been ignored');
 
 					found = false;
-					for (var i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id == 'dummy';
+					for (let i = 0; !found && i < result.missing.length; i++) {
+						found = result.missing[i].id === 'dummy';
 					}
 					assert(!found, '"dummy" module was marked as missing, should have been ignored');
 
@@ -579,7 +587,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; i < result.missing.length; i++) {
-					found = result.missing[i].id == 'doesnotexist';
+					found = result.missing[i].id === 'doesnotexist';
 				}
 				assert(found, '"doesnotexist" module not marked as missing');
 
@@ -604,7 +612,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; i < result.missing.length; i++) {
-						found = result.missing[i].id == 'doesnotexist';
+						found = result.missing[i].id === 'doesnotexist';
 					}
 					assert(found, '"doesnotexist" module not marked as missing');
 
@@ -624,7 +632,7 @@ describe('timodule', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.incompatible.length; i++) {
-					found = result.incompatible[i].id == 'toonew';
+					found = result.incompatible[i].id === 'toonew';
 				}
 				assert(found, '"toonew" module was not marked as incompatible');
 
@@ -649,7 +657,7 @@ describe('timodule', function () {
 
 					var found = false;
 					for (var i = 0; !found && i < result.incompatible.length; i++) {
-						found = result.incompatible[i].id == 'toonew';
+						found = result.incompatible[i].id === 'toonew';
 					}
 					assert(found, '"toonew" module was not marked as incompatible');
 
@@ -665,7 +673,7 @@ describe('timodule', function () {
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				var found = false;
 				for (var i = 0; !found && i < result.conflict.length; i++) {
-					found = result.conflict[i].id == 'ambiguous';
+					found = result.conflict[i].id === 'ambiguous';
 				}
 				assert(found, '"ambiguous" module was not marked as conflict');
 
@@ -686,7 +694,7 @@ describe('timodule', function () {
 				callback: function (result) {
 					var found = false;
 					for (var i = 0; !found && i < result.conflict.length; i++) {
-						found = result.conflict[i].id == 'ambiguous';
+						found = result.conflict[i].id === 'ambiguous';
 					}
 					assert(found, '"ambiguous" module was not marked as conflict');
 
@@ -706,11 +714,11 @@ describe('timodule', function () {
 
 				var found = 0;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'baz') {
+					if (result.found[i].id === 'baz') {
 						found++;
 					}
 				}
-				assert(found == 1, '"baz" module not marked as found');
+				assert(found === 1, '"baz" module not marked as found');
 
 				done();
 			}, true);
@@ -733,11 +741,11 @@ describe('timodule', function () {
 
 					var found = 0;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id == 'baz') {
+						if (result.found[i].id === 'baz') {
 							found++;
 						}
 					}
-					assert(found == 1, '"baz" module not marked as found');
+					assert(found === 1, '"baz" module not marked as found');
 
 					done();
 				}
@@ -755,11 +763,11 @@ describe('timodule', function () {
 
 				var found = 0;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'latestvalid') {
+					if (result.found[i].id === 'latestvalid') {
 						found++;
 					}
 				}
-				assert(found == 1, '"latestvalid" module not marked as found');
+				assert(found === 1, '"latestvalid" module not marked as found');
 
 				done();
 			}, true);
@@ -782,11 +790,11 @@ describe('timodule', function () {
 
 					var found = 0;
 					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id == 'latestvalid') {
+						if (result.found[i].id === 'latestvalid') {
 							found++;
 						}
 					}
-					assert(found == 1, '"latestvalid" module not marked as found');
+					assert(found === 1, '"latestvalid" module not marked as found');
 
 					done();
 				}

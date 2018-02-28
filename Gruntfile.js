@@ -12,7 +12,7 @@ module.exports = function (grunt) {
 				'test/**/*.js'
 			]
 		},
-		// Configure a mochaTest task
+		// Configure a mochaTest task // FIXME: Use mocha_istanbul so we can get coverage
 		mochaTest: {
 			test: {
 				options: {

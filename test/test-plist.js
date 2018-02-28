@@ -4,7 +4,7 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
-/* eslint no-unused-expressions: "off" */
+/* eslint no-unused-expressions: "off", no-template-curly-in-string: "off" */
 'use strict';
 
 var appc = require('../index'),

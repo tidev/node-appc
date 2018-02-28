@@ -31,7 +31,7 @@ describe('environ', function () {
 			dest[testModule].should.equal(testFile);
 		});
 
-		it('should find the test command', function () {
+		it('should not find the hidden command', function () {
 			var dest = {},
 				searchPath = path.join(__dirname, 'resources', 'environ', 'commands'),
 				hiddenModule = path.join(searchPath, '_hidden');

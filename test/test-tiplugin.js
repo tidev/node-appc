@@ -9,13 +9,12 @@
 
 var appc = require('../index'),
 	assert = require('assert'),
-	fs = require('fs'),
 	path = require('path'),
 	colors = require('colors');
 
 function MockConfig() {
 	this.get = function (s) {
-		if (s == 'cli.ignoreDirs') {
+		if (s === 'cli.ignoreDirs') {
 			return '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$';
 		}
 	};
@@ -23,10 +22,18 @@ function MockConfig() {
 
 function MockLogger() {
 	this.buffer = '';
-	this.debug = function (s) { this.buffer += s + '\n'; };
-	this.info = function (s) { this.buffer += s + '\n'; };
-	this.warn = function (s) { this.buffer += s + '\n'; };
-	this.error = function (s) { this.buffer += s + '\n'; };
+	this.debug = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.info = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.warn = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.error = function (s) {
+		this.buffer += s + '\n';
+	};
 }
 
 describe('tiplugin', function () {
@@ -236,7 +243,7 @@ describe('tiplugin', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					found = (result.found[i].id == 'commandtest');
+					found = (result.found[i].id === 'commandtest');
 				}
 				assert(found, '"commandtest" plugin not marked as found');
 
@@ -253,7 +260,7 @@ describe('tiplugin', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'commandtest') {
+					if (result.found[i].id === 'commandtest') {
 						found = true;
 					}
 				}
@@ -272,7 +279,7 @@ describe('tiplugin', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'commandtest';
+					found = result.missing[i].id === 'commandtest';
 				}
 				assert(found, '"commandtest" plugin not marked as missing');
 
@@ -289,7 +296,7 @@ describe('tiplugin', function () {
 
 				var found = false;
 				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'doesnotexist';
+					found = result.missing[i].id === 'doesnotexist';
 				}
 				assert(found, '"doesnotexist" plugin not marked as missing');
 

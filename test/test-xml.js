@@ -79,7 +79,7 @@ describe('xml', function () {
 	describe('#getAttr()', function () {
 		it('should get a node attribute that exists', function () {
 			var n = dom.firstChild;
-			while (n && n.nodeType != appc.xml.ELEMENT_NODE) {
+			while (n && n.nodeType !== appc.xml.ELEMENT_NODE) {
 				n = n.nextSibling;
 			}
 			assert(n !== null, 'should have found <string_test> node, but returned null instead');
@@ -88,7 +88,7 @@ describe('xml', function () {
 
 		it('should return null for a non-existent node attribute', function () {
 			var n = dom.firstChild;
-			while (n && n.nodeType != appc.xml.ELEMENT_NODE) {
+			while (n && n.nodeType !== appc.xml.ELEMENT_NODE) {
 				n = n.nextSibling;
 			}
 			assert(n !== null, 'should have found <string_test> node, but returned null instead');
@@ -111,7 +111,7 @@ describe('xml', function () {
 			appc.xml.forEachElement(dom, function (elem) {
 				values.should.have.ownProperty(elem.tagName);
 				var v = appc.xml.getValue(elem);
-				assert(v == values[elem.tagName], 'element <' + elem.tagName + '> should have a value ' + values[elem.tagName] + ', but got ' + v);
+				assert(v === values[elem.tagName], 'element <' + elem.tagName + '> should have a value ' + values[elem.tagName] + ', but got ' + v);
 			});
 		});
 	});

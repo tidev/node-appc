@@ -21,7 +21,7 @@ describe('android', function () {
 			this.slow('5s');
 
 			appc.android.detect(function (result) {
-				if (result == undefined) {
+				if (!result) {
 					return done();
 				}
 

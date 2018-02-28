@@ -10,7 +10,6 @@
 var appc = require('../index'),
 	fs = require('fs'),
 	path = require('path'),
-	http = require('http'),
 	temp = require('temp');
 
 describe('auth', function () {
