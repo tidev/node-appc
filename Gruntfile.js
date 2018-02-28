@@ -19,10 +19,10 @@ module.exports = function (grunt) {
 				ignoreLeaks: false,
 				reportFormats: [ 'cobertura' ],
 				check: {
-					statements: 64,
-					branches: 54,
-					functions: 70,
-					lines: 64
+					statements: 59,
+					branches: 50,
+					functions: 62,
+					lines: 59
 				}
 			},
 			src: [ 'test/test-*.js' ]
