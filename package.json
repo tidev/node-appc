@@ -44,10 +44,9 @@
 	"license": "Apache-2.0",
 	"main": "./index",
 	"engines": {
-		"node": ">=0.8"
+		"node": ">=4.0"
 	},
 	"scripts": {
-		"test": "mocha --require test/init --reporter spec --check-leaks test/test-*.js",
-		"jenkins-test": "JUNIT_REPORT_PATH=junit_report.xml mocha --require test/init --colors --reporter mocha-jenkins-reporter --check-leaks test/test-*.js"
+		"test": "JUNIT_REPORT_PATH=junit_report.xml mocha --require test/init --reporter spec --check-leaks test/test-*.js"
 	}
 }
