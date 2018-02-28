@@ -22,7 +22,7 @@ module.exports = function (grunt) {
 					statements: 65,
 					branches: 56,
 					functions: 70,
-					lines: 66
+					lines: 65
 				}
 			},
 			src: [ 'test/test-*.js' ]
