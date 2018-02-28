@@ -58,6 +58,6 @@
 		"node": ">=4.0"
 	},
 	"scripts": {
-		"test": "grunt"
+		"test": "JUNIT_REPORT_PATH=junit_report.xml grunt"
 	}
 }
