@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index');
 
@@ -86,7 +88,7 @@ describe('ios', function () {
 				result.provisioningProfiles.should.be.an.Object;
 
 				result.provisioningProfiles.should.have.property('adhoc');
-				['adhoc', 'enterprise', 'development', 'distribution'].forEach(function (type) {
+				[ 'adhoc', 'enterprise', 'development', 'distribution' ].forEach(function (type) {
 					result.provisioningProfiles[type].should.be.an.instanceOf(Array);
 					result.provisioningProfiles[type].forEach(function (pp) {
 						pp.should.be.an.Object;

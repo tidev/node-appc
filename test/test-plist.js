@@ -4,12 +4,14 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	fs = require('fs'),
 	path = require('path'),
 	temp = require('temp'),
-	dt = new Date;
+	dt = new Date();
 
 dt.setTime(1372893710058); // Wed Jul 03 2013 16:21:55 GMT-0700 (PDT)
 
@@ -20,7 +22,7 @@ describe('plist', function () {
 	});
 
 	it('create empty plist', function () {
-		var plist = new appc.plist;
+		var plist = new appc.plist();
 		plist.should.be.an.Object;
 
 		plist.toString().should.equal('[object Object]');
@@ -30,23 +32,23 @@ describe('plist', function () {
 		plist.toString('pretty-json').should.equal('{}');
 
 		plist.toString('xml').should.equal(
-			'<?xml version="1.0" encoding="UTF-8"?>\n' +
-			'<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n' +
-			'<plist version="1.0">\n' +
-			'<dict>\n'+
-			'</dict>\n'+
-			'</plist>'
+			'<?xml version="1.0" encoding="UTF-8"?>\n'
+			+ '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n'
+			+ '<plist version="1.0">\n'
+			+ '<dict>\n'
+			+ '</dict>\n'
+			+ '</plist>'
 		);
 	});
 
 	it('create empty plist and populate', function () {
-		var plist = new appc.plist;
+		var plist = new appc.plist();
 
 		plist.testkey = 'testvalue';
-		plist.testarray = ['testvalue1', 'testvalue2'];
+		plist.testarray = [ 'testvalue1', 'testvalue2' ];
 		plist.testdict = {
-			'testkey1': 'testvalue1',
-			'testkey2': 'testvalue2',
+			testkey1: 'testvalue1',
+			testkey2: 'testvalue2',
 		};
 		plist.testnull = null;
 		plist.testinteger = 13;
@@ -113,26 +115,26 @@ describe('plist', function () {
 		plist.should.be.an.Object;
 
 		JSON.parse(plist.toString('json')).should.eql({
-			"CFBundleDevelopmentRegion": "English",
-			"CFBundleDisplayName": "${PRODUCT_NAME}",
-			"CFBundleExecutable": "${EXECUTABLE_NAME}",
-			"CFBundleIconFile": "__APPICON__.png",
-			"CFBundleURLTypes": [
+			CFBundleDevelopmentRegion: 'English',
+			CFBundleDisplayName: '${PRODUCT_NAME}',
+			CFBundleExecutable: '${EXECUTABLE_NAME}',
+			CFBundleIconFile: '__APPICON__.png',
+			CFBundleURLTypes: [
 				{
-					"CFBundleURLName": "__URL__",
-					"CFBundleURLSchemes": [
-						"__URLSCHEME__"
+					CFBundleURLName: '__URL__',
+					CFBundleURLSchemes: [
+						'__URLSCHEME__'
 					]
 				}
 			],
-			"CFBundleIdentifier": "com.appcelerator.titanium",
-			"CFBundleInfoDictionaryVersion": "6.0",
-			"CFBundleName": "${PRODUCT_NAME}",
-			"CFBundlePackageType": "APPL",
-			"CFBundleSignature": "????",
-			"CFBundleVersion": "1.0",
-			"CFBundleShortVersionString": "1.0",
-			"LSRequiresIPhoneOS": true
+			CFBundleIdentifier: 'com.appcelerator.titanium',
+			CFBundleInfoDictionaryVersion: '6.0',
+			CFBundleName: '${PRODUCT_NAME}',
+			CFBundlePackageType: 'APPL',
+			CFBundleSignature: '????',
+			CFBundleVersion: '1.0',
+			CFBundleShortVersionString: '1.0',
+			LSRequiresIPhoneOS: true
 		});
 
 		plist.toString().should.equal('[object Object]');
@@ -211,7 +213,7 @@ describe('plist', function () {
 
 	it('loading non-existent plist should throw error', function () {
 		(function () {
-			var plist = new appc.plist;
+			var plist = new appc.plist();
 			plist.load(path.join(__dirname, 'resources', 'DoesNotExist.plist'));
 		}).should.throw();
 	});
@@ -230,61 +232,61 @@ describe('plist', function () {
 		dt.setTime(Math.floor(dt.getTime() / 1000) * 1000);
 
 		JSON.parse(plist.toString('json')).should.eql({
-			"CFBundleDevelopmentRegion": "English",
-			"CFBundleDisplayName": "${PRODUCT_NAME}",
-			"CFBundleExecutable": "${EXECUTABLE_NAME}",
-			"CFBundleIconFile": "appicon.png",
-			"CFBundleURLTypes": [
+			CFBundleDevelopmentRegion: 'English',
+			CFBundleDisplayName: '${PRODUCT_NAME}',
+			CFBundleExecutable: '${EXECUTABLE_NAME}',
+			CFBundleIconFile: 'appicon.png',
+			CFBundleURLTypes: [
 				{
-					"CFBundleURLName": "ti.testapp",
-					"CFBundleURLSchemes": [
-						"testapp"
+					CFBundleURLName: 'ti.testapp',
+					CFBundleURLSchemes: [
+						'testapp'
 					]
 				}
 			],
-			"CFBundleIdentifier": "ti.testapp",
-			"CFBundleInfoDictionaryVersion": "6.0",
-			"CFBundleName": "${PRODUCT_NAME}",
-			"CFBundlePackageType": "APPL",
-			"CFBundleSignature": "????",
-			"CFBundleVersion": "1.0",
-			"CFBundleShortVersionString": "1.0",
-			"LSRequiresIPhoneOS": true,
-			"CFBundleIconFiles": [
-				"appicon.png"
+			CFBundleIdentifier: 'ti.testapp',
+			CFBundleInfoDictionaryVersion: '6.0',
+			CFBundleName: '${PRODUCT_NAME}',
+			CFBundlePackageType: 'APPL',
+			CFBundleSignature: '????',
+			CFBundleVersion: '1.0',
+			CFBundleShortVersionString: '1.0',
+			LSRequiresIPhoneOS: true,
+			CFBundleIconFiles: [
+				'appicon.png'
 			],
-			"UISupportedInterfaceOrientations~ipad": [
-				"UIInterfaceOrientationPortrait",
-				"UIInterfaceOrientationPortraitUpsideDown",
-				"UIInterfaceOrientationLandscapeLeft",
-				"UIInterfaceOrientationLandscapeRight"
+			'UISupportedInterfaceOrientations~ipad': [
+				'UIInterfaceOrientationPortrait',
+				'UIInterfaceOrientationPortraitUpsideDown',
+				'UIInterfaceOrientationLandscapeLeft',
+				'UIInterfaceOrientationLandscapeRight'
 			],
-			"UISupportedInterfaceOrientations": [
-				"UIInterfaceOrientationPortrait"
+			UISupportedInterfaceOrientations: [
+				'UIInterfaceOrientationPortrait'
 			],
-			"UIStatusBarStyle": "UIStatusBarStyleDefault",
-			"testnull": null,
-			"testinteger": 13,
-			"testfloat": 3.14,
-			"testdate": JSON.parse(JSON.stringify(dt)),
-			"testbooltrue": true,
-			"testboolfalse": false,
-			"testnesteddict": {
-				"nesteddict": {
-					"key": "value"
+			UIStatusBarStyle: 'UIStatusBarStyleDefault',
+			testnull: null,
+			testinteger: 13,
+			testfloat: 3.14,
+			testdate: JSON.parse(JSON.stringify(dt)),
+			testbooltrue: true,
+			testboolfalse: false,
+			testnesteddict: {
+				nesteddict: {
+					key: 'value'
 				}
 			},
-			"testarray": [
+			testarray: [
 				13,
 				3.14,
 				JSON.parse(JSON.stringify(dt)),
 				true,
 				false,
-				{ "key": "value" },
+				{ key: 'value' },
 				[ true ],
-				"dGl0YW5pdW0K"
+				'dGl0YW5pdW0K'
 			],
-			"testdata": "dGl0YW5pdW0K"
+			testdata: 'dGl0YW5pdW0K'
 		});
 
 		plist.toString().should.equal('[object Object]');
@@ -459,10 +461,10 @@ describe('plist', function () {
 		plist.should.be.an.Object;
 
 		plist.testkey = 'testvalue';
-		plist.testarray = ['testvalue1', 'testvalue2'];
+		plist.testarray = [ 'testvalue1', 'testvalue2' ];
 		plist.testdict = {
-			'testkey1': 'testvalue1',
-			'testkey2': 'testvalue2',
+			testkey1: 'testvalue1',
+			testkey2: 'testvalue2',
 		};
 
 		delete plist.CFBundleSignature;
@@ -576,7 +578,7 @@ describe('plist', function () {
 	});
 
 	it('create empty plist, populate, and save', function () {
-		var plist = new appc.plist,
+		var plist = new appc.plist(),
 			tempDir = temp.mkdirSync(),
 			file = path.join(tempDir, 'temp.plist');
 

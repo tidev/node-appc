@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index');
 
@@ -62,7 +64,7 @@ describe('jdk', function () {
 		it('should return valid result with a config and without specifying options', function (done) {
 			this.timeout(5000);
 
-			appc.jdk.detect(new MockConfig, function (result) {
+			appc.jdk.detect(new MockConfig(), function (result) {
 				result.should.be.an.Object;
 				done();
 			});
@@ -71,7 +73,7 @@ describe('jdk', function () {
 		it('should return valid result with a config and options', function (done) {
 			this.timeout(5000);
 
-			appc.jdk.detect(new MockConfig, { bypassCache: true }, function (result) {
+			appc.jdk.detect(new MockConfig(), { bypassCache: true }, function (result) {
 				result.should.be.an.Object;
 				done();
 			});

@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert');
@@ -23,7 +25,7 @@ describe('haxm', function () {
 
 				if (result.memlimit !== null) {
 					result.memlimit.should.be.a.Number;
-					assert(result.memlimit >= 0, 'mem limit should be a positive integer')
+					assert(result.memlimit >= 0, 'mem limit should be a positive integer');
 				}
 
 				done();
@@ -38,7 +40,7 @@ describe('haxm', function () {
 
 				if (result.memlimit !== null) {
 					result.memlimit.should.be.a.Number;
-					assert(result.memlimit >= 0, 'mem limit should be a positive integer')
+					assert(result.memlimit >= 0, 'mem limit should be a positive integer');
 				}
 
 				done();
@@ -53,7 +55,7 @@ describe('haxm', function () {
 
 				if (result.memlimit !== null) {
 					result.memlimit.should.be.a.Number;
-					assert(result.memlimit >= 0, 'mem limit should be a positive integer')
+					assert(result.memlimit >= 0, 'mem limit should be a positive integer');
 				}
 
 				done();

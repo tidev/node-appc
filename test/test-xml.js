@@ -4,21 +4,23 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert'),
 	DOMParser = require('xmldom').DOMParser,
 	dom = new DOMParser().parseFromString(
-		'<?xml version="1.0" encoding="UTF-8"?>\n' +
-		'<root>\n' +
-		'	<string_test color="red">hello</string_test>\n' +
-		'	<int_test>123</int_test>\n' +
-		'	<float_test>3.14</float_test>\n' +
-		'	<bool_true_test>true</bool_true_test>\n' +
-		'	<bool_false_test>false</bool_false_test>\n' +
-		'	<null_test>null</null_test>\n' +
-		'	<empty_test/>\n' +
-		'</root>', 'text/xml').documentElement;
+		'<?xml version="1.0" encoding="UTF-8"?>\n'
+		+ '<root>\n'
+		+ '	<string_test color="red">hello</string_test>\n'
+		+ '	<int_test>123</int_test>\n'
+		+ '	<float_test>3.14</float_test>\n'
+		+ '	<bool_true_test>true</bool_true_test>\n'
+		+ '	<bool_false_test>false</bool_false_test>\n'
+		+ '	<null_test>null</null_test>\n'
+		+ '	<empty_test/>\n'
+		+ '</root>', 'text/xml').documentElement;
 
 describe('xml', function () {
 	it('namespace exists', function () {
@@ -97,13 +99,13 @@ describe('xml', function () {
 	describe('#getValue()', function () {
 		it('should get node values and return them as the correct type', function () {
 			var values = {
-				'string_test': 'hello',
-				'int_test': 123,
-				'float_test': 3.14,
-				'bool_true_test': true,
-				'bool_false_test': false,
-				'null_test': null,
-				'empty_test': ''
+				string_test: 'hello',
+				int_test: 123,
+				float_test: 3.14,
+				bool_true_test: true,
+				bool_false_test: false,
+				null_test: null,
+				empty_test: ''
 			};
 
 			appc.xml.forEachElement(dom, function (elem) {

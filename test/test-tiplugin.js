@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert'),
@@ -43,12 +45,12 @@ describe('tiplugin', function () {
 		});
 
 		it('should find all test plugins', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 
 			// now run the detection
 			appc.tiplugin.scopedDetect({
 				testResources: testResourcesDir
-			}, new MockConfig, logger, function (result) {
+			}, new MockConfig(), logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -66,8 +68,8 @@ describe('tiplugin', function () {
 								hooks: [],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'commandtest',
-									'version': '1.0'
+									name: 'commandtest',
+									version: '1.0'
 								}
 							}
 						},
@@ -78,8 +80,8 @@ describe('tiplugin', function () {
 								hooks: [],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'emptytest',
-									'version': '1.0'
+									name: 'emptytest',
+									version: '1.0'
 								}
 							}
 						},
@@ -90,8 +92,8 @@ describe('tiplugin', function () {
 								hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'hooktest',
-									'version': '1.0'
+									name: 'hooktest',
+									version: '1.0'
 								}
 							}
 						},
@@ -114,10 +116,10 @@ describe('tiplugin', function () {
 
 	describe('#detect()', function () {
 		it('should find the test plugins', function (done) {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				projectDir = path.join(__dirname, 'resources', 'tiplugin');
 
-			appc.tiplugin.detect(projectDir, new MockConfig, logger, function (result) {
+			appc.tiplugin.detect(projectDir, new MockConfig(), logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -136,8 +138,8 @@ describe('tiplugin', function () {
 							hooks: [],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'commandtest',
-								'version': '1.0'
+								name: 'commandtest',
+								version: '1.0'
 							}
 						}
 					},
@@ -148,8 +150,8 @@ describe('tiplugin', function () {
 							hooks: [],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'emptytest',
-								'version': '1.0'
+								name: 'emptytest',
+								version: '1.0'
 							}
 						}
 					},
@@ -160,8 +162,8 @@ describe('tiplugin', function () {
 							hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'hooktest',
-								'version': '1.0'
+								name: 'hooktest',
+								version: '1.0'
 							}
 						}
 					},
@@ -181,8 +183,8 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "userlegacytest" plugin in user-defined path', function (done) {
-			var config = new MockConfig,
-				logger = new MockLogger,
+			var config = new MockConfig(),
+				logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'userlegacytest');
 
 			config.paths = {
@@ -197,8 +199,8 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "usercommandtest" plugin in user-defined path', function (done) {
-			var config = new MockConfig,
-				logger = new MockLogger,
+			var config = new MockConfig(),
+				logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'usercommandtest');
 
 			config.paths = {
@@ -215,7 +217,7 @@ describe('tiplugin', function () {
 
 	describe('#find()', function () {
 		it('should return immediately if no plugins', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 			appc.tiplugin.find([], null, null, logger, function (result) {
 				result.should.eql({
 					found: [],
@@ -226,7 +228,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin using only the id', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -243,7 +245,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin with matching version', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '1.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -262,7 +264,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find "commandtest" plugin with wrong version', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '2.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
@@ -279,7 +281,7 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find doesnotexist plugin', function (done) {
-			var logger = new MockLogger;
+			var logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'doesnotexist' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {

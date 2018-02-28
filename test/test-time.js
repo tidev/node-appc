@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	time = appc.time;
@@ -15,13 +17,13 @@ describe('time', function () {
 	});
 
 	describe('#prettyDiff()', function () {
-		var dt1 = new Date,
-			dt2 = new Date,
-			dt3 = new Date,
-			dt4 = new Date,
-			dt5 = new Date,
-			dt6 = new Date,
-			dt7 = new Date;
+		var dt1 = new Date(),
+			dt2 = new Date(),
+			dt3 = new Date(),
+			dt4 = new Date(),
+			dt5 = new Date(),
+			dt6 = new Date(),
+			dt7 = new Date();
 
 		dt1.setTime(1372893710058); // Wed Jul 03 2013 16:21:55 GMT-0700 (PDT)
 		dt2.setTime(dt1.getTime() + 15); // add 15 milliseconds
@@ -79,7 +81,7 @@ describe('time', function () {
 			time.prettyDiff(dt1, dt7, { colorize: true }).should.equal('3'.cyan + 'd ' + '15'.cyan + 'h ' + '45'.cyan + 'm ' + '42'.cyan + 's ' + '10'.cyan + 'ms');
 			time.prettyDiff(dt1, dt7, { hideMS: true }).should.equal('3d 15h 45m 42s');
 			time.prettyDiff(dt1, dt7, { showFullName: true }).should.equal('3 days 15 hours 45 minutes 42 seconds 10ms');
-		})
+		});
 	});
 
 	describe('#timestamp()', function () {

@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	colors = require('colors'),
@@ -65,7 +67,7 @@ describe('string', function () {
 	describe('#suggest()', function () {
 		it('suggest no match', function () {
 			var output = '';
-			string.suggest('alpha', ['set', 'getter', 'value', 'stack', 'integer'], function () {
+			string.suggest('alpha', [ 'set', 'getter', 'value', 'stack', 'integer' ], function () {
 				output += Array.prototype.slice.call(arguments).join(' ') + '\n';
 			}, 3);
 			output.should.equal('');
@@ -73,7 +75,7 @@ describe('string', function () {
 
 		it('suggest short word with', function () {
 			var output = '';
-			string.suggest('get', ['set', 'getter', 'value', 'stack', 'integer'], function () {
+			string.suggest('get', [ 'set', 'getter', 'value', 'stack', 'integer' ], function () {
 				output += Array.prototype.slice.call(arguments).join(' ') + '\n';
 			}, 3);
 			output.should.equal('Did you mean this?\n    ' + 'set'.cyan + '\n    ' + 'getter'.cyan + '\n\n');
@@ -81,7 +83,7 @@ describe('string', function () {
 
 		it('suggest long word', function () {
 			var output = '';
-			string.suggest('prototype', ['set', 'getter', 'value', 'stack', 'integer', 'proto', 'type', 'protohype'], function () {
+			string.suggest('prototype', [ 'set', 'getter', 'value', 'stack', 'integer', 'proto', 'type', 'protohype' ], function () {
 				output += Array.prototype.slice.call(arguments).join(' ') + '\n';
 			}, 3);
 			output.should.equal('Did you mean this?\n    ' + 'protohype'.cyan + '\n\n');
@@ -89,13 +91,13 @@ describe('string', function () {
 
 		it('suggest version', function () {
 			var output = '';
-			string.suggest('2.1', ['1.8.0', '2.0.0', '2.1.0.GA', '2.2'], function () {
+			string.suggest('2.1', [ '1.8.0', '2.0.0', '2.1.0.GA', '2.2' ], function () {
 				output += Array.prototype.slice.call(arguments).join(' ') + '\n';
 			}, 2);
 			output.should.equal('Did you mean this?\n    ' + '2.1.0.GA'.cyan + '\n    ' + '2.2'.cyan + '\n\n');
 
 			output = '';
-			string.suggest('2.1', ['1.8.0', '2.0.0', '2.1.0.GA', '2.2'], function () {
+			string.suggest('2.1', [ '1.8.0', '2.0.0', '2.1.0.GA', '2.2' ], function () {
 				output += Array.prototype.slice.call(arguments).join(' ') + '\n';
 			}, 3);
 			output.should.equal('Did you mean this?\n    ' + '2.0.0'.cyan + '\n    ' + '2.1.0.GA'.cyan + '\n    ' + '2.2'.cyan + '\n\n');
@@ -138,88 +140,88 @@ describe('string', function () {
 		});
 
 		it('long string should wrap', function () {
-			string.wrap('Appcelerator Titanium is open, extensible development environment for creating ' +
-				'beautiful native apps across different mobile devices and OSs including iOS, Android, ' +
-				'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with ' +
-				'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, ' +
-				'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.', 80)
-			.should.equal('Appcelerator Titanium is open, extensible development environment for creating\n' +
-				'beautiful native apps across different mobile devices and OSs including iOS,\n' +
-				'Android, Windows and BlackBerry, as well as hybrid and HTML5. It includes an\n' +
-				'open source SDK with over 5,000 device and mobile operating system APIs, Studio,\n' +
-				'a powerful Eclipse-based IDE, Alloy, an MVC framework and Cloud Services for a\n' +
-				'ready-to-use mobile backend.');
+			string.wrap('Appcelerator Titanium is open, extensible development environment for creating '
+				+ 'beautiful native apps across different mobile devices and OSs including iOS, Android, '
+				+ 'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with '
+				+ 'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, '
+				+ 'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.', 80)
+				.should.equal('Appcelerator Titanium is open, extensible development environment for creating\n'
+				+ 'beautiful native apps across different mobile devices and OSs including iOS,\n'
+				+ 'Android, Windows and BlackBerry, as well as hybrid and HTML5. It includes an\n'
+				+ 'open source SDK with over 5,000 device and mobile operating system APIs, Studio,\n'
+				+ 'a powerful Eclipse-based IDE, Alloy, an MVC framework and Cloud Services for a\n'
+				+ 'ready-to-use mobile backend.');
 
-			string.wrap('Titanium is the leading mobile development environment of choice for hundreds of ' +
-				'thousands of developers. With more than 56,843 mobile applications deployed on 145,539,021 ' +
-				'devices, the award-winning Titanium environment helps organizations get to market 60% faster ' +
-				'and achieve a significant competitive advantage.', 80)
-			.should.equal('Titanium is the leading mobile development environment of choice for hundreds of\n' +
-				'thousands of developers. With more than 56,843 mobile applications deployed on\n' +
-				'145,539,021 devices, the award-winning Titanium environment helps organizations\n' +
-				'get to market 60% faster and achieve a significant competitive advantage.');
+			string.wrap('Titanium is the leading mobile development environment of choice for hundreds of '
+				+ 'thousands of developers. With more than 56,843 mobile applications deployed on 145,539,021 '
+				+ 'devices, the award-winning Titanium environment helps organizations get to market 60% faster '
+				+ 'and achieve a significant competitive advantage.', 80)
+				.should.equal('Titanium is the leading mobile development environment of choice for hundreds of\n'
+				+ 'thousands of developers. With more than 56,843 mobile applications deployed on\n'
+				+ '145,539,021 devices, the award-winning Titanium environment helps organizations\n'
+				+ 'get to market 60% faster and achieve a significant competitive advantage.');
 		});
 
 		it('long string with colors should wrap', function () {
 			var counter = 0;
-			string.wrap(('Appcelerator Titanium is open, extensible development environment for creating ' +
-				'beautiful native apps across different mobile devices and OSs including iOS, Android, ' +
-				'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with ' +
-				'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, ' +
-				'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.').split(' ').map(function (word) {
-					return counter++ % 2 ? word : word.cyan;
-				}).join(' '), 80)
-			.should.equal(
-				'Appcelerator'.cyan +	' Titanium ' +
-				'is'.cyan +				' open, ' +
-				'extensible'.cyan +		' development ' +
-				'environment'.cyan +	' for ' +
-				'creating'.cyan +		'\nbeautiful ' +
-				'native'.cyan +			' apps ' +
-				'across'.cyan +			' different ' +
-				'mobile'.cyan +			' devices ' +
-				'and'.cyan +			' OSs ' +
-				'including'.cyan +		' iOS,\n' +
-				'Android,'.cyan +		' Windows ' +
-				'and'.cyan +			' BlackBerry, ' +
-				'as'.cyan +				' well ' +
-				'as'.cyan +				' hybrid ' +
-				'and'.cyan +			' HTML5. ' +
-				'It'.cyan +				' includes ' +
-				'an'.cyan +				'\nopen ' +
-				'source'.cyan +			' SDK ' +
-				'with'.cyan +			' over ' +
-				'5,000'.cyan +			' device ' +
-				'and'.cyan +			' mobile ' +
-				'operating'.cyan +		' system ' +
-				'APIs,'.cyan +			' Studio,\n' +
-				'a'.cyan +				' powerful ' +
-				'Eclipse-based'.cyan +	' IDE, ' +
-				'Alloy,'.cyan +			' an ' +
-				'MVC'.cyan +			' framework ' +
-				'and'.cyan +			' Cloud ' +
-				'Services'.cyan +		' for ' +
-				'a'.cyan +				'\nready-to-use ' +
-				'mobile'.cyan +			' backend.');
+			string.wrap(('Appcelerator Titanium is open, extensible development environment for creating '
+				+ 'beautiful native apps across different mobile devices and OSs including iOS, Android, '
+				+ 'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with '
+				+ 'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, '
+				+ 'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.').split(' ').map(function (word) {
+				return counter++ % 2 ? word : word.cyan;
+			}).join(' '), 80)
+				.should.equal(
+					'Appcelerator'.cyan +	' Titanium '
+				+ 'is'.cyan +				' open, '
+				+ 'extensible'.cyan +		' development '
+				+ 'environment'.cyan +	' for '
+				+ 'creating'.cyan +		'\nbeautiful '
+				+ 'native'.cyan +			' apps '
+				+ 'across'.cyan +			' different '
+				+ 'mobile'.cyan +			' devices '
+				+ 'and'.cyan +			' OSs '
+				+ 'including'.cyan +		' iOS,\n'
+				+ 'Android,'.cyan +		' Windows '
+				+ 'and'.cyan +			' BlackBerry, '
+				+ 'as'.cyan +				' well '
+				+ 'as'.cyan +				' hybrid '
+				+ 'and'.cyan +			' HTML5. '
+				+ 'It'.cyan +				' includes '
+				+ 'an'.cyan +				'\nopen '
+				+ 'source'.cyan +			' SDK '
+				+ 'with'.cyan +			' over '
+				+ '5,000'.cyan +			' device '
+				+ 'and'.cyan +			' mobile '
+				+ 'operating'.cyan +		' system '
+				+ 'APIs,'.cyan +			' Studio,\n'
+				+ 'a'.cyan +				' powerful '
+				+ 'Eclipse-based'.cyan +	' IDE, '
+				+ 'Alloy,'.cyan +			' an '
+				+ 'MVC'.cyan +			' framework '
+				+ 'and'.cyan +			' Cloud '
+				+ 'Services'.cyan +		' for '
+				+ 'a'.cyan +				'\nready-to-use '
+				+ 'mobile'.cyan +			' backend.');
 		});
 
 		it('zero width should not wrap', function () {
-			string.wrap('Appcelerator Titanium is open, extensible development environment for creating ' +
-				'beautiful native apps across different mobile devices and OSs including iOS, Android, ' +
-				'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with ' +
-				'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, ' +
-				'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.', 0)
-			.should.equal('Appcelerator Titanium is open, extensible development environment for creating ' +
-				'beautiful native apps across different mobile devices and OSs including iOS, Android, ' +
-				'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with ' +
-				'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, ' +
-				'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.');
+			string.wrap('Appcelerator Titanium is open, extensible development environment for creating '
+				+ 'beautiful native apps across different mobile devices and OSs including iOS, Android, '
+				+ 'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with '
+				+ 'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, '
+				+ 'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.', 0)
+				.should.equal('Appcelerator Titanium is open, extensible development environment for creating '
+				+ 'beautiful native apps across different mobile devices and OSs including iOS, Android, '
+				+ 'Windows and BlackBerry, as well as hybrid and HTML5. It includes an open source SDK with '
+				+ 'over 5,000 device and mobile operating system APIs, Studio, a powerful Eclipse-based IDE, '
+				+ 'Alloy, an MVC framework and Cloud Services for a ready-to-use mobile backend.');
 		});
 	});
 
 	describe('#renderColumns()', function () {
-		it('should render a few items in columns', function (){
-			string.renderColumns(['apple', 'orange', 'grape', 'banana'], null, 80).should.equal('apple      orange     grape      banana');
+		it('should render a few items in columns', function () {
+			string.renderColumns([ 'apple', 'orange', 'grape', 'banana' ], null, 80).should.equal('apple      orange     grape      banana');
 
 			string.renderColumns([
 				'apple',
@@ -290,29 +292,29 @@ describe('string', function () {
 				'tomato',
 				'ugli fruit'
 			], null, 80).should.equal(
-				'apple                 gooseberry            peach\n' +
-				'apricot               grape                 pepper\n' +
-				'avocado               grapefruit            pear\n' +
-				'banana                guava                 persimmon\n' +
-				'breadfruit            huckleberry           physalis\n' +
-				'bilberry              honeydew              plum\n' +
-				'blackberry            jackfruit             pineapple\n' +
-				'blackcurrant          jettamelon            pomegranate\n' +
-				'blueberry             jambul                pomelo\n' +
-				'boysenberry           jujube                purple mangosteen\n' +
-				'currant               kiwi fruit            quince\n' +
-				'cherry                kumquat               raspberry\n' +
-				'cherimoya             legume                rambutan\n' +
-				'chili                 lemon                 redcurrant\n' +
-				'cloudberry            lime                  salal berry\n' +
-				'coconut               loquat                satsuma\n' +
-				'damson                lychee                star fruit\n' +
-				'date                  mango                 strawberry\n' +
-				'dragonfruit           melon                 tamarillo\n' +
-				'durian                nectarine             tomato\n' +
-				'elderberry            nut                   ugli fruit\n' +
-				'feijoa                orange\n' +
-				'fig                   papaya'
+				'apple                 gooseberry            peach\n'
+				+ 'apricot               grape                 pepper\n'
+				+ 'avocado               grapefruit            pear\n'
+				+ 'banana                guava                 persimmon\n'
+				+ 'breadfruit            huckleberry           physalis\n'
+				+ 'bilberry              honeydew              plum\n'
+				+ 'blackberry            jackfruit             pineapple\n'
+				+ 'blackcurrant          jettamelon            pomegranate\n'
+				+ 'blueberry             jambul                pomelo\n'
+				+ 'boysenberry           jujube                purple mangosteen\n'
+				+ 'currant               kiwi fruit            quince\n'
+				+ 'cherry                kumquat               raspberry\n'
+				+ 'cherimoya             legume                rambutan\n'
+				+ 'chili                 lemon                 redcurrant\n'
+				+ 'cloudberry            lime                  salal berry\n'
+				+ 'coconut               loquat                satsuma\n'
+				+ 'damson                lychee                star fruit\n'
+				+ 'date                  mango                 strawberry\n'
+				+ 'dragonfruit           melon                 tamarillo\n'
+				+ 'durian                nectarine             tomato\n'
+				+ 'elderberry            nut                   ugli fruit\n'
+				+ 'feijoa                orange\n'
+				+ 'fig                   papaya'
 			);
 		});
 	});

@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	colors = require('colors');
@@ -55,7 +57,7 @@ describe('appc', function () {
 
 		try {
 			dump('titanium');
-			output.should.equal("'titanium'");
+			output.should.equal('\'titanium\'');
 			console.error = tmp;
 		} catch (ex) {
 			console.error = tmp;
@@ -126,8 +128,8 @@ describe('appc', function () {
 		};
 
 		try {
-			dump(['a', 'b', 'c']);
-			output.should.equal("[ 'a', 'b', 'c' ]");
+			dump([ 'a', 'b', 'c' ]);
+			output.should.equal('[ \'a\', \'b\', \'c\' ]');
 			console.error = tmp;
 		} catch (ex) {
 			console.error = tmp;
@@ -148,7 +150,7 @@ describe('appc', function () {
 				a: 1,
 				b: 'ti',
 				c: true,
-				d: ['x', 'y', 'z'],
+				d: [ 'x', 'y', 'z' ],
 				e: {
 					m: 2,
 					n: false,
@@ -157,11 +159,11 @@ describe('appc', function () {
 			});
 
 			output.should.equal(
-				"{ a: 1,\n" +
-				"  b: 'ti',\n" +
-				"  c: true,\n" +
-				"  d: [ 'x', 'y', 'z' ],\n" +
-				"  e: { m: 2, n: false, o: 'appc' } }");
+				'{ a: 1,\n'
+				+ '  b: \'ti\',\n'
+				+ '  c: true,\n'
+				+ '  d: [ \'x\', \'y\', \'z\' ],\n'
+				+ '  e: { m: 2, n: false, o: \'appc\' } }');
 
 			console.error = tmp;
 		} catch (ex) {

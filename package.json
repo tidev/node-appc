@@ -43,6 +43,10 @@
 		"xmldom": "0.1.22"
 	},
 	"devDependencies": {
+		"grunt": "^1.0.2",
+		"grunt-appc-js": "^2.1.0",
+		"grunt-cli": "^1.2.0",
+		"grunt-mocha-test": "^0.13.3",
 		"mocha": "*",
 		"mocha-jenkins-reporter": "0.3.7",
 		"should": "11.2.1"
@@ -53,6 +57,6 @@
 		"node": ">=4.0"
 	},
 	"scripts": {
-		"test": "JUNIT_REPORT_PATH=junit_report.xml mocha --require test/init --reporter mocha-jenkins-reporter --check-leaks test/test-*.js"
+		"test": "grunt"
 	}
 }
