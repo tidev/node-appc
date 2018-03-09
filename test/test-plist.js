@@ -7,7 +7,7 @@
 /* eslint no-unused-expressions: "off", no-template-curly-in-string: "off" */
 'use strict';
 
-var appc = require('../index'),
+const appc = require('../index'),
 	fs = require('fs'),
 	path = require('path'),
 	temp = require('temp'),
@@ -15,14 +15,14 @@ var appc = require('../index'),
 
 dt.setTime(1372893710058); // Wed Jul 03 2013 16:21:55 GMT-0700 (PDT)
 
-describe('plist', function () {
-	it('namespace exists', function () {
+describe('plist', () => {
+	it('namespace exists', () => {
 		appc.should.have.property('plist');
 		appc.plist.should.be.a.Function;
 	});
 
-	it('create empty plist', function () {
-		var plist = new appc.plist();
+	it('create empty plist', () => {
+		const plist = new appc.plist();
 		plist.should.be.an.Object;
 
 		plist.toString().should.equal('[object Object]');
@@ -41,8 +41,8 @@ describe('plist', function () {
 		);
 	});
 
-	it('create empty plist and populate', function () {
-		var plist = new appc.plist();
+	it('create empty plist and populate', () => {
+		const plist = new appc.plist();
 
 		plist.testkey = 'testvalue';
 		plist.testarray = [ 'testvalue1', 'testvalue2' ];
@@ -110,8 +110,8 @@ describe('plist', function () {
 		].join('\n'));
 	});
 
-	it('read plist from file', function () {
-		var plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
+	it('read plist from file', () => {
+		const plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
 		plist.should.be.an.Object;
 
 		JSON.parse(plist.toString('json')).should.eql({
@@ -211,21 +211,21 @@ describe('plist', function () {
 		].join('\n'));
 	});
 
-	it('loading non-existent plist should throw error', function () {
+	it('loading non-existent plist should throw error', () => {
 		(function () {
-			var plist = new appc.plist();
+			const plist = new appc.plist();
 			plist.load(path.join(__dirname, 'resources', 'DoesNotExist.plist'));
 		}).should.throw();
 	});
 
-	it('read bad plist should throw error', function () {
+	it('read bad plist should throw error', () => {
 		(function () {
-			var plist = new appc.plist(path.join(__dirname, 'resources', 'InfoBad.plist'));
+			new appc.plist(path.join(__dirname, 'resources', 'InfoBad.plist'));
 		}).should.throw();
 	});
 
-	it('read big plist from file', function () {
-		var plist = new appc.plist(path.join(__dirname, 'resources', 'InfoBig.plist'));
+	it('read big plist from file', () => {
+		const plist = new appc.plist(path.join(__dirname, 'resources', 'InfoBig.plist'));
 		plist.should.be.an.Object;
 
 		// since plists do not support milliseconds, we have to force the milliseconds to zero
@@ -456,8 +456,8 @@ describe('plist', function () {
 		].join('\n'));
 	});
 
-	it('read from file and modify', function () {
-		var plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
+	it('read from file and modify', () => {
+		const plist = new appc.plist(path.join(__dirname, 'resources', 'Info.plist'));
 		plist.should.be.an.Object;
 
 		plist.testkey = 'testvalue';
@@ -577,8 +577,8 @@ describe('plist', function () {
 		].join('\n'));
 	});
 
-	it('create empty plist, populate, and save', function () {
-		var plist = new appc.plist(),
+	it('create empty plist, populate, and save', () => {
+		const plist = new appc.plist(),
 			tempDir = temp.mkdirSync(),
 			file = path.join(tempDir, 'temp.plist');
 

@@ -7,7 +7,7 @@
 /* eslint no-unused-expressions: "off" */
 'use strict';
 
-var appc = require('../index'),
+const appc = require('../index'),
 	assert = require('assert'),
 	fs = require('fs-extra'),
 	path = require('path'),
@@ -51,7 +51,7 @@ describe('timodule', function () {
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
-			appc.timodule.scopedDetect(null, null, null, function (result) {
+			appc.timodule.scopedDetect(null, null, null, function () {
 				done();
 			});
 		});
@@ -59,7 +59,7 @@ describe('timodule', function () {
 		// because the internal detectModules() function caches all modules for the
 		// remainder of this test, we must test the zip file stuff first
 		it('should unzip dummy module and report bad zip file failure', function (done) {
-			var logger = new MockLogger(),
+			const logger = new MockLogger(),
 				dummyDir = path.join(__dirname, 'resources', 'timodule', 'modules', 'ios', 'dummy'),
 				goodZipFile = path.join(__dirname, 'resources', 'timodule', 'dummy-ios-1.2.3.zip'),
 				badZipFile = path.join(__dirname, 'resources', 'timodule', 'badzip-ios-1.0.0.zip');
@@ -101,7 +101,7 @@ describe('timodule', function () {
 		});
 
 		it('should find all test modules', function (done) {
-			var logger = new MockLogger();
+			const logger = new MockLogger();
 
 			// now run the detection
 			appc.timodule.scopedDetect({
@@ -133,7 +133,7 @@ describe('timodule', function () {
 			// now run the detection
 			appc.timodule.scopedDetect({
 				testResources: path.join(testResourcesDir, 'modules')
-			}, new MockConfig(), logger, function (result) {
+			}, new MockConfig(), logger, function () {
 				logger.buffer.stripColors.should.not.containEql('Detecting modules in ' + path.join(testResourcesDir, 'modules'));
 				done();
 			});
@@ -142,7 +142,7 @@ describe('timodule', function () {
 
 	describe('#detect()', function () {
 		it('should find the test modules with individual params', function (done) {
-			var logger = new MockLogger(),
+			const logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'timodule');
 
 			// we test for dupe search paths, but only one should be searched
@@ -171,7 +171,7 @@ describe('timodule', function () {
 		});
 
 		it('should find the test modules with params object', function (done) {
-			var logger = new MockLogger(),
+			const logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'timodule');
 
 			// we test for dupe search paths, but only one should be searched
@@ -207,7 +207,7 @@ describe('timodule', function () {
 
 	describe('#find()', function () {
 		it('should return immediately if no modules with individual params', function (done) {
-			var logger = new MockLogger();
+			const logger = new MockLogger();
 			appc.timodule.find([], null, null, null, null, logger, function (result) {
 				result.should.eql({
 					found: [],
@@ -220,7 +220,7 @@ describe('timodule', function () {
 		});
 
 		it('should return immediately if no modules with params object', function (done) {
-			var logger = new MockLogger();
+			const logger = new MockLogger();
 			appc.timodule.find({
 				modules: [],
 				platforms: null,
