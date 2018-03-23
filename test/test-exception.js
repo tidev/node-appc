@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	AppcException = appc.exception;
@@ -16,7 +18,7 @@ describe('exception', function () {
 
 	it('should have a type', function () {
 		try {
-			throw new AppcException;
+			throw new AppcException();
 		} catch (ex) {
 			ex.should.have.property('type');
 			ex.type.should.equal('AppcException');
@@ -25,7 +27,7 @@ describe('exception', function () {
 
 	it('should have an empty message', function () {
 		try {
-			throw new AppcException;
+			throw new AppcException();
 		} catch (ex) {
 			ex.should.have.property('type');
 			ex.type.should.equal('AppcException');

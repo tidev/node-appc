@@ -4,11 +4,12 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	fs = require('fs'),
 	path = require('path'),
-	http = require('http'),
 	temp = require('temp');
 
 describe('auth', function () {

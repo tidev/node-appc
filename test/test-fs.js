@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert'),
@@ -13,10 +15,18 @@ var appc = require('../index'),
 
 function MockLogger() {
 	this.buffer = '';
-	this.debug = function (s) { this.buffer += s + '\n'; };
-	this.info = function (s) { this.buffer += s + '\n'; };
-	this.warn = function (s) { this.buffer += s + '\n'; };
-	this.error = function (s) { this.buffer += s + '\n'; };
+	this.debug = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.info = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.warn = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.error = function (s) {
+		this.buffer += s + '\n';
+	};
 }
 
 describe('fs', function () {
@@ -27,7 +37,7 @@ describe('fs', function () {
 
 	describe('#copyFileSync()', function () {
 		it('copy file to file with existing directory', function () {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = path.join(temp.mkdirSync(), 'testfile.txt');
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
@@ -36,7 +46,7 @@ describe('fs', function () {
 		});
 
 		it('copy file to file with non-existent directory', function () {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = path.join(temp.mkdirSync(), 'test', 'testfile.txt');
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
@@ -45,7 +55,7 @@ describe('fs', function () {
 		});
 
 		it('copy file to /tmp', function () {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = '/tmp';
 			fs.ensureDirSync(dest);
@@ -55,7 +65,7 @@ describe('fs', function () {
 		});
 
 		it('copy file to existing directory', function () {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = temp.mkdirSync();
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
@@ -64,7 +74,7 @@ describe('fs', function () {
 		});
 
 		it('copy file to non-existent directory', function () {
-			var logger = new MockLogger,
+			var logger = new MockLogger(),
 				src = path.join(__dirname, 'resources', 'testfile.txt'),
 				dest = path.join(temp.mkdirSync(), 'test');
 			// since dest does not exist, it doesn't know it's a directory and the dest
@@ -87,6 +97,6 @@ describe('fs', function () {
 			visited.should.have.property(path.join(dir, 'a1'));
 			visited.should.have.property('a2');
 			visited.should.have.property(path.join(dir, 'a2'));
-		})
+		});
 	});
 });

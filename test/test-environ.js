@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert'),
@@ -29,7 +31,7 @@ describe('environ', function () {
 			dest[testModule].should.equal(testFile);
 		});
 
-		it('should find the test command', function () {
+		it('should not find the hidden command', function () {
 			var dest = {},
 				searchPath = path.join(__dirname, 'resources', 'environ', 'commands'),
 				hiddenModule = path.join(searchPath, '_hidden');

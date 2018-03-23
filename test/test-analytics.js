@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	http = require('http'),
@@ -25,17 +27,17 @@ describe('analytics', function () {
 	});
 
 	describe('#send()', function () {
-		it.skip('should fail to send because missing arguments', function (done) {
+		it.skip('should fail to send because missing arguments', function (done) { // eslint-disable-line mocha/no-skipped-tests
 			this.timeout(10000);
 			this.slow(9000);
 
 			appc.analytics.events = [];
 
 			var server = http.createServer(function (req, res) {
-					res.writeHead(200, {'Content-Type': 'text/plain'});
-					res.end('Hello World\n');
-					cleanup(new Error('analytics sent despite missing arguments'));
-				});
+				res.writeHead(200, { 'Content-Type': 'text/plain' });
+				res.end('Hello World\n');
+				cleanup(new Error('analytics sent despite missing arguments'));
+			});
 
 			server.on('error', function (err) {
 				cleanup(new Error(err));
@@ -80,7 +82,7 @@ describe('analytics', function () {
 			}
 		});
 
-		it.skip('should post ti.start event', function (done) {
+		it.skip('should post ti.start event', function (done) { // eslint-disable-line mocha/no-skipped-tests
 			this.timeout(10000);
 			this.slow(9000);
 
@@ -89,7 +91,9 @@ describe('analytics', function () {
 			var finished = false,
 				tempDir = temp.mkdirSync(),
 				server = http.createServer(function (req, res) {
-					if (req.method != 'POST') return cleanup(new Error('expected POST, got ' + req.method));
+					if (req.method !== 'POST') {
+						return cleanup(new Error('expected POST, got ' + req.method));
+					}
 
 					var body = '';
 					req.on('data', function (chunk) {
@@ -106,8 +110,12 @@ describe('analytics', function () {
 							b[entry.substring(0, p)] = entry.substring(p + 1);
 						});
 
-						if (!b.type) return cleanup(new Error('analytics event missing type'));
-						if (b.type != 'ti.start') return cleanup(new Error('analytics event wrong type; got ' + b.type + ', expected ti.start'));
+						if (!b.type) {
+							return cleanup(new Error('analytics event missing type'));
+						}
+						if (b.type !== 'ti.start') {
+							return cleanup(new Error('analytics event wrong type; got ' + b.type + ', expected ti.start'));
+						}
 
 						res.writeHead(204);
 						res.end();
@@ -124,7 +132,9 @@ describe('analytics', function () {
 				child;
 
 			function cleanup(err) {
-				if (finished) return;
+				if (finished) {
+					return;
+				}
 				finished = true;
 				clearTimeout(successTimer);
 				if (childRunning) {

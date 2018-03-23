@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index'),
 	assert = require('assert'),
@@ -24,10 +26,10 @@ describe('zip', function () {
 				assert(!err, 'expected unzip to not error');
 
 				fs.existsSync(path.join(tempDir, 'main.m')).should.be.ok;
-				(fs.statSync(path.join(tempDir, 'main.m')).mode & 0777).should.equal(process.platform == 'win32' ? 0666 : 0644);
+				(fs.statSync(path.join(tempDir, 'main.m')).mode & 0o777).should.equal(process.platform === 'win32' ? 0o666 : 0o644);
 
 				fs.existsSync(path.join(tempDir, 'ios-sim')).should.be.ok;
-				(fs.statSync(path.join(tempDir, 'ios-sim')).mode & 0777).should.equal(process.platform == 'win32' ? 0666 : 0755);
+				(fs.statSync(path.join(tempDir, 'ios-sim')).mode & 0o777).should.equal(process.platform === 'win32' ? 0o666 : 0o755);
 
 				done();
 			});

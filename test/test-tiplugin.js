@@ -4,16 +4,17 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
-var appc = require('../index'),
+const appc = require('../index'),
 	assert = require('assert'),
-	fs = require('fs'),
 	path = require('path'),
 	colors = require('colors');
 
 function MockConfig() {
 	this.get = function (s) {
-		if (s == 'cli.ignoreDirs') {
+		if (s === 'cli.ignoreDirs') {
 			return '^(.svn|.git|.hg|.?[Cc][Vv][Ss]|.bzr)$';
 		}
 	};
@@ -21,10 +22,18 @@ function MockConfig() {
 
 function MockLogger() {
 	this.buffer = '';
-	this.debug = function (s) { this.buffer += s + '\n'; };
-	this.info = function (s) { this.buffer += s + '\n'; };
-	this.warn = function (s) { this.buffer += s + '\n'; };
-	this.error = function (s) { this.buffer += s + '\n'; };
+	this.debug = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.info = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.warn = function (s) {
+		this.buffer += s + '\n';
+	};
+	this.error = function (s) {
+		this.buffer += s + '\n';
+	};
 }
 
 describe('tiplugin', function () {
@@ -33,22 +42,22 @@ describe('tiplugin', function () {
 		appc.tiplugin.should.be.an.Object;
 	});
 
-	var testResourcesDir = path.join(__dirname, 'resources', 'tiplugin', 'plugins');
+	const testResourcesDir = path.join(__dirname, 'resources', 'tiplugin', 'plugins');
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
-			appc.tiplugin.scopedDetect(null, null, null, function (result) {
+			appc.tiplugin.scopedDetect(null, null, null, function () {
 				done();
 			});
 		});
 
 		it('should find all test plugins', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 
 			// now run the detection
 			appc.tiplugin.scopedDetect({
 				testResources: testResourcesDir
-			}, new MockConfig, logger, function (result) {
+			}, new MockConfig(), logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -66,8 +75,8 @@ describe('tiplugin', function () {
 								hooks: [],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'commandtest',
-									'version': '1.0'
+									name: 'commandtest',
+									version: '1.0'
 								}
 							}
 						},
@@ -78,8 +87,8 @@ describe('tiplugin', function () {
 								hooks: [],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'emptytest',
-									'version': '1.0'
+									name: 'emptytest',
+									version: '1.0'
 								}
 							}
 						},
@@ -90,8 +99,8 @@ describe('tiplugin', function () {
 								hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
 								legacyPluginFile: null,
 								manifest: {
-									'name': 'hooktest',
-									'version': '1.0'
+									name: 'hooktest',
+									version: '1.0'
 								}
 							}
 						},
@@ -114,10 +123,10 @@ describe('tiplugin', function () {
 
 	describe('#detect()', function () {
 		it('should find the test plugins', function (done) {
-			var logger = new MockLogger,
+			const logger = new MockLogger(),
 				projectDir = path.join(__dirname, 'resources', 'tiplugin');
 
-			appc.tiplugin.detect(projectDir, new MockConfig, logger, function (result) {
+			appc.tiplugin.detect(projectDir, new MockConfig(), logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + testResourcesDir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: commandtest 1.0 @ ' + path.join(testResourcesDir, 'commandtest', '1.0'));
 				logger.buffer.stripColors.should.containEql('Detected plugin: emptytest 1.0 @ ' + path.join(testResourcesDir, 'emptytest', '1.0'));
@@ -136,8 +145,8 @@ describe('tiplugin', function () {
 							hooks: [],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'commandtest',
-								'version': '1.0'
+								name: 'commandtest',
+								version: '1.0'
 							}
 						}
 					},
@@ -148,8 +157,8 @@ describe('tiplugin', function () {
 							hooks: [],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'emptytest',
-								'version': '1.0'
+								name: 'emptytest',
+								version: '1.0'
 							}
 						}
 					},
@@ -160,8 +169,8 @@ describe('tiplugin', function () {
 							hooks: [ { name: 'hooktest', path: path.join(testResourcesDir, 'hooktest', '1.0', 'hooks', 'hooktest.js'), cliVersion: '>=3.X' } ],
 							legacyPluginFile: null,
 							manifest: {
-								'name': 'hooktest',
-								'version': '1.0'
+								name: 'hooktest',
+								version: '1.0'
 							}
 						}
 					},
@@ -181,15 +190,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "userlegacytest" plugin in user-defined path', function (done) {
-			var config = new MockConfig,
-				logger = new MockLogger,
+			const config = new MockConfig(),
+				logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'userlegacytest');
 
 			config.paths = {
 				plugins: [ dir ]
 			};
 
-			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
+			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function () {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + dir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: userlegacytest @ ' + dir);
 				done();
@@ -197,15 +206,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "usercommandtest" plugin in user-defined path', function (done) {
-			var config = new MockConfig,
-				logger = new MockLogger,
+			const config = new MockConfig(),
+				logger = new MockLogger(),
 				dir = path.join(__dirname, 'resources', 'tiplugin', 'user', 'usercommandtest');
 
 			config.paths = {
 				plugins: [ dir ]
 			};
 
-			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function (result) {
+			appc.tiplugin.detect(path.join(__dirname, 'resources', 'tiplugin'), config, logger, function () {
 				logger.buffer.stripColors.should.containEql('Detecting plugins in ' + dir);
 				logger.buffer.stripColors.should.containEql('Detected plugin: usercommandtest @ ' + dir);
 				done();
@@ -215,7 +224,7 @@ describe('tiplugin', function () {
 
 	describe('#find()', function () {
 		it('should return immediately if no plugins', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 			appc.tiplugin.find([], null, null, logger, function (result) {
 				result.should.eql({
 					found: [],
@@ -226,15 +235,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin using only the id', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Found Titanium plugin id=commandtest version=latest');
 
-				var found = false;
-				for (var i = 0; !found && i < result.found.length; i++) {
-					found = (result.found[i].id == 'commandtest');
+				let found = false;
+				for (let i = 0; !found && i < result.found.length; i++) {
+					found = (result.found[i].id === 'commandtest');
 				}
 				assert(found, '"commandtest" plugin not marked as found');
 
@@ -243,15 +252,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should find "commandtest" plugin with matching version', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '1.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Found Titanium plugin id=commandtest version=1.0');
 
-				var found = false;
-				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id == 'commandtest') {
+				let found = false;
+				for (let i = 0; !found && i < result.found.length; i++) {
+					if (result.found[i].id === 'commandtest') {
 						found = true;
 					}
 				}
@@ -262,15 +271,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find "commandtest" plugin with wrong version', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'commandtest', version: '2.0' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Could not find Titanium plugin id=commandtest version=2.0');
 
-				var found = false;
-				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'commandtest';
+				let found = false;
+				for (let i = 0; !found && i < result.missing.length; i++) {
+					found = result.missing[i].id === 'commandtest';
 				}
 				assert(found, '"commandtest" plugin not marked as missing');
 
@@ -279,15 +288,15 @@ describe('tiplugin', function () {
 		});
 
 		it('should not find doesnotexist plugin', function (done) {
-			var logger = new MockLogger;
+			const logger = new MockLogger();
 			appc.tiplugin.find([
 				{ id: 'doesnotexist' }
 			], path.join(__dirname, 'resources', 'tiplugin'), {}, logger, function (result) {
 				logger.buffer.stripColors.should.containEql('Could not find Titanium plugin id=doesnotexist version=latest');
 
-				var found = false;
-				for (var i = 0; !found && i < result.missing.length; i++) {
-					found = result.missing[i].id == 'doesnotexist';
+				let found = false;
+				for (let i = 0; !found && i < result.missing.length; i++) {
+					found = result.missing[i].id === 'doesnotexist';
 				}
 				assert(found, '"doesnotexist" plugin not marked as missing');
 

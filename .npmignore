@@ -10,3 +10,6 @@ coverage.html
 forge
 forge-tools
 en-us.js
+coverage/
+junit_report.xml
+retirejs.output.json

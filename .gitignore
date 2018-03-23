@@ -6,3 +6,6 @@ lib-cov
 coverage.html
 en-us.js
 test/resources/timodule/modules/ios/dummy
+junit_report.xml
+coverage/
+retirejs.output.json

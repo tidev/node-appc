@@ -4,6 +4,8 @@
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
+/* eslint no-unused-expressions: "off" */
+'use strict';
 
 var appc = require('../index');
 
@@ -19,7 +21,7 @@ describe('async', function () {
 				this.counter = 0;
 			}
 
-			var obj = new TestObj;
+			var obj = new TestObj();
 
 			appc.async.parallel(obj, [
 				function (next) {
@@ -45,7 +47,7 @@ describe('async', function () {
 				this.counter = 0;
 			}
 
-			var obj = new TestObj;
+			var obj = new TestObj();
 
 			appc.async.parallel(obj, [
 				function () {
@@ -70,7 +72,7 @@ describe('async', function () {
 				this.counter = 0;
 			}
 
-			var obj = new TestObj;
+			var obj = new TestObj();
 
 			appc.async.series(obj, [
 				function (next) {
@@ -96,7 +98,7 @@ describe('async', function () {
 				this.counter = 0;
 			}
 
-			var obj = new TestObj;
+			var obj = new TestObj();
 
 			appc.async.series(obj, [
 				function () {
