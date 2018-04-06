@@ -1,63 +1,63 @@
 {
-	"name": "node-appc",
-	"description": "Appcelerator Common Node Library",
-	"homepage": "http://github.com/appcelerator/node-appc",
-	"keywords": [
-		"appcelerator"
-	],
-	"version": "0.2.45",
-	"author": {
-		"name": "Appcelerator, Inc.",
-		"email": "npmjs@appcelerator.com"
-	},
-	"maintainers": [
-		{
-			"name": "Jeff Haynie",
-			"email": "jhaynie@appcelerator.com"
-		},
-		{
-			"name": "Chris Barber",
-			"email": "cbarber@appcelerator.com"
-		}
-	],
-	"bugs": {
-		"url": "https://jira.appcelerator.org/browse/TIMOB"
-	},
-	"repository": {
-		"type": "git",
-		"url": "http://github.com/appcelerator/node-appc.git"
-	},
-	"dependencies": {
-		"adm-zip": "0.4.7",
-		"async": "2.3.0",
-		"colors": "1.1.2",
-		"diff": "3.2.0",
-		"uuid": "3.0.1",
-		"optimist": "0.6.1",
-		"request": "2.81.0",
-		"semver": "5.3.0",
-		"sprintf": "0.1.5",
-		"temp": "0.8.3",
-		"fs-extra": "2.0.0",
-		"uglify-js": "2.8.21",
-		"xmldom": "0.1.22"
-	},
-	"devDependencies": {
-		"grunt": "^1.0.2",
-		"grunt-appc-js": "^2.1.0",
-		"grunt-cli": "^1.2.0",
-		"grunt-mocha-istanbul": "^5.0.2",
-		"istanbul": "^0.4.5",
-		"mocha": "*",
-		"mocha-jenkins-reporter": "0.3.7",
-		"should": "11.2.1"
-	},
-	"license": "Apache-2.0",
-	"main": "./index",
-	"engines": {
-		"node": ">=4.0"
-	},
-	"scripts": {
-		"test": "JUNIT_REPORT_PATH=junit_report.xml grunt"
-	}
+  "name": "node-appc",
+  "description": "Appcelerator Common Node Library",
+  "homepage": "http://github.com/appcelerator/node-appc",
+  "keywords": [
+    "appcelerator"
+  ],
+  "version": "0.2.46",
+  "author": {
+    "name": "Appcelerator, Inc.",
+    "email": "npmjs@appcelerator.com"
+  },
+  "maintainers": [
+    {
+      "name": "Jeff Haynie",
+      "email": "jhaynie@appcelerator.com"
+    },
+    {
+      "name": "Chris Barber",
+      "email": "cbarber@appcelerator.com"
+    }
+  ],
+  "bugs": {
+    "url": "https://jira.appcelerator.org/browse/TIMOB"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/appcelerator/node-appc.git"
+  },
+  "dependencies": {
+    "adm-zip": "0.4.7",
+    "async": "2.3.0",
+    "colors": "1.1.2",
+    "diff": "3.2.0",
+    "uuid": "3.0.1",
+    "optimist": "0.6.1",
+    "request": "2.81.0",
+    "semver": "5.3.0",
+    "sprintf": "0.1.5",
+    "temp": "0.8.3",
+    "fs-extra": "2.0.0",
+    "uglify-js": "2.8.21",
+    "xmldom": "0.1.22"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.2",
+    "grunt-appc-js": "^2.1.0",
+    "grunt-cli": "^1.2.0",
+    "grunt-mocha-istanbul": "^5.0.2",
+    "istanbul": "^0.4.5",
+    "mocha": "*",
+    "mocha-jenkins-reporter": "0.3.7",
+    "should": "11.2.1"
+  },
+  "license": "Apache-2.0",
+  "main": "./index",
+  "engines": {
+    "node": ">=4.0"
+  },
+  "scripts": {
+    "test": "JUNIT_REPORT_PATH=junit_report.xml grunt"
+  }
 }
