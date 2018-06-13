@@ -1,0 +1,14 @@
+{
+  "groups": {
+    "default": {
+      "packages": [
+        "package.json",
+        "test/resources/pkginfo/package.json",
+        "test/resources/tiplugin/plugins/commandtest/1.0/package.json",
+        "test/resources/tiplugin/plugins/emptytest/1.0/package.json",
+        "test/resources/tiplugin/plugins/hooktest/1.0/package.json",
+        "test/resources/tiplugin/user/usercommandtest/package.json"
+      ]
+    }
+  }
+}
