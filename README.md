@@ -3,7 +3,7 @@
 > This is a common library used by Appcelerator Node.js-based software products such as the
 [Titanium CLI](http://github.com/appcelerator/titanium).
 
-[![Build Status](https://travis-ci.org/appcelerator/node-appc.png)](https://travis-ci.org/appcelerator/node-appc)
+[![Build Status](https://travis-ci.org/appcelerator/node-appc.png)](https://travis-ci.org/appcelerator/node-appc) [![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/node-appc.svg)](https://greenkeeper.io/)
 
 ## Prerequisites
 
