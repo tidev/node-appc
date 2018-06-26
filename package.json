@@ -39,7 +39,7 @@
     "sprintf": "^0.1.5",
     "temp": "~0.8.3",
     "uglify-js": "~3.4.0",
-    "uuid": "~3.2.1",
+    "uuid": "~3.3.0",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
