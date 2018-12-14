@@ -11,5 +11,8 @@ forge
 forge-tools
 en-us.js
 coverage/
+.nyc_output/
 junit_report.xml
+dangerfile.js
+greenkeeper.json
 retirejs.output.json
