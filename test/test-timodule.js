@@ -1,17 +1,18 @@
 /**
  * node-appc - Appcelerator Common Library for Node.js
- * Copyright (c) 2009-2014 by Appcelerator, Inc. All Rights Reserved.
+ * Copyright (c) 2009-2019 by Appcelerator, Inc. All Rights Reserved.
  * Licensed under the terms of the Apache Public License
  * Please see the LICENSE included with this distribution for details.
  */
 /* eslint no-unused-expressions: "off" */
 'use strict';
 
-const appc = require('../index'),
-	assert = require('assert'),
-	fs = require('fs-extra'),
-	path = require('path'),
-	colors = require('colors');
+const appc = require('../index');
+const assert = require('assert');
+const fs = require('fs-extra');
+const path = require('path');
+require('should');
+require('colors');
 
 function MockConfig() {
 	this.get = function (s) {
@@ -800,5 +801,26 @@ describe('timodule', function () {
 				}
 			});
 		});
+	});
+
+	describe('#detectNodeModules()', () => {
+		it('detects native module in node_modules folder with specific package.json properties', async () => {
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/node_modules') ]);
+			modules.should.be.an.Array;
+			modules.should.have.length(1);
+			const nativeModule = modules[0];
+			nativeModule.id.should.eql('native-module');
+			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+			nativeModule.platform.should.eql([ 'iphone' ]);
+			nativeModule.version.should.eql('2.0.1');
+			nativeModule.manifest.should.be.an.Object;
+			nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+			nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+			nativeModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+			nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
+			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+		});
+
+		// TODO Detect multiple with differing platforms?
 	});
 });

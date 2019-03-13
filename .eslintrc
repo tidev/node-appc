@@ -1,11 +1,8 @@
 {
   "extends": [ "axway/env-node", "axway/+mocha"],
   "parserOptions": {
-    "ecmaVersion": 2015,
+    "ecmaVersion": 2017,
     "sourceType": "script"
-  },
-  "rules": {
-    "strict": ["error", "global"]
   },
   "overrides": [
     {
@@ -13,7 +10,7 @@
       "parserOptions": {
         "ecmaVersion": 2017,
         "sourceType": "module"
-      },
-    },
+      }
+    }
   ]
 }
