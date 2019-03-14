@@ -204,6 +204,70 @@ describe('timodule', function () {
 				}
 			});
 		});
+
+		it('detects native module in node_modules folder under given project path', finished => {
+			const logger = new MockLogger();
+			appc.timodule.detect([ path.join(__dirname, 'resources') ], logger, result => {
+				try {
+					result.should.be.an.Object;
+					result.should.have.property('global');
+					result.should.have.property('project');
+					result.project.should.have.property('ios');
+					result.project.ios.should.be.an.Object;
+					result.project.ios.should.have.property('Native Module');
+					const nativeModule = result.project.ios['Native Module']['2.0.1'];
+					nativeModule.id.should.eql('native-module');
+					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+					nativeModule.platform.should.eql([ 'ios' ]);
+					nativeModule.version.should.eql('2.0.1');
+					nativeModule.manifest.should.be.an.Object;
+					nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+					nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+					nativeModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+					nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
+					nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+					finished();
+				} catch (e) {
+					finished(e);
+				}
+			});
+		});
+
+		it('combines node_modules and legacy based modules', finished => {
+			const logger = new MockLogger();
+			const dir = path.join(__dirname, 'resources', 'timodule');
+			appc.timodule.detect([ path.join(__dirname, 'resources'), dir ], logger, result => {
+				try {
+					result.should.be.an.Object;
+					result.should.have.property('global');
+					result.should.have.property('project');
+					result.project.should.have.property('ios');
+					result.project.ios.should.be.an.Object;
+					// has the "legacy" modules
+					result.project.ios.should.have.property('dummy');
+					result.project.ios.should.have.property('toonew');
+					result.project.ios.should.have.property('ambiguous');
+					result.project.should.have.property('commonjs');
+					result.project.commonjs.should.have.property('ambiguous');
+					// has the native module supplied via node_modules
+					result.project.ios.should.have.property('Native Module');
+					const nativeModule = result.project.ios['Native Module']['2.0.1'];
+					nativeModule.id.should.eql('native-module');
+					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+					nativeModule.platform.should.eql([ 'ios' ]);
+					nativeModule.version.should.eql('2.0.1');
+					nativeModule.manifest.should.be.an.Object;
+					nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+					nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+					nativeModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+					nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
+					nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+					finished();
+				} catch (e) {
+					finished(e);
+				}
+			});
+		});
 	});
 
 	describe('#find()', function () {
@@ -342,7 +406,7 @@ describe('timodule', function () {
 				{ id: 'dummy', version: '3.2.1' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				logger.buffer.stripColors.should.containEql(
-					'Could not find a valid Titanium module id=dummy version=3.2.1 platform=ios,iphone,commonjs deploy-type=development'
+					'Could not find a valid Titanium module id=dummy version=3.2.1 platform=ios,commonjs deploy-type=development'
 				);
 
 				var found = false;
@@ -367,7 +431,7 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					logger.buffer.stripColors.should.containEql(
-						'Could not find a valid Titanium module id=dummy version=3.2.1 platform=ios,iphone,commonjs deploy-type=development'
+						'Could not find a valid Titanium module id=dummy version=3.2.1 platform=ios,commonjs deploy-type=development'
 					);
 
 					var found = false;
@@ -583,7 +647,7 @@ describe('timodule', function () {
 				{ id: 'doesnotexist' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				logger.buffer.stripColors.should.containEql(
-					'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,iphone,commonjs deploy-type=development'
+					'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
 				);
 
 				var found = false;
@@ -608,7 +672,7 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					logger.buffer.stripColors.should.containEql(
-						'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,iphone,commonjs deploy-type=development'
+						'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
 					);
 
 					var found = false;
@@ -628,7 +692,7 @@ describe('timodule', function () {
 				{ id: 'toonew' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				logger.buffer.stripColors.should.containEql(
-					'Found incompatible Titanium module id=toonew version=1.0 platform=ios,iphone deploy-type=development'
+					'Found incompatible Titanium module id=toonew version=1.0 platform=ios deploy-type=development'
 				);
 
 				var found = false;
@@ -653,7 +717,7 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					logger.buffer.stripColors.should.containEql(
-						'Found incompatible Titanium module id=toonew version=1.0 platform=ios,iphone deploy-type=development'
+						'Found incompatible Titanium module id=toonew version=1.0 platform=ios deploy-type=development'
 					);
 
 					var found = false;
@@ -811,7 +875,7 @@ describe('timodule', function () {
 			const nativeModule = modules[0];
 			nativeModule.id.should.eql('native-module');
 			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
-			nativeModule.platform.should.eql([ 'iphone' ]);
+			nativeModule.platform.should.eql([ 'ios' ]);
 			nativeModule.version.should.eql('2.0.1');
 			nativeModule.manifest.should.be.an.Object;
 			nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
@@ -820,7 +884,5 @@ describe('timodule', function () {
 			nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
 			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
 		});
-
-		// TODO Detect multiple with differing platforms?
 	});
 });
