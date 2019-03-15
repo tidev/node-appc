@@ -10,4 +10,4 @@ junit_report.xml
 coverage/
 retirejs.output.json
 .nyc_output/
-!test/resources/node_modules/
+!test/resources/**/node_modules/
