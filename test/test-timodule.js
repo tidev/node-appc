@@ -933,7 +933,54 @@ describe('timodule', function () {
 			androidModule.manifest.should.have.a.property('architectures').which.is.eql([ 'arm64-v8a', 'armeabi-v7a', 'x86' ]);
 		});
 
-		// TODO: Test single-platfomr module with manifest file gets values merged with package.json
-		// TODO: Test cross-platform module with platform subdirs and merging package.json/manifest values
+		it('detects native module in node_modules folder with package.json and manifest and merges values', async () => {
+			// test that we merge the info from package.json and manifest
+			// This is a single-platform module with implicit top-level dir
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/native-module-with-manifest/node_modules') ]);
+			modules.should.be.an.Array;
+			modules.should.have.length(1);
+			const nativeModule = modules[0];
+			nativeModule.id.should.eql('native-module-with-manifest');
+			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/native-module-with-manifest/node_modules/native-module-with-manifest'));
+			nativeModule.platform.should.eql([ 'ios' ]);
+			nativeModule.version.should.eql('2.0.1');
+			nativeModule.manifest.should.be.an.Object;
+			nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+			nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+			nativeModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+			nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module-with-manifest');
+			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+		});
+
+		it('detects cross-platform native module with platform-specific manifests', async () => {
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/cross-platform-native-module-with-manifest/node_modules') ]);
+			modules.should.be.an.Array;
+			// Expands out to one "module" per-platform
+			modules.should.have.length(2);
+			const iosModule = modules[0];
+			iosModule.id.should.eql('cross-platform-with-manifest');
+			iosModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-with-manifest/node_modules/cross-platform/ios'));
+			iosModule.platform.should.eql([ 'ios' ]);
+			iosModule.version.should.eql('2.0.1'); // which wins? package.json or manifest? in this case package.json did
+			iosModule.manifest.should.be.an.Object;
+			iosModule.manifest.should.have.a.property('minsdk').which.is.eql('3.0.0');
+			iosModule.manifest.should.have.a.property('apiversion').which.is.eql(1);
+			iosModule.manifest.should.have.a.property('guid').which.is.eql('ccb89061-0fdb-4ff1-95a8-02876f5601f9');
+			iosModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform-with-manifest');
+			iosModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'i386' ]);
+			// android
+			const androidModule = modules[1];
+			androidModule.id.should.eql('cross-platform-with-manifest');
+			androidModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-with-manifest/node_modules/cross-platform/android'));
+			androidModule.platform.should.eql([ 'android' ]);
+			androidModule.version.should.eql('2.0.1'); // which wins? package.json or manifest? in this case package.json did
+			androidModule.manifest.should.be.an.Object;
+			androidModule.manifest.should.have.a.property('minsdk').which.is.eql('4.0.0');
+			androidModule.manifest.should.have.a.property('apiversion').which.is.eql(6);
+			androidModule.manifest.should.have.a.property('guid').which.is.eql('ccb89061-0fdb-4ff1-95a8-02876f5601f9');
+			androidModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform-with-manifest');
+			androidModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armeabi-v7a', 'x86' ]);
+		});
+		// TODO: Test single platform module with explicit sub-dir and manifest file!
 	});
 });
