@@ -207,7 +207,7 @@ describe('timodule', function () {
 
 		it('detects native module in node_modules folder under given project path', finished => {
 			const logger = new MockLogger();
-			appc.timodule.detect([ path.join(__dirname, 'resources') ], logger, result => {
+			appc.timodule.detect([ path.join(__dirname, 'resources/npm-native-module') ], logger, result => {
 				try {
 					result.should.be.an.Object;
 					result.should.have.property('global');
@@ -217,7 +217,7 @@ describe('timodule', function () {
 					result.project.ios.should.have.property('Native Module');
 					const nativeModule = result.project.ios['Native Module']['2.0.1'];
 					nativeModule.id.should.eql('native-module');
-					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/npm-native-module/node_modules/native-module'));
 					nativeModule.platform.should.eql([ 'ios' ]);
 					nativeModule.version.should.eql('2.0.1');
 					nativeModule.manifest.should.be.an.Object;
@@ -236,7 +236,7 @@ describe('timodule', function () {
 		it('combines node_modules and legacy based modules', finished => {
 			const logger = new MockLogger();
 			const dir = path.join(__dirname, 'resources', 'timodule');
-			appc.timodule.detect([ path.join(__dirname, 'resources'), dir ], logger, result => {
+			appc.timodule.detect([ path.join(__dirname, 'resources/npm-native-module'), dir ], logger, result => {
 				try {
 					result.should.be.an.Object;
 					result.should.have.property('global');
@@ -253,7 +253,7 @@ describe('timodule', function () {
 					result.project.ios.should.have.property('Native Module');
 					const nativeModule = result.project.ios['Native Module']['2.0.1'];
 					nativeModule.id.should.eql('native-module');
-					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+					nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/npm-native-module/node_modules/native-module'));
 					nativeModule.platform.should.eql([ 'ios' ]);
 					nativeModule.version.should.eql('2.0.1');
 					nativeModule.manifest.should.be.an.Object;
@@ -868,13 +868,13 @@ describe('timodule', function () {
 	});
 
 	describe('#detectNodeModules()', () => {
-		it('detects native module in node_modules folder with specific package.json properties', async () => {
-			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/node_modules') ]);
+		it('detects single-platform native module with package.json and no explicit platform sub-directory', async () => {
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/npm-native-module/node_modules') ]);
 			modules.should.be.an.Array;
 			modules.should.have.length(1);
 			const nativeModule = modules[0];
 			nativeModule.id.should.eql('native-module');
-			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/node_modules/native-module'));
+			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/npm-native-module/node_modules/native-module'));
 			nativeModule.platform.should.eql([ 'ios' ]);
 			nativeModule.version.should.eql('2.0.1');
 			nativeModule.manifest.should.be.an.Object;
@@ -884,5 +884,56 @@ describe('timodule', function () {
 			nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
 			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
 		});
+
+		it('detects single-platform native module with package.json and explicit platform sub-directory', async () => {
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/native-module-with-platform-subdir/node_modules') ]);
+			modules.should.be.an.Array;
+			modules.should.have.length(1);
+			const nativeModule = modules[0];
+			nativeModule.id.should.eql('native-module');
+			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/native-module-with-platform-subdir/node_modules/native-module/ios'));
+			nativeModule.platform.should.eql([ 'ios' ]);
+			nativeModule.version.should.eql('2.0.1');
+			nativeModule.manifest.should.be.an.Object;
+			nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+			nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+			nativeModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+			nativeModule.manifest.should.have.a.property('moduleid').which.is.eql('native-module');
+			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+		});
+
+		it('detects cross-platform native module', async () => {
+			// test that we handle a native module with per-platform sub-directories
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/cross-platform-native-module/node_modules') ]);
+			modules.should.be.an.Array;
+			// Expands out to one "module" per-platform
+			modules.should.have.length(2);
+			const iosModule = modules[0];
+			iosModule.id.should.eql('cross-platform');
+			iosModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module/node_modules/cross-platform/ios'));
+			iosModule.platform.should.eql([ 'ios' ]);
+			iosModule.version.should.eql('2.0.1');
+			iosModule.manifest.should.be.an.Object;
+			iosModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+			iosModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+			iosModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+			iosModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform');
+			iosModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+			// android
+			const androidModule = modules[1];
+			androidModule.id.should.eql('cross-platform');
+			androidModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module/node_modules/cross-platform/android'));
+			androidModule.platform.should.eql([ 'android' ]);
+			androidModule.version.should.eql('2.0.1');
+			androidModule.manifest.should.be.an.Object;
+			androidModule.manifest.should.have.a.property('minsdk').which.is.eql('7.0.0');
+			androidModule.manifest.should.have.a.property('apiversion').which.is.eql(4);
+			androidModule.manifest.should.have.a.property('guid').which.is.eql('bba89061-0fdb-4ff1-95a8-02876f5601f9');
+			androidModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform');
+			androidModule.manifest.should.have.a.property('architectures').which.is.eql([ 'arm64-v8a', 'armeabi-v7a', 'x86' ]);
+		});
+
+		// TODO: Test single-platfomr module with manifest file gets values merged with package.json
+		// TODO: Test cross-platform module with platform subdirs and merging package.json/manifest values
 	});
 });
