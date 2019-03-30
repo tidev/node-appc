@@ -51,7 +51,7 @@
     "@seadub/danger-plugin-eslint": "^1.0.0",
     "@seadub/danger-plugin-junit": "0.1.1",
     "danger": "^7.1.2",
-    "eslint": "^5.10.0",
+    "eslint": "^5.16.0",
     "eslint-config-axway": "^4.1.1",
     "eslint-plugin-mocha": "^5.2.0",
     "husky": "^2.1.0",
