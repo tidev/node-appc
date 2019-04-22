@@ -46,11 +46,11 @@ describe('timodule', function () {
 		appc.timodule.should.be.an.Object;
 	});
 
-	var testResourcesDir = path.join(__dirname, 'resources', 'timodule'),
-		dummyModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'dummy', '1.2.3'),
-		toonewModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'toonew', '1.0'),
-		ambiguousModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'ambiguous', '1.0'),
-		ambiguousCommonJSModuleDir = path.join(testResourcesDir, 'modules', 'commonjs', 'ambiguous', '1.0');
+	const testResourcesDir = path.join(__dirname, 'resources', 'timodule');
+	const dummyModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'dummy', '1.2.3');
+	const toonewModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'toonew', '1.0');
+	const ambiguousModuleDir = path.join(testResourcesDir, 'modules', 'ios', 'ambiguous', '1.0');
+	const ambiguousCommonJSModuleDir = path.join(testResourcesDir, 'modules', 'commonjs', 'ambiguous', '1.0');
 
 	describe('#scopedDetect()', function () {
 		it('should return immediately if no paths to search', function (done) {
@@ -156,9 +156,14 @@ describe('timodule', function () {
 	});
 
 	describe('#detect()', function () {
+		let logger;
+
+		beforeEach(() => {
+			logger = new MockLogger();
+		});
+
 		it('should find the test modules with individual params', function (done) {
-			const logger = new MockLogger(),
-				dir = path.join(__dirname, 'resources', 'timodule');
+			const dir = path.join(__dirname, 'resources', 'timodule');
 
 			// we test for dupe search paths, but only one should be searched
 			appc.timodule.detect([ dir, dir ], logger, function (result) {
@@ -190,8 +195,7 @@ describe('timodule', function () {
 		});
 
 		it('should find the test modules with params object', function (done) {
-			const logger = new MockLogger(),
-				dir = path.join(__dirname, 'resources', 'timodule');
+			const dir = path.join(__dirname, 'resources', 'timodule');
 
 			// we test for dupe search paths, but only one should be searched
 			appc.timodule.detect({
@@ -228,7 +232,6 @@ describe('timodule', function () {
 		});
 
 		it('detects native module in node_modules folder under given project path', finished => {
-			const logger = new MockLogger();
 			appc.timodule.detect([ path.join(__dirname, 'resources/npm-native-module') ], logger, result => {
 				try {
 					result.should.be.an.Object;
@@ -256,7 +259,6 @@ describe('timodule', function () {
 		});
 
 		it('combines node_modules and legacy based modules', finished => {
-			const logger = new MockLogger();
 			const dir = path.join(__dirname, 'resources', 'timodule');
 			appc.timodule.detect([ path.join(__dirname, 'resources/npm-native-module'), dir ], logger, result => {
 				try {
@@ -293,8 +295,13 @@ describe('timodule', function () {
 	});
 
 	describe('#find()', function () {
+		let logger;
+
+		beforeEach(() => {
+			logger = new MockLogger();
+		});
+
 		it('should return immediately if no modules with individual params', function (done) {
-			const logger = new MockLogger();
 			appc.timodule.find([], null, null, null, null, logger, function (result) {
 				try {
 					result.should.eql({
@@ -311,7 +318,6 @@ describe('timodule', function () {
 		});
 
 		it('should return immediately if no modules with params object', function (done) {
-			const logger = new MockLogger();
 			appc.timodule.find({
 				modules: [],
 				platforms: null,
@@ -337,7 +343,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module using only the id with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -346,10 +351,7 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						found = (result.found[i].id === 'ti.dummy');
-					}
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(found, '"ti.dummy" module not marked as found');
 
 					done();
@@ -360,7 +362,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module using only the id with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -375,10 +376,7 @@ describe('timodule', function () {
 							'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.found.length; i++) {
-							found = (result.found[i].id === 'ti.dummy');
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(found, '"ti.dummy" module not marked as found');
 
 						done();
@@ -390,7 +388,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching version with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', version: '1.2.3' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -399,12 +396,7 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id === 'ti.dummy') {
-							found = true;
-						}
-					}
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(found, '"ti.dummy" module not marked as found');
 
 					done();
@@ -415,7 +407,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching version with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', version: '1.2.3' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -430,12 +421,7 @@ describe('timodule', function () {
 							'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.found.length; i++) {
-							if (result.found[i].id === 'ti.dummy') {
-								found = true;
-							}
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(found, '"ti.dummy" module not marked as found');
 
 						done();
@@ -447,7 +433,6 @@ describe('timodule', function () {
 		});
 
 		it('should not find "dummy" module with wrong version with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', version: '3.2.1' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -456,11 +441,8 @@ describe('timodule', function () {
 						'Could not find a valid Titanium module id=ti.dummy version=3.2.1 platform=ios,commonjs deploy-type=development'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id === 'ti.dummy';
-					}
-					assert(found, '"ti.dummy" module not marked as missing');
+					const missing = result.missing.find(r => r.id === 'ti.dummy');
+					assert(missing, '"ti.dummy" module not marked as missing');
 
 					done();
 				} catch (e) {
@@ -470,7 +452,6 @@ describe('timodule', function () {
 		});
 
 		it('should not find "dummy" module with wrong version with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', version: '3.2.1' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -485,11 +466,8 @@ describe('timodule', function () {
 							'Could not find a valid Titanium module id=ti.dummy version=3.2.1 platform=ios,commonjs deploy-type=development'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.missing.length; i++) {
-							found = result.missing[i].id === 'ti.dummy';
-						}
-						assert(found, '"ti.dummy" module not marked as missing');
+						const missing = result.missing.find(r => r.id === 'ti.dummy');
+						assert(missing, '"ti.dummy" module not marked as missing');
 
 						done();
 					} catch (e) {
@@ -500,7 +478,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching deploy type with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', deployType: 'test,production' }
 			], [ 'ios', 'iphone' ], 'production', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -509,12 +486,7 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=test,production'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id === 'ti.dummy') {
-							found = true;
-						}
-					}
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(found, '"ti.dummy" module not marked as found');
 
 					done();
@@ -525,7 +497,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching deploy type with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', deployType: 'test,production' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -540,12 +511,7 @@ describe('timodule', function () {
 							'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=test,production'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.found.length; i++) {
-							if (result.found[i].id === 'ti.dummy') {
-								found = true;
-							}
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(found, '"ti.dummy" module not marked as found');
 
 						done();
@@ -557,22 +523,16 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching deploy type with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', deployType: 'test,production' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				try {
-					var found = false;
-					for (let i = 0; !found && i < result.found.length; i++) {
-						found = result.found[i].id === 'ti.dummy';
-					}
+
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(!found, '"ti.dummy" module was marked as found, should have been ignored');
 
-					found = false;
-					for (let i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id === 'ti.dummy';
-					}
-					assert(!found, '"ti.dummy" module was marked as missing, should have been ignored');
+					const missing = result.missing.find(r => r.id === 'ti.dummy');
+					assert(!missing, '"ti.dummy" module was marked as missing, should have been ignored');
 
 					done();
 				} catch (e) {
@@ -582,7 +542,6 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching deploy type with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', deployType: 'test,production' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -593,17 +552,11 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					try {
-						var found = false;
-						for (let i = 0; !found && i < result.found.length; i++) {
-							found = result.found[i].id === 'ti.dummy';
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(!found, '"ti.dummy" module was marked as found, should have been ignored');
 
-						found = false;
-						for (let i = 0; !found && i < result.missing.length; i++) {
-							found = result.missing[i].id === 'ti.dummy';
-						}
-						assert(!found, '"ti.dummy" module was marked as missing, should have been ignored');
+						const missing = result.missing.find(r => r.id === 'ti.dummy');
+						assert(!missing, '"ti.dummy" module was marked as missing, should have been ignored');
 
 						done();
 					} catch (e) {
@@ -614,7 +567,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching platform with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', platform: 'ios,android' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -623,12 +575,7 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id === 'ti.dummy') {
-							found = true;
-						}
-					}
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(found, '"ti.dummy" module not marked as found');
 
 					done();
@@ -639,7 +586,6 @@ describe('timodule', function () {
 		});
 
 		it('should find "dummy" module with matching platform with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', platform: 'ios,android' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -654,12 +600,7 @@ describe('timodule', function () {
 							'Found Titanium module id=ti.dummy version=1.2.3 platform=ios deploy-type=development'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.found.length; i++) {
-							if (result.found[i].id === 'ti.dummy') {
-								found = true;
-							}
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(found, '"ti.dummy" module not marked as found');
 
 						done();
@@ -671,22 +612,15 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching platform with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.dummy', platform: 'android,mobileweb' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				try {
-					var found = false;
-					for (let i = 0; !found && i < result.found.length; i++) {
-						found = result.found[i].id === 'ti.dummy';
-					}
+					const found = result.found.find(r => r.id === 'ti.dummy');
 					assert(!found, '"ti.dummy" module was marked as found, should have been ignored');
 
-					found = false;
-					for (let i = 0; !found && i < result.missing.length; i++) {
-						found = result.missing[i].id === 'ti.dummy';
-					}
-					assert(!found, '"ti.dummy" module was marked as missing, should have been ignored');
+					const missing = result.missing.find(r => r.id === 'ti.dummy');
+					assert(!missing, '"ti.dummy" module was marked as missing, should have been ignored');
 
 					done();
 				} catch (e) {
@@ -696,7 +630,6 @@ describe('timodule', function () {
 		});
 
 		it('should ignore "dummy" module with non-matching platform with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.dummy', platform: 'android,mobileweb' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -707,17 +640,11 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					try {
-						var found = false;
-						for (let i = 0; !found && i < result.found.length; i++) {
-							found = result.found[i].id === 'ti.dummy';
-						}
+						const found = result.found.find(r => r.id === 'ti.dummy');
 						assert(!found, '"ti.dummy" module was marked as found, should have been ignored');
 
-						found = false;
-						for (let i = 0; !found && i < result.missing.length; i++) {
-							found = result.missing[i].id === 'ti.dummy';
-						}
-						assert(!found, '"ti.dummy" module was marked as missing, should have been ignored');
+						const missing = result.missing.find(r => r.id === 'ti.dummy');
+						assert(!missing, '"ti.dummy" module was marked as missing, should have been ignored');
 
 						done();
 					} catch (e) {
@@ -728,26 +655,25 @@ describe('timodule', function () {
 		});
 
 		it('should not find doesnotexist module with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'doesnotexist' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
-				logger.buffer.stripColors.should.containEql(
-					'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
-				);
+				try {
+					logger.buffer.stripColors.should.containEql(
+						'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
+					);
 
-				var found = false;
-				for (var i = 0; i < result.missing.length; i++) {
-					found = result.missing[i].id === 'doesnotexist';
+					const missing = result.missing.find(r => r.id === 'doesnotexist');
+					assert(missing, '"doesnotexist" module not marked as missing');
+
+					done();
+				} catch (e) {
+					done(e);
 				}
-				assert(found, '"doesnotexist" module not marked as missing');
-
-				done();
 			}, true);
 		});
 
 		it('should not find doesnotexist module with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'doesnotexist' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -757,23 +683,23 @@ describe('timodule', function () {
 				logger: logger,
 				bypassCache: true,
 				callback: function (result) {
-					logger.buffer.stripColors.should.containEql(
-						'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
-					);
+					try {
+						logger.buffer.stripColors.should.containEql(
+							'Could not find a valid Titanium module id=doesnotexist version=latest platform=ios,commonjs deploy-type=development'
+						);
 
-					var found = false;
-					for (var i = 0; i < result.missing.length; i++) {
-						found = result.missing[i].id === 'doesnotexist';
+						const missing = result.missing.find(r => r.id === 'doesnotexist');
+						assert(missing, '"doesnotexist" module not marked as missing');
+
+						done();
+					} catch (e) {
+						done(e);
 					}
-					assert(found, '"doesnotexist" module not marked as missing');
-
-					done();
 				}
 			});
 		});
 
 		it('should find incompatible "toonew" module with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.toonew' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
@@ -782,11 +708,8 @@ describe('timodule', function () {
 						'Found incompatible Titanium module id=ti.toonew version=1.0 platform=ios deploy-type=development'
 					);
 
-					var found = false;
-					for (var i = 0; !found && i < result.incompatible.length; i++) {
-						found = result.incompatible[i].id === 'ti.toonew';
-					}
-					assert(found, '"ti.toonew" module was not marked as incompatible');
+					const incompatible = result.incompatible.find(r => r.id === 'ti.toonew');
+					assert(incompatible, '"ti.toonew" module not marked as incompatible');
 
 					done();
 				} catch (e) {
@@ -796,7 +719,6 @@ describe('timodule', function () {
 		});
 
 		it('should find incompatible "toonew" module with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.toonew' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -811,11 +733,8 @@ describe('timodule', function () {
 							'Found incompatible Titanium module id=ti.toonew version=1.0 platform=ios deploy-type=development'
 						);
 
-						var found = false;
-						for (var i = 0; !found && i < result.incompatible.length; i++) {
-							found = result.incompatible[i].id === 'ti.toonew';
-						}
-						assert(found, '"ti.toonew" module was not marked as incompatible');
+						const incompatible = result.incompatible.find(r => r.id === 'ti.toonew');
+						assert(incompatible, '"ti.toonew" module not marked as incompatible');
 
 						done();
 					} catch (e) {
@@ -826,16 +745,12 @@ describe('timodule', function () {
 		});
 
 		it('should find conflicting "ambiguous" module with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.ambiguous' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir ], logger, function (result) {
 				try {
-					var found = false;
-					for (var i = 0; !found && i < result.conflict.length; i++) {
-						found = result.conflict[i].id === 'ti.ambiguous';
-					}
-					assert(found, '"ti.ambiguous" module was not marked as conflict');
+					const conflict = result.conflict.find(r => r.id === 'ti.ambiguous');
+					assert(conflict, '"ti.ambiguous" module was not marked as conflict');
 
 					done();
 				} catch (e) {
@@ -845,7 +760,6 @@ describe('timodule', function () {
 		});
 
 		it('should find conflicting "ambiguous" module with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.ambiguous' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -856,11 +770,8 @@ describe('timodule', function () {
 				bypassCache: true,
 				callback: function (result) {
 					try {
-						var found = false;
-						for (var i = 0; !found && i < result.conflict.length; i++) {
-							found = result.conflict[i].id === 'ti.ambiguous';
-						}
-						assert(found, '"ti.ambiguous" module was not marked as conflict');
+						const conflict = result.conflict.find(r => r.id === 'ti.ambiguous');
+						assert(conflict, '"ti.ambiguous" module was not marked as conflict');
 
 						done();
 					} catch (e) {
@@ -871,28 +782,30 @@ describe('timodule', function () {
 		});
 
 		it('should find only one "baz" module with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'baz' }
 			], [ 'ios', 'iphone' ], 'development', '3.2.0', [ testResourcesDir, path.join(__dirname, 'resources', 'timodule2') ], logger, function (result) {
-				logger.buffer.stripColors.should.containEql(
-					'Found Titanium module id=baz version=2.0.1 platform=ios deploy-type=development'
-				);
+				try {
+					logger.buffer.stripColors.should.containEql(
+						'Found Titanium module id=baz version=2.0.1 platform=ios deploy-type=development'
+					);
 
-				var found = 0;
-				for (var i = 0; !found && i < result.found.length; i++) {
-					if (result.found[i].id === 'baz') {
-						found++;
+					let found = 0;
+					for (let i = 0; !found && i < result.found.length; i++) {
+						if (result.found[i].id === 'baz') {
+							found++;
+						}
 					}
-				}
-				assert(found === 1, '"baz" module not marked as found');
+					assert(found === 1, '"baz" module not marked as found');
 
-				done();
+					done();
+				} catch (e) {
+					done(e);
+				}
 			}, true);
 		});
 
 		it('should find only one "baz" module with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'baz' } ],
 				platforms: [ 'ios', 'iphone' ],
@@ -902,25 +815,28 @@ describe('timodule', function () {
 				logger: logger,
 				bypassCache: true,
 				callback: function (result) {
-					logger.buffer.stripColors.should.containEql(
-						'Found Titanium module id=baz version=2.0.1 platform=ios deploy-type=development'
-					);
+					try {
+						logger.buffer.stripColors.should.containEql(
+							'Found Titanium module id=baz version=2.0.1 platform=ios deploy-type=development'
+						);
 
-					var found = 0;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id === 'baz') {
-							found++;
+						let found = 0;
+						for (let i = 0; !found && i < result.found.length; i++) {
+							if (result.found[i].id === 'baz') {
+								found++;
+							}
 						}
-					}
-					assert(found === 1, '"baz" module not marked as found');
+						assert(found === 1, '"baz" module not marked as found');
 
-					done();
+						done();
+					} catch (e) {
+						done(e);
+					}
 				}
 			});
 		});
 
 		it('should find the latest valid module with individual params', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.latestvalid' }
 			], [ 'commonjs' ], 'development', '3.2.0', [ path.join(__dirname, 'resources', 'timodule3') ], logger, function (result) {
@@ -929,8 +845,8 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.latestvalid version=1.0 platform=commonjs deploy-type=development'
 					);
 
-					var found = 0;
-					for (var i = 0; !found && i < result.found.length; i++) {
+					let found = 0;
+					for (let i = 0; !found && i < result.found.length; i++) {
 						if (result.found[i].id === 'ti.latestvalid') {
 							found++;
 						}
@@ -945,7 +861,6 @@ describe('timodule', function () {
 		});
 
 		it('should find the latest valid module with params object', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find({
 				modules: [ { id: 'ti.latestvalid' } ],
 				platforms: [ 'commonjs' ],
@@ -960,8 +875,8 @@ describe('timodule', function () {
 							'Found Titanium module id=ti.latestvalid version=1.0 platform=commonjs deploy-type=development'
 						);
 
-						var found = 0;
-						for (var i = 0; !found && i < result.found.length; i++) {
+						let found = 0;
+						for (let i = 0; !found && i < result.found.length; i++) {
 							if (result.found[i].id === 'ti.latestvalid') {
 								found++;
 							}
@@ -977,7 +892,6 @@ describe('timodule', function () {
 		});
 
 		it('should find the latest valid module with iphone/ios mismatch platform', function (done) {
-			var logger = new MockLogger();
 			appc.timodule.find([
 				{ id: 'ti.map' }
 			], [ 'ios' ], 'development', '6.3.0', [ path.join(__dirname, 'resources', 'timodule4') ], logger, function (result) {
@@ -986,13 +900,8 @@ describe('timodule', function () {
 						'Found Titanium module id=ti.map version=3.1.0 platform=ios deploy-type=development'
 					);
 
-					var found = 0;
-					for (var i = 0; !found && i < result.found.length; i++) {
-						if (result.found[i].id === 'ti.map') {
-							found++;
-						}
-					}
-					assert(found === 1, '"ti.map" module not marked as found');
+					const found = result.found.find(r => r.id === 'ti.map');
+					assert(found, '"ti.map" module not marked as found');
 
 					done();
 				} catch (e) {
