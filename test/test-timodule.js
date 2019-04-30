@@ -909,6 +909,25 @@ describe('timodule', function () {
 				}
 			}, true);
 		});
+
+		it('should find the latest valid module with iphone/ios mismatch platform 2', function (done) {
+			appc.timodule.find([
+				{ id: 'ti.map', platform: 'iphone' }
+			], [ 'iphone' ], 'development', '6.3.0', [ path.join(__dirname, 'resources', 'timodule4') ], logger, function (result) {
+				try {
+					logger.buffer.stripColors.should.containEql(
+						'Found Titanium module id=ti.map version=3.1.0 platform=ios deploy-type=development'
+					);
+
+					const found = result.found.find(r => r.id === 'ti.map');
+					assert(found, '"ti.map" module not marked as found');
+
+					done();
+				} catch (e) {
+					done(e);
+				}
+			}, true);
+		});
 	});
 
 	describe('#detectNodeModules()', () => {
