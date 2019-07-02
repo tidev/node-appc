@@ -928,6 +928,25 @@ describe('timodule', function () {
 				}
 			}, true);
 		});
+
+		it('should parse apiversion to an integer before comparing', function (done) {
+			appc.timodule.find([
+				{ id: 'ti.map', platform: 'android' }
+			], [ 'android' ], 'development', { sdkVersion: '6.3.0', moduleAPIVersion: { android: 2 } }, [ path.join(__dirname, 'resources', 'timodule5') ], logger, function (result) {
+				try {
+					logger.buffer.stripColors.should.containEql(
+						'Found Titanium module id=ti.map version=3.1.0 platform=android deploy-type=development'
+					);
+
+					const found = result.found.find(r => r.id === 'ti.map');
+					assert(found, '"ti.map" module not marked as found');
+
+					done();
+				} catch (e) {
+					done(e);
+				}
+			}, true);
+		});
 	});
 
 	describe('#detectNodeModules()', () => {
