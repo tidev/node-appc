@@ -5,7 +5,7 @@
   "keywords": [
     "appcelerator"
   ],
-  "version": "0.3.2",
+  "version": "0.3.3",
   "author": {
     "name": "Appcelerator, Inc.",
     "email": "npmjs@appcelerator.com"
@@ -54,8 +54,8 @@
     "eslint": "^5.16.0",
     "eslint-config-axway": "^4.1.1",
     "eslint-plugin-mocha": "^5.2.0",
-    "husky": "^2.1.0",
-    "lint-staged": "^8.1.0",
+    "husky": "^3.0.0",
+    "lint-staged": "^9.0.0",
     "mocha": "^6.0.2",
     "mocha-jenkins-reporter": "^0.4.1",
     "nyc": "^14.0.0",

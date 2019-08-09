@@ -928,6 +928,47 @@ describe('timodule', function () {
 				}
 			}, true);
 		});
+
+		it('should parse apiversion to an integer before comparing', function (done) {
+			appc.timodule.find([
+				{ id: 'ti.map', platform: 'android' }
+			], [ 'android' ], 'development', { sdkVersion: '6.3.0', moduleAPIVersion: { android: 2 } }, [ path.join(__dirname, 'resources', 'timodule5') ], logger, function (result) {
+				try {
+					logger.buffer.stripColors.should.containEql(
+						'Found Titanium module id=ti.map version=3.1.0 platform=android deploy-type=development'
+					);
+
+					const found = result.found.find(r => r.id === 'ti.map');
+					assert(found, '"ti.map" module not marked as found');
+
+					done();
+				} catch (e) {
+					done(e);
+				}
+			}, true);
+		});
+
+		it('should check apiversion for iphone if no ios value', function (done) {
+			appc.timodule.find([
+				{ id: 'cross-platform-with-manifest', platform: 'iphone' }
+			], [ 'iphone' ], 'development', { sdkVersion: '6.3.0', moduleAPIVersion: { iphone: '2' } }, [ path.join(__dirname, 'resources', 'cross-platform-native-module-with-manifest') ], logger, function (result) {
+				try {
+					console.log(logger.buffer.stripColors);
+					logger.buffer.stripColors.should.containEql(
+						'Found incompatible Titanium module id=cross-platform-with-manifest version=2.0.1 platform=ios api-version=1 deploy-type=development'
+					);
+
+					logger.buffer.stripColors.should.containEql(
+						'Module cross-platform-with-manifest has apiversion=1, but the selected SDK supports module apiversion=2 on platform=ios'
+					);
+
+					assert(result.found.length === 0, '"cross-platform-with-manifest" module was marked as found');
+					done();
+				} catch (e) {
+					done(e);
+				}
+			}, true);
+		});
 	});
 
 	describe('#detectNodeModules()', () => {
