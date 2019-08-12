@@ -955,7 +955,7 @@ describe('timodule', function () {
 				try {
 					console.log(logger.buffer.stripColors);
 					logger.buffer.stripColors.should.containEql(
-						'Found incompatible Titanium module id=cross-platform-with-manifest version=2.0.1 platform=ios api-version=1 deploy-type=development'
+						'Found incompatible Titanium module id=cross-platform-with-manifest version=1.2.3 platform=ios api-version=1 deploy-type=development'
 					);
 
 					logger.buffer.stripColors.should.containEql(
@@ -1006,7 +1006,7 @@ describe('timodule', function () {
 			nativeModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
 		});
 
-		it('detects cross-platform native module', async () => {
+		it('detects cross-platform native module w/o manifest files', async () => {
 			// test that we handle a native module with per-platform sub-directories
 			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/cross-platform-native-module/node_modules') ]);
 			modules.should.be.an.Array;
@@ -1047,7 +1047,7 @@ describe('timodule', function () {
 			nativeModule.id.should.eql('native-module-with-manifest');
 			nativeModule.modulePath.should.eql(path.join(__dirname, 'resources/native-module-with-manifest/node_modules/native-module-with-manifest'));
 			nativeModule.platform.should.eql([ 'ios' ]);
-			nativeModule.version.should.eql('2.0.1');
+			nativeModule.version.should.eql('4.0.2'); // taken from anifest file, not package.json version
 			nativeModule.manifest.should.be.an.Object;
 			nativeModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
 			nativeModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
@@ -1065,7 +1065,7 @@ describe('timodule', function () {
 			iosModule.id.should.eql('cross-platform-with-manifest');
 			iosModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-with-manifest/node_modules/cross-platform/ios'));
 			iosModule.platform.should.eql([ 'ios' ]);
-			iosModule.version.should.eql('2.0.1'); // which wins? package.json or manifest? in this case package.json did
+			iosModule.version.should.eql('1.2.3'); // platform specific manifest value trumps the cross-platform package.json version
 			iosModule.manifest.should.be.an.Object;
 			iosModule.manifest.should.have.a.property('minsdk').which.is.eql('3.0.0');
 			iosModule.manifest.should.have.a.property('apiversion').which.is.eql(1);
@@ -1077,7 +1077,7 @@ describe('timodule', function () {
 			androidModule.id.should.eql('cross-platform-with-manifest');
 			androidModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-with-manifest/node_modules/cross-platform/android'));
 			androidModule.platform.should.eql([ 'android' ]);
-			androidModule.version.should.eql('2.0.1'); // which wins? package.json or manifest? in this case package.json did
+			androidModule.version.should.eql('1.2.3'); // platform specific manifest value trumps the cross-platform package.json version
 			androidModule.manifest.should.be.an.Object;
 			androidModule.manifest.should.have.a.property('minsdk').which.is.eql('4.0.0');
 			androidModule.manifest.should.have.a.property('apiversion').which.is.eql(6);
@@ -1086,5 +1086,51 @@ describe('timodule', function () {
 			androidModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armeabi-v7a', 'x86' ]);
 		});
 		// TODO: Test single platform module with explicit sub-dir and manifest file!
+
+		// TODO: test the priority of values: platform-specific package.json > manifest > cross-platform package.json values > generic package.json values
+		it('detects cross-platform native module w/ manifest files, w/ platform-specific package.json values', async () => {
+			const modules = await appc.timodule.detectNodeModules([ path.join(__dirname, 'resources/cross-platform-native-module-specific-package-json/node_modules') ]);
+			modules.should.be.an.Array;
+			// Expands out to one "module" per-platform
+			modules.should.have.length(2);
+			const iosModule = modules[0];
+			iosModule.id.should.eql('cross-platform-with-manifest-ios'); // manifest beat out the cross-platform section in package.json
+			iosModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-specific-package-json/node_modules/cross-platform/ios'));
+			iosModule.platform.should.eql([ 'ios' ]);
+
+			// platform subsection of package.json wins over manifest
+			iosModule.version.should.eql('4.3.1');
+			iosModule.manifest.should.be.an.Object;
+			iosModule.manifest.should.have.a.property('minsdk').which.is.eql('5.0.0');
+			iosModule.manifest.should.have.a.property('apiversion').which.is.eql(2);
+			iosModule.manifest.should.have.a.property('architectures').which.is.eql([ 'armv7', 'arm64', 'i386', 'x86_64' ]);
+
+			// manifest wins over cross-platform section of package.json
+			iosModule.manifest.should.have.a.property('guid').which.is.eql('ccb89061-0fdb-4ff1-95a8-02876f5601f9');
+			iosModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform-with-manifest-ios');
+
+			// falls back to npm package name (without scope) if titanium sub-sections of package.json and manifest don't declare it
+			iosModule.manifest.should.have.a.property('name').which.is.eql('cross-platform-npm-package');
+
+			// android
+			const androidModule = modules[1];
+			androidModule.id.should.eql('cross-platform-with-manifest-android');
+			androidModule.modulePath.should.eql(path.join(__dirname, 'resources/cross-platform-native-module-specific-package-json/node_modules/cross-platform/android'));
+			androidModule.platform.should.eql([ 'android' ]);
+
+			// platform subsection of package.json wins over manifest
+			androidModule.version.should.eql('6.0.1');
+			androidModule.manifest.should.be.an.Object;
+			androidModule.manifest.should.have.a.property('minsdk').which.is.eql('7.0.0');
+			androidModule.manifest.should.have.a.property('apiversion').which.is.eql(4);
+			androidModule.manifest.should.have.a.property('architectures').which.is.eql([ 'arm64-v8a', 'armeabi-v7a', 'x86' ]);
+
+			// manifest wins over cross-platform section of package.json
+			androidModule.manifest.should.have.a.property('guid').which.is.eql('ccb89061-0fdb-4ff1-95a8-02876f5601f9');
+			androidModule.manifest.should.have.a.property('moduleid').which.is.eql('cross-platform-with-manifest-android');
+
+			// falls back to npm package name (without scope) if titanium sub-sections of package.json and manifest don't declare it
+			androidModule.manifest.should.have.a.property('name').which.is.eql('cross-platform-npm-package');
+		});
 	});
 });
