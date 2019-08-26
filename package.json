@@ -41,15 +41,15 @@
     "semver": "~6.3.0",
     "sprintf": "^0.1.5",
     "temp": "~0.9.0",
-    "uglify-js": "~3.5.15",
+    "uglify-js": "^3.6.0",
     "uuid": "^3.3.3",
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
-    "@seadub/danger-plugin-dependencies": "0.0.1",
+    "@seadub/danger-plugin-dependencies": "^0.1.0",
     "@seadub/danger-plugin-eslint": "^1.0.0",
     "@seadub/danger-plugin-junit": "0.1.1",
-    "danger": "^8.0.0",
+    "danger": "^9.1.8",
     "eslint": "^5.16.0",
     "eslint-config-axway": "^4.3.0",
     "eslint-plugin-mocha": "^5.2.0",
