@@ -44,7 +44,7 @@
     "temp": "~0.9.0",
     "uglify-js": "~3.5.15",
     "uuid": "~3.3.2",
-    "xmldom": "^0.1.27"
+    "xmldom": "^0.2.1"
   },
   "devDependencies": {
     "@seadub/danger-plugin-dependencies": "0.0.1",
