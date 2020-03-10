@@ -47,7 +47,7 @@
     "xmldom": "^0.1.27"
   },
   "devDependencies": {
-    "@seadub/danger-plugin-dependencies": "0.0.1",
+    "@seadub/danger-plugin-dependencies": "0.1.0",
     "@seadub/danger-plugin-eslint": "^1.0.0",
     "@seadub/danger-plugin-junit": "0.1.2",
     "danger": "^8.0.0",
