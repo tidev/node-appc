@@ -64,7 +64,7 @@
   "license": "Apache-2.0",
   "main": "./index",
   "engines": {
-    "node": ">=8.0"
+    "node": ">=10.13"
   },
   "scripts": {
     "lint": "eslint .",
