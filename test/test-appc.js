@@ -8,8 +8,8 @@
 /* eslint no-unused-expressions: "off" */
 'use strict';
 
-var appc = require('../index'),
-	colors = require('colors');
+require('../index'); // hangs global.dump
+require('colors');
 
 describe('appc', function () {
 	it('dump() integer', function () {
