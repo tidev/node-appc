@@ -35,7 +35,7 @@ describe('jdk', function () {
 				should(jdk.version).be.a.String;
 				should(jdk.version).match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
 				should(jdk.build).be.a.String;
-				should(jdk.build).match(/^\d+$/);
+				should(jdk.build).match(/^\d+(-[-a-zA-Z0-9.]+)?$/);
 				should(jdk.executables).be.a.Object;
 				should(jdk.architecture).be.a.String;
 				should(jdk.architecture).match(/^(32|64)bit/);
