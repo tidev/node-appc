@@ -7,7 +7,7 @@
 /* eslint no-unused-expressions: "off" */
 'use strict';
 
-var appc = require('../index');
+const appc = require('../index');
 
 describe('android', function () {
 	it('namespace exists', function () {
@@ -34,11 +34,11 @@ describe('android', function () {
 				if (result.java !== null) {
 					result.java.should.be.an.Object;
 
-					result.java.version.should.be.a.String;
+					result.java.should.have.a.property('version').which.is.a.String;
 					result.java.version.should.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
 
-					result.java.build.should.be.a.String;
-					result.java.build.should.match(/^\d+$/);
+					result.java.should.have.a.property('build').which.is.a.String;
+					result.java.build.should.match(/^\d+(-[-a-zA-Z0-9.]+)?$/);
 				}
 
 				if (result.ndk !== null) {
