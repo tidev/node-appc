@@ -36,7 +36,6 @@
     "async": "^3.2.0",
     "colors": "~1.4.0",
     "fs-extra": "~9.0.0",
-    "optimist": "^0.6.1",
     "request": "~2.88.0",
     "semver": "~7.3.2",
     "sprintf": "^0.1.5",
