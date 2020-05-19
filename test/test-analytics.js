@@ -12,6 +12,12 @@ var appc = require('../index'),
 	temp = require('temp');
 
 describe('analytics', function () {
+
+	beforeEach(done => {
+		appc.analytics.events.splice(0, appc.analytics.events.length);
+		done();
+	});
+
 	it('namespace exists', function () {
 		appc.should.have.property('analytics');
 		appc.analytics.should.be.an.Object;
@@ -22,71 +28,14 @@ describe('analytics', function () {
 			var length = appc.analytics.events.length;
 			appc.analytics.addEvent('dummy unit test event', { dummy: 'data' }, 'unit.test');
 			(appc.analytics.events.length).should.equal(length + 1);
-			appc.analytics.events = [];
 		});
 	});
 
 	describe('#send()', function () {
-		it.skip('should fail to send because missing arguments', function (done) { // eslint-disable-line mocha/no-skipped-tests
+
+		it('should post ti.start event', function (done) {
 			this.timeout(10000);
 			this.slow(9000);
-
-			appc.analytics.events = [];
-
-			var server = http.createServer(function (req, res) {
-				res.writeHead(200, { 'Content-Type': 'text/plain' });
-				res.end('Hello World\n');
-				cleanup(new Error('analytics sent despite missing arguments'));
-			});
-
-			server.on('error', function (err) {
-				cleanup(new Error(err));
-			});
-
-			server.listen(8000);
-
-			var childRunning = true,
-				child,
-				successTimer = setTimeout(function () {
-					cleanup();
-				}, 5000);
-
-			appc.analytics.send({
-				analyticsUrl: 'http://localhost:8000',
-				debug: true,
-				logger: {
-					debug: console.log,
-					log: console.log
-				},
-				loggedIn: true,
-				guid: 'test'
-			}, function (err, _child) {
-				child = _child;
-				// check if the child exited abnormally
-				_child && _child.on('exit', function (code) {
-					childRunning = false;
-					code && cleanup();
-				});
-			});
-
-			function cleanup(err) {
-				clearTimeout(successTimer);
-				if (childRunning) {
-					childRunning = false;
-					child && child.kill();
-				}
-				server && server.close(function () {
-					server = null;
-					done(err);
-				});
-			}
-		});
-
-		it.skip('should post ti.start event', function (done) { // eslint-disable-line mocha/no-skipped-tests
-			this.timeout(10000);
-			this.slow(9000);
-
-			appc.analytics.events = [];
 
 			var finished = false,
 				tempDir = temp.mkdirSync(),
@@ -119,7 +68,7 @@ describe('analytics', function () {
 
 						res.writeHead(204);
 						res.end();
-						setTimeout(cleanup, 100);
+						setTimeout(cleanup, 10);
 					});
 				});
 
@@ -160,8 +109,10 @@ describe('analytics', function () {
 					appName: 'Analytics Unit Test',
 					appGuid: '12345678_1234_1234_123456789012',
 					directory: tempDir,
-					version: '1.0.0'
-				}, function (_child) {
+					version: '1.0.0',
+					debug: true,
+					logger: console
+				}, function (err, _child) {
 					child = _child;
 					// check if the child exited
 					_child && _child.on('exit', function (code) {
@@ -177,7 +128,5 @@ describe('analytics', function () {
 		});
 
 		// TODO: test sending multiple events
-		// TODO: simulate send while logged out
-		// TODO: simulate send while logged in
 	});
 });
