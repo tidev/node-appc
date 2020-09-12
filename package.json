@@ -32,7 +32,6 @@
     "url": "http://github.com/appcelerator/node-appc.git"
   },
   "dependencies": {
-    "adm-zip": "^0.4.11",
     "async": "^3.2.0",
     "colors": "~1.4.0",
     "fs-extra": "~9.0.0",
