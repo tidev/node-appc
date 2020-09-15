@@ -64,5 +64,56 @@ describe('zip', function () {
 				done();
 			});
 		});
+
+		it('should handle if a symlink already exists', function (done) {
+			const tempDir = temp.mkdirSync();
+			appc.zip.unzip(path.join(__dirname, 'resources', 'symlinks.zip'), tempDir, null, function (err) {
+				assert(!err, 'expected unzip to not error');
+
+				fs.existsSync(path.join(tempDir, 'symlinks/folder')).should.be.true();
+				const stat3 = fs.statSync(path.join(tempDir, 'symlinks/folder'));
+				stat3.isDirectory().should.be.true();
+
+				fs.existsSync(path.join(tempDir, 'symlinks/folder/testfile.txt')).should.be.true();
+				const stat4 = fs.statSync(path.join(tempDir, 'symlinks/folder/testfile.txt'));
+				stat4.isDirectory().should.be.false();
+				stat4.isFile().should.be.true();
+
+				fs.existsSync(path.join(tempDir, 'symlinks/link.txt')).should.be.true();
+				const stat = fs.lstatSync(path.join(tempDir, 'symlinks/link.txt'));
+				stat.isSymbolicLink().should.be.true(); // fails here
+
+				const p = path.join(tempDir, 'symlinks/folderlink');
+				fs.existsSync(p).should.be.true();
+				const stat2 = fs.lstatSync(p);
+				stat2.isSymbolicLink().should.be.true(); // fails here
+				const target = fs.readlinkSync(p);
+				target.should.eql('folder/');
+				appc.zip.unzip(path.join(__dirname, 'resources', 'symlinks.zip'), tempDir, null, function (err) {
+					assert(!err, 'expected unzip to not error');
+
+					fs.existsSync(path.join(tempDir, 'symlinks/folder')).should.be.true();
+					const stat3 = fs.statSync(path.join(tempDir, 'symlinks/folder'));
+					stat3.isDirectory().should.be.true();
+
+					fs.existsSync(path.join(tempDir, 'symlinks/folder/testfile.txt')).should.be.true();
+					const stat4 = fs.statSync(path.join(tempDir, 'symlinks/folder/testfile.txt'));
+					stat4.isDirectory().should.be.false();
+					stat4.isFile().should.be.true();
+
+					fs.existsSync(path.join(tempDir, 'symlinks/link.txt')).should.be.true();
+					const stat = fs.lstatSync(path.join(tempDir, 'symlinks/link.txt'));
+					stat.isSymbolicLink().should.be.true(); // fails here
+
+					const p = path.join(tempDir, 'symlinks/folderlink');
+					fs.existsSync(p).should.be.true();
+					const stat2 = fs.lstatSync(p);
+					stat2.isSymbolicLink().should.be.true(); // fails here
+					const target = fs.readlinkSync(p);
+					target.should.eql('folder/');
+					done();
+				});
+			});
+		});
 	});
 });
