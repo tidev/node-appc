@@ -160,11 +160,13 @@ describe('appc', function () {
 			});
 
 			output.should.equal(
-				'{ a: 1,\n'
+				'{\n'
+				+ '  a: 1,\n'
 				+ '  b: \'ti\',\n'
 				+ '  c: true,\n'
 				+ '  d: [ \'x\', \'y\', \'z\' ],\n'
-				+ '  e: { m: 2, n: false, o: \'appc\' } }');
+				+ '  e: { m: 2, n: false, o: \'appc\' }\n'
+				+ '}');
 
 			console.error = tmp;
 		} catch (ex) {

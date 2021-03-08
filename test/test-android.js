@@ -12,7 +12,7 @@ const appc = require('../index');
 describe('android', function () {
 	it('namespace exists', function () {
 		appc.should.have.property('android');
-		appc.android.should.be.an.Object;
+		appc.android.should.be.an.Object();
 	});
 
 	describe('#detect()', function () {
@@ -25,37 +25,37 @@ describe('android', function () {
 					return done();
 				}
 
-				result.should.be.an.Object;
+				result.should.be.an.Object();
 
 				if (result.sdkPath !== null) {
-					result.sdkPath.should.be.a.String;
+					result.sdkPath.should.be.a.String();
 				}
 
 				if (result.java !== null) {
-					result.java.should.be.an.Object;
+					result.java.should.be.an.Object();
 
-					result.java.should.have.a.property('version').which.is.a.String;
+					result.java.should.have.a.property('version').which.is.a.String();
 					result.java.version.should.match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
 
-					result.java.should.have.a.property('build').which.is.a.String;
+					result.java.should.have.a.property('build').which.is.a.String();
 					result.java.build.should.match(/^\d+(-[-a-zA-Z0-9.]+)?$/);
 				}
 
 				if (result.ndk !== null) {
-					result.ndk.should.be.an.Object;
+					result.ndk.should.be.an.Object();
 
-					result.ndk.path.should.be.a.String;
+					result.ndk.path.should.be.a.String();
 
-					result.ndk.version.should.be.a.String;
+					result.ndk.version.should.be.a.String();
 				}
 
-				result.targets.should.be.ok;
-				result.targets.should.be.an.Object;
+				result.targets.should.be.ok();
+				result.targets.should.be.an.Object();
 
 				result.avds.should.be.an.instanceOf(Array);
 
 				if (result.exe !== null) {
-					result.exe.should.be.a.String;
+					result.exe.should.be.a.String();
 				}
 
 				done();
