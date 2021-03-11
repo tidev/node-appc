@@ -58,7 +58,6 @@
     "mocha": "^8.1.1",
     "mocha-jenkins-reporter": "^0.4.1",
     "nyc": "^15.0.0",
-    "pinst": "^2.1.6",
     "should": "^13.2.1"
   },
   "license": "Apache-2.0",
@@ -70,9 +69,7 @@
     "lint": "eslint .",
     "test": "npm run lint && npm run unit-test",
     "unit-test": "JUNIT_REPORT_PATH=junit_report.xml nyc mocha test/**/test-*.js --reporter=mocha-jenkins-reporter",
-    "postinstall": "husky install",
-    "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable"
+    "prepare": "husky install"
   },
   "mocha": {
     "timeout": 30000,
