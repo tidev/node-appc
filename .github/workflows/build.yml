@@ -15,10 +15,12 @@ jobs:
     name: Node ${{ matrix.node }}
     steps:
       - uses: actions/checkout@v2
+
       - name: Setup node
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+
       - run: npm ci
         name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
@@ -28,10 +30,10 @@ jobs:
 
       - run: npm pack
         name: Package
-        if: env.node == '12'
+        if: matrix.node == '12'
 
       - uses: actions/upload-artifact@v2
-        if: env.node == '12'
+        if: matrix.node == '12'
         with:
-          name: node-titanium-sdk
-          path: node-titanium-sdk-*.tgz
+          name: node-appc
+          path: node-appc-*.tgz
