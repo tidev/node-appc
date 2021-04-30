@@ -3,10 +3,5 @@ updates:
 - package-ecosystem: npm
   directory: "/"
   schedule:
-    interval: daily
-    time: "10:00"
+    interval: weekly
   open-pull-requests-limit: 10
-  ignore:
-  - dependency-name: husky
-    versions:
-    - 5.1.2
