@@ -9,7 +9,7 @@
 
 var appc = require('../index'),
 	assert = require('assert'),
-	DOMParser = require('xmldom').DOMParser,
+	DOMParser = require('@xmldom/xmldom').DOMParser,
 	dom = new DOMParser().parseFromString(
 		'<?xml version="1.0" encoding="UTF-8"?>\n'
 		+ '<root>\n'
