@@ -33,7 +33,7 @@ describe('jdk', function () {
 				should(jdk).have.properties('home', 'version', 'build', 'executables', 'architecture');
 				should(jdk.home).be.a.String();
 				should(jdk.version).be.a.String();
-				should(jdk.version).match(/^(\d+\.)?(\d+\.)?(\*|\d+)$/);
+				should(jdk.version).match(/^(\d+\.)?(\d+\.)?(\d+\.)?(\*|\d+)$/);
 				should(jdk.build).be.a.String();
 				should(jdk.build).match(/^\d+(-[-a-zA-Z0-9.]+)?$/);
 				should(jdk.executables).be.a.Object();
