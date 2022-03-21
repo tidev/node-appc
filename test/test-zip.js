@@ -36,7 +36,7 @@ describe('zip', function () {
 			});
 		});
 
-		it('should preserve symlinks', function (done) {
+		(process.platform === 'win32' ? it.skip : it)('should preserve symlinks', function (done) {
 			const tempDir = temp.mkdirSync();
 			appc.zip.unzip(path.join(__dirname, 'resources', 'symlinks.zip'), tempDir, null, function (err) {
 				assert(!err, 'expected unzip to not error');
@@ -65,7 +65,7 @@ describe('zip', function () {
 			});
 		});
 
-		it('should handle if a symlink already exists', function (done) {
+		(process.platform === 'win32' ? it.skip : it)('should handle if a symlink already exists', function (done) {
 			const tempDir = temp.mkdirSync();
 			appc.zip.unzip(path.join(__dirname, 'resources', 'symlinks.zip'), tempDir, null, function (err) {
 				assert(!err, 'expected unzip to not error');
