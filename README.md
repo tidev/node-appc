@@ -1,68 +1,49 @@
-## Appcelerator Node Utilities
+## Titanium SDK Node Utilities
 
-> This is a common library used by Appcelerator Node.js-based software products such as the
-[Titanium CLI](http://github.com/appcelerator/titanium).
+`node-appc` is a common library used by the [Titanium CLI][ticli] and [Titanium SDK][tisdk].
 
-[![Build Status](https://travis-ci.org/appcelerator/node-appc.png)](https://travis-ci.org/appcelerator/node-appc) [![Greenkeeper badge](https://badges.greenkeeper.io/appcelerator/node-appc.svg)](https://greenkeeper.io/)
+## APIs
 
-## Prerequisites
-
-node-appc requires [Node.js 0.8.x](http://nodejs.org/dist/) or newer.
-
-## Installation
-
-    [sudo] npm install node-appc -g
-
-### Running Unit Tests
-
-To run the unit tests, simply run:
-
-    node forge test
-
-### Running Code Coverage
-
-To generate the code coverage, you first must install
-[node-jscoverage](https://github.com/visionmedia/node-jscoverage). The easist
-way to do this is run:
-
-    git clone git@github.com:visionmedia/node-jscoverage.git
-    cd node-jscoverage
-    ./configure
-    make
-    sudo make install
-
-Then run:
-
-	node forge test-cov
-
-It will generate a file called _coverage.html_ in the node-appc directory.
+| Name            | Used By      | Replaced By |
+| --------------- | ------------ | ----------- |
+| `analytics`     | Nothing      | |
+| `android`       | Nothing      | [node-titanium-sdk][1], [androidlib][2] |
+| `async`         | Titanium SDK | |
+| `auth`          | Nothing      | |
+| `busyindicator` | ?            | |
+| `clitools`      | Nothing      | [ioslib][3] |
+| `encoding`      | ?            | |
+| `environ`       | ?            | |
+| `exception`     | Titanium SDK | |
+| `fs`            | Titanium SDK | |
+| `haxm`          | Nothing      | |
+| `i18n`          | Titanium SDK | |
+| `image`         | Titanium SDK | |
+| `ios`           | Nothing      | [ioslib][3] |
+| `jdk`           | Titanium SDK | Maybe someday [jdklib][4]? |
+| `net`           | ?            | |
+| `pkginfo`       | Titanium SDK | |
+| `plist`         | Titanium SDK | |
+| `progress`      | ?            | |
+| `string`        | Titanium SDK | |
+| `subprocess`    | Titanium SDK | |
+| `time`          | Titanium SDK | |
+| `timodule`      | Nothing      | [node-titanium-sdk][1] |
+| `tiplugin`      | ?            | |
+| `util`          | Titanium SDK | |
+| `version`       | Titanium SDK | |
+| `xcconfig`      | Titanium SDK | |
+| `xml`           | ?            | |
+| `zip`           | Titanium SDK | |
 
 ## Contributing
 
-Titanium is an open source project. Titanium wouldn't be where it is now without
-contributions by the community. Please consider forking this repo to improve,
-enhance or fix issues. If you feel like the community will benefit from your
-fork, please open a pull request.
+For more information on how to contribute to this project, please visit
+https://titaniumsdk.com/contribute.html.
 
-To protect the interests of the Titanium contributors, Appcelerator, customers
-and end users we require contributors to sign a Contributors License Agreement
-(CLA) before we pull the changes into the main repository. Our CLA is simple and
-straightforward - it requires that the contributions you make to any
-Appcelerator open source project are properly licensed and that you have the
-legal authority to make those changes. This helps us significantly reduce future
-legal risk for everyone involved. It is easy, helps everyone, takes only a few
-minutes, and only needs to be completed once.
-
-[You can digitally sign the CLA](http://bit.ly/app_cla) online. Please indicate
-your e-mail address in your first pull request so that we can make sure that
-will locate your CLA. Once you've submitted it, you no longer need to send one
-for subsequent submissions.
-
-## License
-
-This project is open source and provided under the Apache Public License
-(version 2). Please make sure you see the `LICENSE` file included in this
-distribution for more details on the license.  Also, please take notice of the
-privacy notice at the end of the file.
-
-#### (C) Copyright 2012-2013, [Appcelerator](http://www.appcelerator.com/) Inc. All Rights Reserved.
+[ticli]: http://github.com/tidev/titanium
+[tisdk]: http://github.com/tidev/titanium_mobile
+[1]: https://github.com/tidev/node-titanium-sdk
+[2]: https://github.com/tidev/androidlib
+[3]: http://github.com/tidev/ioslib
+[4]: http://github.com/tidev/jdklib
