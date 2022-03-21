@@ -1,0 +1,32 @@
+name: Test
+on:
+  - pull_request
+  - push
+
+jobs:
+  test:
+    name: ${{ matrix.os }} ${{ matrix.node }} Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ 14, 16, 17 ]
+        os: [ macos-latest, ubuntu-latest, windows-latest ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Setup node
+      uses: actions/setup-node@v2
+      with:
+        node-version: ${{ matrix.node }}
+
+    - name: Install dependencies
+      run: npm ci
+      if: steps.node-cache.outputs.cache-hit != 'true'
+
+    - name: Test
+      run: npm test
