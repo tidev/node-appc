@@ -26,7 +26,7 @@ describe('jdk', function () {
 
 	describe('#detect()', function () {
 		it('should return valid result without specifying a config or options', function (done) {
-			this.timeout(5000);
+			this.timeout(10000);
 
 			function checkJDK(jdk) {
 				should(jdk).be.an.Object();

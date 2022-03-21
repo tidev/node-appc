@@ -60,7 +60,7 @@ describe('fs', function () {
 				dest = '/tmp';
 			fs.ensureDirSync(dest);
 			appc.fs.copyFileSync(src, dest, { logger: logger.info.bind(logger) });
-			logger.buffer.stripColors.should.equal('Copying ' + src + ' => ' + dest + path.sep + 'testfile.txt\n');
+			logger.buffer.stripColors.should.equal('Copying ' + src + ' => ' + path.sep + dest.substring(1) + path.sep + 'testfile.txt\n');
 			assert(fs.existsSync(path.join(dest, 'testfile.txt')), 'Destination file does not exist');
 		});
 
