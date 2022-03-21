@@ -24,8 +24,13 @@ describe('jdk', function () {
 		appc.jdk.should.be.an.Object();
 	});
 
+	/**
+	 * Note: only run the tests below on macOS because it's the only OS that GitHub supports that
+	 * has an JDK and doesn't time out the tests.
+	 */
+
 	describe('#detect()', function () {
-		it('should return valid result without specifying a config or options', function (done) {
+		(process.platform === 'darwin' ? it : it.skip)('should return valid result without specifying a config or options', function (done) {
 			this.timeout(10000);
 
 			function checkJDK(jdk) {
@@ -61,7 +66,7 @@ describe('jdk', function () {
 			});
 		});
 
-		it('should return valid result with a config and without specifying options', function (done) {
+		(process.platform === 'darwin' ? it : it.skip)('should return valid result with a config and without specifying options', function (done) {
 			this.timeout(5000);
 
 			appc.jdk.detect(new MockConfig(), function (result) {
@@ -70,7 +75,7 @@ describe('jdk', function () {
 			});
 		});
 
-		it('should return valid result with a config and options', function (done) {
+		(process.platform === 'darwin' ? it : it.skip)('should return valid result with a config and options', function (done) {
 			this.timeout(5000);
 
 			appc.jdk.detect(new MockConfig(), { bypassCache: true }, function (result) {
