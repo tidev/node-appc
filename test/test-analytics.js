@@ -115,12 +115,16 @@ describe('analytics', function () {
 				}, function (err, _child) {
 					child = _child;
 					// check if the child exited
-					_child && _child.on('exit', function (code) {
+					_child && _child.on('close', function (code) {
 						childRunning = false;
 						if (code) {
 							cleanup(new Error('analytics send process exited with ' + code));
-						} else if (!finished) {
-							cleanup(new Error('analytics sent, but server never received the request'));
+						} else {
+							setTimeout(() => {
+								if (!finished) {
+									cleanup(new Error('analytics sent, but server never received the request'));
+								}
+							}, 2000);
 						}
 					});
 				});
