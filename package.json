@@ -11,7 +11,7 @@
   "scripts": {
     "lint": "eslint .",
     "test": "npm run lint && npm run unit-test",
-    "unit-test": "nyc mocha test/**/test-*.js",
+    "unit-test": "nyc mocha test/**/test-*.js --lines 55",
     "prepare": "husky install"
   },
   "dependencies": {
