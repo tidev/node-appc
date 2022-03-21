@@ -5,7 +5,7 @@ on:
 
 jobs:
   test:
-    name: ${{ matrix.os }} ${{ matrix.node }} Tests
+    name: ${{ matrix.os }} / Node.js ${{ matrix.node }} Tests
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
