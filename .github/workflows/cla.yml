@@ -8,4 +8,4 @@ jobs:
     - name: Check CLA
       env:
         GITHUB_USER: ${{ github.actor }}
-      uses: tidev/tidev-cla-checker
+      uses: tidev/tidev-cla-checker@1
