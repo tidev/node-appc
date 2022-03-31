@@ -1,0 +1,11 @@
+name: CLA
+on:
+  - pull_request
+
+jobs:
+  check-cla:
+    steps:
+    - name: Check CLA
+      env:
+        GITHUB_USER: ${{ github.actor }}
+      uses: tidev/tidev-cla-checker
