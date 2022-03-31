@@ -10,4 +10,4 @@ jobs:
     steps:
     - env:
         GITHUB_USER: ${{ github.actor }}
-      uses: tidev/tidev-cla-checker@1
+      uses: tidev/tidev-cla-action@1
