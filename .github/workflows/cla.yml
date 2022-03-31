@@ -4,8 +4,10 @@ on:
 
 jobs:
   check-cla:
+    runs-on: ubuntu-latest
+    name: Check CLA
+
     steps:
-    - name: Check CLA
-      env:
+    - env:
         GITHUB_USER: ${{ github.actor }}
       uses: tidev/tidev-cla-checker@1
