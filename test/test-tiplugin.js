@@ -9,8 +9,7 @@
 
 const appc = require('../index'),
 	assert = require('assert'),
-	path = require('path'),
-	colors = require('colors');
+	path = require('path');
 
 function MockConfig() {
 	this.get = function (s) {

@@ -48,7 +48,7 @@
 	"Directory \"%s\" is not writable": "Directory \"%s\" is not writable",
 	"Please ensure the Titanium CLI has access to this directory.": "Please ensure the Titanium CLI has access to this directory.",
 	"The Command Line Tools are not installed": "The Command Line Tools are not installed",
-	"Titanium requires that the Command Line Tools be installed to develop __Tizen apps__ or __native Android modules__.": "Titanium requires that the Command Line Tools be installed to develop __Tizen apps__ or __native Android modules__.",
+	"Titanium requires that the Command Line Tools be installed to develop __native Android modules__.": "Titanium requires that the Command Line Tools be installed to develop __native Android modules__.",
 	"You can install them from the Xcode Preferences > Downloads tab or by visiting": "You can install them from the Xcode Preferences > Downloads tab or by visiting",
 	"Copying %s => %s": "Copying %s => %s",
 	"Symlinking %s => %s": "Symlinking %s => %s",
