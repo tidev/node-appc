@@ -8,7 +8,6 @@
 'use strict';
 
 var appc = require('../index'),
-	colors = require('colors'),
 	string = appc.string;
 
 describe('string', function () {
