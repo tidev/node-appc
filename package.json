@@ -18,7 +18,7 @@
     "@xmldom/xmldom": "^0.8.6",
     "async": "^3.2.4",
     "colors": "1.4.0",
-    "fs-extra": "~9.1.0",
+    "fs-extra": "~11.1.0",
     "request": "~2.88.0",
     "semver": "~7.3.8",
     "sprintf": "^0.1.5",
