@@ -13,7 +13,7 @@
 | `busyindicator` | ?            | |
 | `clitools`      | Nothing      | [ioslib][3] |
 | `encoding`      | ?            | |
-| `environ`       | ?            | |
+| `environ`       | Titanium CLI | |
 | `exception`     | Titanium SDK | |
 | `fs`            | Titanium SDK | |
 | `haxm`          | Nothing      | |
