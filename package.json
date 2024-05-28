@@ -1,6 +1,6 @@
 {
   "name": "node-appc",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "description": "Titanium SDK Common Node Library",
   "author": "TiDev, Inc. <tisdk@cb1inc.com>",
   "maintainers": [
